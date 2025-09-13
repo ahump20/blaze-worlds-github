@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLAZE WORLDS | Championship Gaming Hub</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+        :root {
+            --texas-orange: #BF5700;
+            --cardinal-blue: #9BCBEB;
+            --deep-navy: #002244;
+            --teal-accent: #00B2A9;
+            --pearl: #FAFAFA;
+            --graphite: #36454F;
+            --platinum: #E5E4E2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 40%, #2a1810 100%);
+            color: var(--pearl);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Championship Header */
+        .championship-header {
+            background: rgba(10, 14, 26, 0.95);
+            border-bottom: 3px solid var(--texas-orange);
+            padding: 20px 40px;
+            backdrop-filter: blur(15px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .blaze-logo {
+            font-size: 32px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--texas-orange), var(--cardinal-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .championship-nav {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-item {
+            color: var(--cardinal-blue);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(191, 87, 0, 0.1);
+            border-color: var(--texas-orange);
+            color: var(--texas-orange);
+        }
+
+        /* Main Hub Container */
+        .championship-hub {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        /* Hero Section */
+        .hero-championship {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 60px 0;
+            position: relative;
+        }
+
+        .hero-title {
+            font-size: 64px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--texas-orange), var(--cardinal-blue), var(--teal-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: championship-glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes championship-glow {
+            0% { filter: brightness(1); }
+            100% { filter: brightness(1.2); }
+        }
+
+        .hero-subtitle {
+            font-size: 24px;
+            color: var(--cardinal-blue);
+            margin-bottom: 40px;
+            font-weight: 500;
+        }
+
+        .hero-description {
+            font-size: 18px;
+            color: var(--platinum);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Game Grid */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .game-card {
+            background: rgba(10, 14, 26, 0.9);
+            border: 2px solid var(--deep-navy);
+            border-radius: 16px;
+            padding: 30px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--texas-orange), var(--cardinal-blue), var(--teal-accent));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .game-card:hover {
+            border-color: var(--texas-orange);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(191, 87, 0, 0.2);
+        }
+
+        .game-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .game-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--texas-orange);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .game-description {
+            color: var(--cardinal-blue);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .game-features {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .game-features li {
+            color: var(--platinum);
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .game-features li::before {
+            content: '⚡';
+            position: absolute;
+            left: 0;
+            color: var(--teal-accent);
+        }
+
+        .launch-button {
+            background: linear-gradient(135deg, var(--texas-orange), var(--teal-accent));
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+        }
+
+        .launch-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(191, 87, 0, 0.4);
+        }
+
+        .launch-button:active {
+            transform: translateY(0);
+        }
+
+        .game-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--teal-accent);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Statistics Dashboard */
+        .championship-stats {
+            background: rgba(10, 14, 26, 0.95);
+            border: 2px solid var(--cardinal-blue);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--texas-orange);
+            margin-bottom: 30px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: rgba(155, 203, 235, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(155, 203, 235, 0.2);
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 900;
+            color: var(--texas-orange);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: var(--cardinal-blue);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* News and Updates */
+        .championship-news {
+            background: rgba(10, 14, 26, 0.95);
+            border: 2px solid var(--deep-navy);
+            border-radius: 16px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .news-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--cardinal-blue);
+            margin-bottom: 30px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .news-item {
+            border-bottom: 1px solid rgba(155, 203, 235, 0.2);
+            padding: 20px 0;
+        }
+
+        .news-item:last-child {
+            border-bottom: none;
+        }
+
+        .news-date {
+            color: var(--teal-accent);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .news-headline {
+            color: var(--texas-orange);
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .news-content {
+            color: var(--platinum);
+            line-height: 1.5;
+        }
+
+        /* Footer */
+        .championship-footer {
+            background: rgba(10, 14, 26, 0.98);
+            border-top: 2px solid var(--texas-orange);
+            padding: 40px;
+            margin-top: 60px;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--texas-orange), var(--cardinal-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .footer-text {
+            color: var(--cardinal-blue);
+            margin-bottom: 20px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: var(--platinum);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--texas-orange);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .championship-header {
+                padding: 15px 20px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .championship-nav {
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .championship-hub {
+                padding: 20px;
+            }
+
+            .hero-title {
+                font-size: 42px;
+            }
+
+            .hero-subtitle {
+                font-size: 20px;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 14, 26, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(191, 87, 0, 0.3);
+            border-top: 3px solid var(--texas-orange);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Championship Header -->
+    <header class="championship-header">
+        <div class="header-content">
+            <div class="blaze-logo">Blaze Worlds</div>
+            <nav class="championship-nav">
+                <a href="#games" class="nav-item">Games</a>
+                <a href="#stats" class="nav-item">Statistics</a>
+                <a href="#news" class="nav-item">Updates</a>
+                <a href="#settings" class="nav-item">Settings</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Championship Hub -->
+    <main class="championship-hub">
+        <!-- Hero Section -->
+        <section class="hero-championship">
+            <h1 class="hero-title">Championship Frontiers</h1>
+            <p class="hero-subtitle">Where Legends are Born</p>
+            <p class="hero-description">
+                Experience the ultimate gaming frontier with Blaze Worlds Championship Edition.
+                Built with Texas grit and championship spirit, featuring authentic terrain generation,
+                dynamic weather systems, and the heart of competitive gaming.
+            </p>
+        </section>
+
+        <!-- Games Grid -->
+        <section class="games-grid" id="games">
+            <div class="game-card" data-game="texas-championship">
+                <div class="game-status">Ready</div>
+                <h2 class="game-title">Texas Championship Edition</h2>
+                <p class="game-description">
+                    Explore the vast frontiers of Texas with authentic biomes, oil deposits,
+                    and dynamic weather. Claim territory, build your empire, and experience
+                    the spirit of the Lone Star State.
+                </p>
+                <ul class="game-features">
+                    <li>6 Authentic Texas Biomes</li>
+                    <li>Dynamic Weather System</li>
+                    <li>Territory Claiming Mechanics</li>
+                    <li>Oil Discovery & Management</li>
+                    <li>Championship Performance Metrics</li>
+                    <li>Mobile & Desktop Optimized</li>
+                </ul>
+                <button class="launch-button" onclick="launchGame('texas-championship')">
+                    Launch Championship
+                </button>
+            </div>
+
+            <div class="game-card" data-game="conquest-mode">
+                <div class="game-status">Ready</div>
+                <h2 class="game-title">Conquest Mode</h2>
+                <p class="game-description">
+                    Strategic RTS-style gameplay meets exploration. Build armies,
+                    manage resources, and conquer territories in this comprehensive
+                    strategy experience.
+                </p>
+                <ul class="game-features">
+                    <li>RTS-Style Unit Management</li>
+                    <li>Resource Collection & Trading</li>
+                    <li>Territory Expansion System</li>
+                    <li>Multi-Camera Perspective</li>
+                    <li>Advanced Control Groups</li>
+                    <li>Strategic Building Placement</li>
+                </ul>
+                <button class="launch-button" onclick="launchGame('conquest-mode')">
+                    Begin Conquest
+                </button>
+            </div>
+
+            <div class="game-card" data-game="championship-classic">
+                <div class="game-status">Ready</div>
+                <h2 class="game-title">Championship Classic</h2>
+                <p class="game-description">
+                    The original Blaze Worlds experience with enhanced graphics and
+                    optimized performance. Pure exploration and building in infinite worlds.
+                </p>
+                <ul class="game-features">
+                    <li>Infinite Procedural Worlds</li>
+                    <li>Advanced Chunk Management</li>
+                    <li>Performance Optimizations</li>
+                    <li>Enhanced Graphics Pipeline</li>
+                    <li>Modular Biome System</li>
+                    <li>Cross-Platform Compatibility</li>
+                </ul>
+                <button class="launch-button" onclick="launchGame('championship-classic')">
+                    Launch Classic
+                </button>
+            </div>
+
+            <div class="game-card" data-game="sports-analytics" style="opacity: 0.7;">
+                <div class="game-status" style="background: var(--graphite);">Coming Soon</div>
+                <h2 class="game-title">Sports Analytics Mode</h2>
+                <p class="game-description">
+                    Integrate real-world sports data with game mechanics.
+                    Experience baseball analytics and football strategy in immersive 3D environments.
+                </p>
+                <ul class="game-features">
+                    <li>Live Sports Data Integration</li>
+                    <li>Cardinal Analytics Engine</li>
+                    <li>Perfect Game Youth Baseball Data</li>
+                    <li>NFL/NCAA Strategy Simulation</li>
+                    <li>AI-Powered Scouting</li>
+                    <li>Performance Visualization</li>
+                </ul>
+                <button class="launch-button" style="opacity: 0.5; cursor: not-allowed;" disabled>
+                    Coming Q2 2025
+                </button>
+            </div>
+        </section>
+
+        <!-- Championship Statistics -->
+        <section class="championship-stats" id="stats">
+            <h2 class="stats-title">Championship Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-value" id="totalPlayTime">0</span>
+                    <span class="stat-label">Hours Played</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="worldsGenerated">0</span>
+                    <span class="stat-label">Worlds Generated</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="territoryClaimed">0</span>
+                    <span class="stat-label">Territory Claimed</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="championshipLevel">1</span>
+                    <span class="stat-label">Championship Level</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="averageFPS">60</span>
+                    <span class="stat-label">Average FPS</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="achievements">0</span>
+                    <span class="stat-label">Achievements</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Championship News -->
+        <section class="championship-news" id="news">
+            <h2 class="news-title">Championship Updates</h2>
+
+            <article class="news-item">
+                <div class="news-date">January 2025</div>
+                <h3 class="news-headline">Texas Championship Edition Released</h3>
+                <p class="news-content">
+                    Experience the authentic Texas frontier with 6 unique biomes, dynamic weather systems,
+                    and territory claiming mechanics. Built with championship-grade performance optimizations.
+                </p>
+            </article>
+
+            <article class="news-item">
+                <div class="news-date">December 2024</div>
+                <h3 class="news-headline">Enhanced Three.js Pipeline</h3>
+                <p class="news-content">
+                    Major performance improvements with upgraded Three.js rendering pipeline,
+                    improved shadow mapping, and optimized chunk loading for smoother gameplay.
+                </p>
+            </article>
+
+            <article class="news-item">
+                <div class="news-date">November 2024</div>
+                <h3 class="news-headline">Mobile Optimization Update</h3>
+                <p class="news-content">
+                    Championship-quality mobile experience with touch controls,
+                    responsive UI design, and performance optimizations for mobile devices.
+                </p>
+            </article>
+
+            <article class="news-item">
+                <div class="news-date">Coming Soon</div>
+                <h3 class="news-headline">Sports Analytics Integration</h3>
+                <p class="news-content">
+                    Revolutionary sports analytics mode featuring live data integration
+                    from MLB, NCAA, and Perfect Game youth baseball systems.
+                </p>
+            </article>
+        </section>
+    </main>
+
+    <!-- Championship Footer -->
+    <footer class="championship-footer">
+        <div class="footer-content">
+            <div class="footer-logo">Blaze Intelligence</div>
+            <p class="footer-text">
+                Pioneering the future of sports intelligence and championship gaming experiences.
+            </p>
+            <nav class="footer-links">
+                <a href="#" class="footer-link">About Blaze Intelligence</a>
+                <a href="#" class="footer-link">Sports Analytics</a>
+                <a href="#" class="footer-link">Perfect Game Integration</a>
+                <a href="#" class="footer-link">Championship Support</a>
+                <a href="#" class="footer-link">Developer Resources</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script>
+        // Championship Gaming Hub JavaScript
+        class ChampionshipHub {
+            constructor() {
+                this.stats = {
+                    totalPlayTime: parseInt(localStorage.getItem('blazeWorlds_totalPlayTime') || '0'),
+                    worldsGenerated: parseInt(localStorage.getItem('blazeWorlds_worldsGenerated') || '0'),
+                    territoryClaimed: parseInt(localStorage.getItem('blazeWorlds_territoryClaimed') || '0'),
+                    championshipLevel: parseInt(localStorage.getItem('blazeWorlds_championshipLevel') || '1'),
+                    averageFPS: parseInt(localStorage.getItem('blazeWorlds_averageFPS') || '60'),
+                    achievements: parseInt(localStorage.getItem('blazeWorlds_achievements') || '0')
+                };
+
+                this.init();
+            }
+
+            init() {
+                // Initialize the hub
+                this.updateStatsDisplay();
+                this.initEventListeners();
+                this.hideLoading();
+
+                // Welcome message
+                console.log('🤠 Welcome to the Blaze Worlds Championship Hub!');
+                console.log('🏆 Ready to experience championship-grade gaming?');
+
+                // Simulate loading some stats
+                setTimeout(() => {
+                    this.animateStats();
+                }, 500);
+            }
+
+            hideLoading() {
+                setTimeout(() => {
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                }, 1000);
+            }
+
+            initEventListeners() {
+                // Smooth scrolling for navigation
+                document.querySelectorAll('.nav-item').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const targetId = link.getAttribute('href').substring(1);
+                        const targetElement = document.getElementById(targetId);
+
+                        if (targetElement) {
+                            targetElement.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    });
+                });
+
+                // Game card hover effects
+                document.querySelectorAll('.game-card').forEach(card => {
+                    card.addEventListener('mouseenter', () => {
+                        this.playHoverSound();
+                    });
+                });
+            }
+
+            updateStatsDisplay() {
+                // Update all statistics displays
+                Object.keys(this.stats).forEach(key => {
+                    const element = document.getElementById(key);
+                    if (element) {
+                        element.textContent = this.stats[key].toLocaleString();
+                    }
+                });
+            }
+
+            animateStats() {
+                // Animate statistics with championship flair
+                const statsElements = document.querySelectorAll('.stat-value');
+
+                statsElements.forEach((element, index) => {
+                    setTimeout(() => {
+                        element.style.transform = 'scale(1.1)';
+                        element.style.color = 'var(--teal-accent)';
+
+                        setTimeout(() => {
+                            element.style.transform = 'scale(1)';
+                            element.style.color = 'var(--texas-orange)';
+                        }, 300);
+                    }, index * 100);
+                });
+            }
+
+            incrementStat(statName, amount = 1) {
+                this.stats[statName] += amount;
+                localStorage.setItem(`blazeWorlds_${statName}`, this.stats[statName].toString());
+                this.updateStatsDisplay();
+            }
+
+            playHoverSound() {
+                // Future: Add championship-quality sound effects
+            }
+
+            showNotification(message, type = 'info') {
+                // Create championship-style notification
+                const notification = document.createElement('div');
+                notification.className = 'championship-notification';
+                notification.textContent = message;
+
+                // Style based on type
+                const colors = {
+                    info: 'var(--cardinal-blue)',
+                    success: 'var(--teal-accent)',
+                    warning: 'var(--texas-orange)',
+                    error: '#ff4444'
+                };
+
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: rgba(10, 14, 26, 0.95);
+                    border: 2px solid ${colors[type]};
+                    border-radius: 8px;
+                    padding: 15px 20px;
+                    color: var(--pearl);
+                    font-weight: 600;
+                    z-index: 1001;
+                    backdrop-filter: blur(10px);
+                    animation: slideInRight 0.3s ease;
+                `;
+
+                document.body.appendChild(notification);
+
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.style.animation = 'slideOutRight 0.3s ease';
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 300);
+                }, 3000);
+            }
+        }
+
+        // Championship Game Launcher
+        function launchGame(gameType) {
+            const hub = window.championshipHub;
+
+            switch(gameType) {
+                case 'texas-championship':
+                    hub.showNotification('Launching Texas Championship Edition...', 'info');
+                    hub.incrementStat('worldsGenerated');
+
+                    // Launch with enhanced experience
+                    setTimeout(() => {
+                        window.open('./blaze-worlds-texas-championship.html', '_blank',
+                            'width=1200,height=800,resizable=yes,scrollbars=no,toolbar=no,menubar=no');
+                    }, 1000);
+                    break;
+
+                case 'conquest-mode':
+                    hub.showNotification('Preparing Conquest Mode...', 'info');
+                    hub.incrementStat('worldsGenerated');
+
+                    setTimeout(() => {
+                        window.open('./blaze-worlds-championship.html', '_blank',
+                            'width=1200,height=800,resizable=yes,scrollbars=no,toolbar=no,menubar=no');
+                    }, 1000);
+                    break;
+
+                case 'championship-classic':
+                    hub.showNotification('Loading Championship Classic...', 'info');
+                    hub.incrementStat('worldsGenerated');
+
+                    setTimeout(() => {
+                        window.open('./blaze-worlds-ultimate.html', '_blank',
+                            'width=1200,height=800,resizable=yes,scrollbars=no,toolbar=no,menubar=no');
+                    }, 1000);
+                    break;
+
+                case 'sports-analytics':
+                    hub.showNotification('Sports Analytics Mode coming Q2 2025!', 'warning');
+                    break;
+
+                default:
+                    hub.showNotification('Game mode not available', 'error');
+            }
+        }
+
+        // Add some championship CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize Championship Hub
+        document.addEventListener('DOMContentLoaded', () => {
+            window.championshipHub = new ChampionshipHub();
+        });
+
+        // Championship performance monitoring
+        if ('performance' in window && 'mark' in performance) {
+            performance.mark('championship-hub-start');
+
+            window.addEventListener('load', () => {
+                performance.mark('championship-hub-end');
+                performance.measure('championship-hub-load', 'championship-hub-start', 'championship-hub-end');
+
+                const measure = performance.getEntriesByName('championship-hub-load')[0];
+                console.log(`🏆 Championship Hub loaded in ${measure.duration.toFixed(2)}ms`);
+            });
+        }
+
+        // Championship keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.code) {
+                    case 'Digit1':
+                        e.preventDefault();
+                        launchGame('texas-championship');
+                        break;
+                    case 'Digit2':
+                        e.preventDefault();
+                        launchGame('conquest-mode');
+                        break;
+                    case 'Digit3':
+                        e.preventDefault();
+                        launchGame('championship-classic');
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

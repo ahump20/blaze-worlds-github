@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(git clone:*)",
+      "Bash(chmod:*)",
+      "Bash(./deploy-blaze-worlds-championship.sh:*)",
+      "WebSearch",
+      "Bash(curl:*)",
+      "Bash(node:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git rebase:*)"
+    ]
+  },
+  "outputStyle": "texas-sports-authority"
+}

@@ -1,12 +1,17 @@
 {
   "type": "module",
-  "name": "blaze-intelligence-api",
-  "version": "1.0.0",
-  "description": "Blaze Intelligence API Services",
-  "main": "contact-form.js",
+  "name": "blaze-worlds-championship",
+  "version": "1.0.0-texas",
+  "description": "Texas Championship Edition - Where frontier spirit meets championship gaming",
+  "main": "blaze-worlds-launcher.html",
   "scripts": {
-    "deploy:contact": "wrangler deploy contact-form.js --config ../wrangler-contact-api.toml --env production",
-    "deploy:auth": "wrangler deploy auth.js --config ../wrangler-auth-api.toml --env production"
+    "start": "python3 -m http.server 8080",
+    "build": "node build.js",
+    "build-championship": "./deploy-blaze-worlds-championship.sh local",
+    "deploy": "./deploy-blaze-worlds-championship.sh production",
+    "test": "echo \"Championship tests coming soon\" && exit 0",
+    "dev": "python3 -m http.server 3000",
+    "serve": "npm run start"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -14,12 +19,107 @@
     "ws": "^8.18.3"
   },
   "keywords": [
+    "blaze-worlds",
+    "texas",
+    "championship",
+    "sports-analytics",
+    "gaming",
+    "three.js",
+    "frontier",
+    "blaze-intelligence",
     "cloudflare",
     "workers",
-    "api",
-    "authentication",
-    "contact"
+    "api"
   ],
-  "author": "Austin Humphrey <ahump20@outlook.com>",
-  "license": "MIT"
+  "author": {
+    "name": "Austin Humphrey",
+    "email": "ahump20@outlook.com",
+    "company": "Blaze Intelligence"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ahump20/blaze-worlds-github.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ahump20/blaze-worlds-github/issues"
+  },
+  "homepage": "https://github.com/ahump20/blaze-worlds-github#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "devDependencies": {},
+  "gameVariants": [
+    {
+      "name": "Texas Championship Edition",
+      "file": "blaze-worlds-texas-championship.html",
+      "description": "Authentic Texas frontier experience with 6 biomes, dynamic weather, and oil discovery",
+      "features": [
+        "6 Texas Biomes",
+        "Dynamic Weather System",
+        "Territory Claiming",
+        "Oil Discovery",
+        "Sports Analytics Integration",
+        "10 Enhancement Systems"
+      ]
+    },
+    {
+      "name": "Conquest Mode",
+      "file": "blaze-worlds-championship.html",
+      "description": "Strategic RTS-style gameplay with unit management and resource collection",
+      "features": [
+        "RTS Controls",
+        "Unit Management",
+        "Resource Collection",
+        "Strategic Building"
+      ]
+    },
+    {
+      "name": "Championship Classic",
+      "file": "blaze-worlds-ultimate.html",
+      "description": "Original exploration experience with enhanced graphics and performance",
+      "features": [
+        "Infinite Worlds",
+        "Enhanced Graphics",
+        "Optimized Performance",
+        "Cross-Platform"
+      ]
+    }
+  ],
+  "blazeIntelligence": {
+    "analytics": {
+      "enabled": true,
+      "sports": ["MLB", "NFL", "NCAA", "NBA"],
+      "teams": ["Cardinals", "Titans", "Longhorns", "Grizzlies"],
+      "perfectGame": true
+    },
+    "performance": {
+      "targetFPS": 60,
+      "mobileOptimized": true,
+      "webGLRequired": true
+    },
+    "features": {
+      "territoryClaimingSystem": true,
+      "dynamicWeatherSystem": true,
+      "sportsAnalyticsIntegration": true,
+      "perfectGameIntegration": true,
+      "texasBiomeSystem": true,
+      "oilDiscoveryMechanics": true,
+      "gpuParticleSystem": true,
+      "advancedLighting": true,
+      "enhancedShaders": true,
+      "heroUnits": true,
+      "economySystem": true,
+      "rtsCommands": true,
+      "voxelEngine": true,
+      "dynamicWorld": true,
+      "diegeticUI": true,
+      "spatialAudio": true
+    }
+  }
 }

@@ -1,0 +1,39 @@
+{
+  "name": "Blaze Worlds Texas Championship Edition",
+  "version": "1.0.0",
+  "buildDate": "2025-09-13T19:48:05.512Z",
+  "files": {
+    "html": [
+      "blaze-worlds-texas-championship.html",
+      "blaze-worlds-launcher.html",
+      "index.html",
+      "classic.html",
+      "conquest.html",
+      "launcher.html"
+    ],
+    "javascript": [
+      "advanced-particle-system.js",
+      "advanced-lighting-system.js",
+      "enhanced-shader-pipeline.js",
+      "hero-unit-system.js",
+      "economy-building-system.js",
+      "rts-command-interface.js",
+      "nextgen-voxel-engine.js",
+      "dynamic-world-systems.js",
+      "diegetic-interface-system.js",
+      "spatial-audio-accessibility.js"
+    ],
+    "systems": [
+      "GPU Particle System",
+      "Advanced Lighting",
+      "Enhanced Shaders",
+      "Hero Units",
+      "Economy System",
+      "RTS Commands",
+      "Voxel Engine",
+      "Dynamic World",
+      "Diegetic UI",
+      "Spatial Audio"
+    ]
+  }
+}

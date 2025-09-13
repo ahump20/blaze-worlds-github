@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BLAZE WORLDS | Texas Championship Edition</title>
+    <script src="./js/advanced-particle-system.js"></script>
+    <script src="./js/advanced-lighting-system.js"></script>
+    <script src="./js/hero-unit-system.js"></script>
+    <script src="./js/economy-building-system.js"></script>
+    <script src="./js/rts-command-interface.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 50%, #2a1810 100%);
+            color: #FAFAFA;
+            overflow: hidden;
+            position: relative;
+        }
+        #gameCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+        /* Texas Championship HUD */
+        .championship-hud {
+            position: absolute;
+            pointer-events: none;
+            user-select: none;
+            z-index: 100;
+        }
+        .hud-top-bar {
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .hud-bottom-bar {
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .championship-panel {
+            background: rgba(10, 14, 26, 0.95);
+            border: 2px solid #BF5700;
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(191, 87, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        .championship-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #BF5700, #9BCBEB, #BF5700);
+            animation: championship-glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes championship-glow {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        .longhorn-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            min-width: 300px;
+        }
+        .stat-block {
+            text-align: center;
+        }
+        .stat-title {
+            font-size: 11px;
+            color: #9BCBEB;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 900;
+            color: #BF5700;
+            text-shadow: 0 2px 4px rgba(191, 87, 0, 0.3);
+        }
+        .texas-minimap {
+            width: 250px;
+            height: 200px;
+            border: 3px solid #9BCBEB;
+            border-radius: 12px;
+            position: relative;
+            background: rgba(0, 0, 0, 0.9);
+            overflow: hidden;
+        }
+        .minimap-canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 9px;
+        }
+        .minimap-overlay {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            right: 5px;
+            background: rgba(10, 14, 26, 0.8);
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 10px;
+            color: #9BCBEB;
+            text-align: center;
+        }
+        /* Championship Controls Panel */
+        .controls-championship {
+            background: rgba(10, 14, 26, 0.95);
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 320px;
+            border: 2px solid #9BCBEB;
+        }
+        .controls-title {
+            color: #BF5700;
+            font-weight: 900;
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .control-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(155, 203, 235, 0.2);
+        }
+        .control-key {
+            color: #BF5700;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(191, 87, 0, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(191, 87, 0, 0.3);
+        }
+        .control-desc {
+            color: #9BCBEB;
+            font-size: 14px;
+        }
+        /* Texas Loading Screen */
+        .texas-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0e1a 0%, #2a1810 50%, #1a1f2e 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.8s ease;
+        }
+        .championship-logo {
+            font-size: 64px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #BF5700, #9BCBEB, #BF5700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            animation: texas-pulse 2.5s infinite;
+        }
+        @keyframes texas-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+        .championship-subtitle {
+            font-size: 18px;
+            color: #9BCBEB;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        .loading-progress {
+            width: 400px;
+            height: 6px;
+            background: rgba(155, 203, 235, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #BF5700, #9BCBEB);
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 3px;
+        }
+        .loading-status {
+            color: #9BCBEB;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        /* Performance Monitor - Championship Style */
+        .championship-perf {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(10, 14, 26, 0.95);
+            border: 2px solid #BF5700;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            min-width: 180px;
+        }
+        .perf-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 4px 0;
+        }
+        .perf-label {
+            color: #9BCBEB;
+        }
+        .perf-value {
+            color: #BF5700;
+            font-weight: 600;
+        }
+        /* Texas Mobile Controls */
+        .mobile-texas-controls {
+            display: none;
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            gap: 30px;
+        }
+        @media (max-width: 768px) and (pointer: coarse) {
+            .mobile-texas-controls {
+                display: flex;
+            }
+            .controls-championship {
+                display: none;
+            }
+        }
+        .texas-joystick {
+            width: 140px;
+            height: 140px;
+            background: rgba(10, 14, 26, 0.9);
+            border: 3px solid #BF5700;
+            border-radius: 50%;
+            position: relative;
+            touch-action: none;
+        }
+        .joystick-knob {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #BF5700, #9BCBEB);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .championship-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .texas-action-btn {
+            width: 70px;
+            height: 70px;
+            background: rgba(10, 14, 26, 0.9);
+            border: 3px solid #9BCBEB;
+            border-radius: 50%;
+            color: #9BCBEB;
+            font-weight: 700;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: none;
+            transition: all 0.2s ease;
+        }
+        .texas-action-btn:active {
+            background: rgba(155, 203, 235, 0.3);
+            transform: scale(0.95);
+        }
+        /* Championship Notification System */
+        .championship-notification {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 14, 26, 0.95);
+            border: 2px solid #BF5700;
+            border-radius: 12px;
+            padding: 20px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #FAFAFA;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 500;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        .championship-notification.show {
+            opacity: 1;
+        }
+        /* Texas Weather Effects */
+        .weather-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+        .dust-storm {
+            background: radial-gradient(circle, rgba(193, 154, 107, 0.1) 0%, transparent 70%);
+        }
+        .thunderstorm {
+            background: rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div class="championship-hud hud-top-bar">
+        <div class="championship-panel">
+            <div class="longhorn-stats">
+                <div class="stat-block">
+                    <div class="stat-title">Territory</div>
+                    <div class="stat-value" id="territoryStat">0</div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-title">Victories</div>
+                    <div class="stat-value" id="victoryStat">0</div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-title">Honor</div>
+                    <div class="stat-value" id="honorStat">100</div>
+                </div>
+            </div>
+        </div>
+        <div class="texas-minimap">
+            <canvas class="minimap-canvas" id="texasMinimap" width="250" height="200"></canvas>
+            <div class="minimap-overlay" id="minimapOverlay">Texas Frontier</div>
+        </div>
+    </div>
+    <div class="championship-hud hud-bottom-bar">
+        <div class="championship-panel controls-championship">
+            <div class="controls-title">Championship Controls</div>
+            <div class="control-row">
+                <span class="control-key">WASD</span>
+                <span class="control-desc">Move across Texas</span>
+            </div>
+            <div class="control-row">
+                <span class="control-key">MOUSE</span>
+                <span class="control-desc">Survey land</span>
+            </div>
+            <div class="control-row">
+                <span class="control-key">SPACE</span>
+                <span class="control-desc">Jump/Fly</span>
+            </div>
+            <div class="control-row">
+                <span class="control-key">SHIFT</span>
+                <span class="control-desc">Sprint</span>
+            </div>
+            <div class="control-row">
+                <span class="control-key">F</span>
+                <span class="control-desc">Fly Mode</span>
+            </div>
+            <div class="control-row">
+                <span class="control-key">G</span>
+                <span class="control-desc">Build/Claim</span>
+            </div>
+            <div class="control-row">
+                <span class="control-key">B</span>
+                <span class="control-desc">Build Menu</span>
+            </div>
+            <div class="control-row">
+                <span class="control-key">H</span>
+                <span class="control-desc">Hero Commands</span>
+            </div>
+        </div>
+    </div>
+    <div class="championship-notification" id="championshipNotification">
+        Welcome to the Texas Championship!
+    </div>
+    <script type="module">
+        // Texas Championship Game Configuration
+        const TEXAS_CONFIG = {
+            CHUNK_SIZE: 16,
+            CHUNK_HEIGHT: 96,
+            RENDER_DISTANCE: 10,
+            BLOCK_SIZE: 1,
+            GRAVITY: -35,
+            JUMP_FORCE: 15,
+            MOVE_SPEED: 12,
+            SPRINT_MULTIPLIER: 2.2,
+            MOUSE_SENSITIVITY: 0.002,
+            FOV: 75,
+            // Texas-specific terrain
+            TERRAIN_SCALE: 0.015,
+            BIOME_SCALE: 0.003,
+            OIL_SCALE: 0.08,
+            CATTLE_SPAWN_CHANCE: 0.001,
+            // Championship features
+            TERRITORY_SIZE: 64,
+            CLAIM_RADIUS: 32,
+            HONOR_DECAY: 0.1,
+            VICTORY_THRESHOLD: 10
+        };
+        // Texas Biomes - Heart of the Lone Star State
+        const TEXAS_BIOMES = {
+            EAST_TEXAS_PINEY_WOODS: {
+                name: 'East Texas Piney Woods',
+                baseHeight: 45,
+                variance: 15,
+                color: new THREE.Color(0x2d5016),
+                fogColor: new THREE.Color(0x4a5d23),
+                treeChance: 0.25,
+                oilChance: 0.15,
+                description: 'Dense pine forests where champions are forged'
+            },
+            HILL_COUNTRY: {
+                name: 'Texas Hill Country',
+                baseHeight: 55,
+                variance: 25,
+                color: new THREE.Color(0x8fbc8f),
+                fogColor: new THREE.Color(0x87ceeb),
+                treeChance: 0.12,
+                oilChance: 0.05,
+                description: 'Rolling hills of bluebonnets and oak trees'
+            },
+            COASTAL_PLAINS: {
+                name: 'Gulf Coastal Plains',
+                baseHeight: 35,
+                variance: 8,
+                color: new THREE.Color(0x7fb069),
+                fogColor: new THREE.Color(0x87ceeb),
+                treeChance: 0.08,
+                oilChance: 0.25,
+                description: 'Rich oil fields meeting the Gulf coast'
+            },
+            WEST_TEXAS_DESERT: {
+                name: 'West Texas Desert',
+                baseHeight: 40,
+                variance: 20,
+                color: new THREE.Color(0xc19a6b),
+                fogColor: new THREE.Color(0xffd4a3),
+                treeChance: 0.002,
+                oilChance: 0.08,
+                description: 'Endless horizons under the desert sun'
+            },
+            PANHANDLE_PLAINS: {
+                name: 'Texas Panhandle',
+                baseHeight: 50,
+                variance: 12,
+                color: new THREE.Color(0x9acd32),
+                fogColor: new THREE.Color(0x87ceeb),
+                treeChance: 0.05,
+                oilChance: 0.03,
+                description: 'Vast plains where cattle roam free'
+            },
+            BIG_BEND_MOUNTAINS: {
+                name: 'Big Bend Country',
+                baseHeight: 65,
+                variance: 35,
+                color: new THREE.Color(0x8b7355),
+                fogColor: new THREE.Color(0xb0b0b0),
+                treeChance: 0.03,
+                oilChance: 0.01,
+                description: 'Rugged mountains on the Rio Grande'
+            }
+        };
+        // Championship Block Types
+        const TEXAS_BLOCKS = {
+            AIR: 0,
+            GRASS: 1,
+            DIRT: 2,
+            STONE: 3,
+            WATER: 4,
+            SAND: 5,
+            SNOW: 6,
+            PINE_WOOD: 7,
+            PINE_LEAVES: 8,
+            OAK_WOOD: 9,
+            OAK_LEAVES: 10,
+            OIL_SAND: 11,
+            LIMESTONE: 12,
+            BLUEBONNET: 13,
+            PRICKLY_PEAR: 14,
+            CLAIM_MARKER: 15
+        };
+        class BlazeWorldsTexasChampionship {
+            constructor() {
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+                this.chunks = new Map();
+                this.entities = [];
+                this.player = null;
+                this.clock = new THREE.Clock();
+                // Championship stats
+                this.championshipStats = {
+                    fps: 60,
+                    chunks: 0,
+                    entities: 0,
+                    territory: 0,
+                    victories: 0,
+                    honor: 100,
+                    position: { x: 0, y: 64, z: 0 },
+                    biome: 'East Texas Piney Woods',
+                    weather: 'Clear'
+                };
+                // Noise generators for Texas terrain
+                this.terrainNoise = null;
+                this.biomeNoise = null;
+                this.oilNoise = null;
+                this.weatherNoise = null;
+                // Texas game state
+                this.claimedTerritories = new Set();
+                this.oilWells = new Map();
+                this.cattleHerds = [];
+                this.weatherSystem = null;
+                // Championship Enhancement Systems
+                this.particleSystem = null;
+                this.lightingSystem = null;
+                this.heroSystem = null;
+                this.economySystem = null;
+                this.commandInterface = null;
+                this.terrainSystem = null;
+                // Input handling
+                this.keys = {};
+                this.mouse = { x: 0, y: 0, locked: false };
+                this.velocity = new THREE.Vector3();
+                this.joystick = { x: 0, y: 0, active: false };
+                this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                this.init();
+            }
+            async init() {
+                try {
+                    await this.showTexasLoading();
+                    await this.initThreeJS();
+                    await this.initTexasNoise();
+                    await this.initChampionPlayer();
+                    await this.initTexasControls();
+                    await this.initTexasWorld();
+                    await this.initChampionshipLighting();
+                    await this.initWeatherSystem();
+                    await this.initTexasAudio();
+                    // Initialize Championship Enhancement Systems
+                    await this.initChampionshipSystems();
+                    this.hideTexasLoading();
+                    this.showChampionshipNotification('Welcome to the Texas Championship!', 3000);
+                    this.animate();
+                } catch (error) {
+                    console.error('Failed to initialize Texas Championship:', error);
+                    this.showChampionshipNotification('Failed to load championship - Check console', 5000);
+                }
+            }
+            async showTexasLoading() {
+                const progressFill = document.getElementById('progressFill');
+                const loadingStatus = document.getElementById('loadingStatus');
+                const texasSteps = [
+                    { progress: 15, status: 'Loading the spirit of Texas...' },
+                    { progress: 30, status: 'Generating championship terrain...' },
+                    { progress: 45, status: 'Spawning longhorn cattle...' },
+                    { progress: 60, status: 'Drilling for black gold...' },
+                    { progress: 75, status: 'Setting up Friday night lights...' },
+                    { progress: 85, status: 'Building championship economy...' },
+                    { progress: 95, status: 'Training Texas heroes...' },
+                    { progress: 100, status: 'Texas Championship ready!' }
+                ];
+                for (const step of texasSteps) {
+                    progressFill.style.width = `${step.progress}%`;
+                    loadingStatus.textContent = step.status;
+                    await this.sleep(400);
+                }
+            }
+            hideTexasLoading() {
+                const loadingScreen = document.getElementById('texasLoading');
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 800);
+            }
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            async initThreeJS() {
+                // Scene setup with Texas atmosphere
+                this.scene = new THREE.Scene();
+                this.scene.fog = new THREE.Fog(0x87ceeb, 60, 300);
+                // Camera positioned for Texas vistas
+                this.camera = new THREE.PerspectiveCamera(
+                    TEXAS_CONFIG.FOV,
+                    window.innerWidth / window.innerHeight,
+                    0.1,
+                    2000
+                );
+                this.camera.position.set(0, TEXAS_CONFIG.CHUNK_HEIGHT  30, 0);
+                // High-performance renderer for championship quality
+                this.renderer = new THREE.WebGLRenderer({
+                    canvas: document.getElementById('gameCanvas'),
+                    antialias: true,
+                    alpha: false,
+                    powerPreference: 'high-performance'
+                });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+                this.renderer.toneMappingExposure = 1.1;
+                // Handle Texas-sized window resizing
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            }
+            async initTexasNoise() {
+                // Initialize noise generators for authentic Texas terrain
+                const seed = Math.random();
+                this.terrainNoise = new SimplexNoise(() => seed);
+                this.biomeNoise = new SimplexNoise(() => seed * 2);
+                this.oilNoise = new SimplexNoise(() => seed * 3);
+                this.weatherNoise = new SimplexNoise(() => seed * 4);
+            }
+            async initChampionPlayer() {
+                // Create championship-caliber player
+                this.player = {
+                    position: new THREE.Vector3(0, TEXAS_CONFIG.CHUNK_HEIGHT  30, 0),
+                    rotation: new THREE.Euler(0, 0, 0),
+                    velocity: new THREE.Vector3(0, 0, 0),
+                    onGround: false,
+                    sprinting: false,
+                    flying: false,
+                    claimMode: false,
+                    inventory: new Map(),
+                    health: 100,
+                    stamina: 100,
+                    honor: 100
+                };
+                // Player representation (invisible but tracked)
+                const playerGeometry = new THREE.BoxGeometry(1, 2, 1);
+                const playerMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xBF5700,
+                    transparent: true,
+                    opacity: 0
+                });
+                this.playerMesh = new THREE.Mesh(playerGeometry, playerMaterial);
+                this.scene.add(this.playerMesh);
+            }
+            async initTexasControls() {
+                // Championship keyboard controls
+                document.addEventListener('keydown', (e) => {
+                    this.keys[e.code] = true;
+                    switch(e.code) {
+                        case 'KeyG':
+                            this.toggleClaimMode();
+                            break;
+                        case 'KeyF':
+                            this.toggleFlyMode();
+                            break;
+                        case 'Escape':
+                            this.showChampionshipMenu();
+                            break;
+                    }
+                });
+                document.addEventListener('keyup', (e) => {
+                    this.keys[e.code] = false;
+                });
+                // Championship mouse controls
+                document.addEventListener('click', async () => {
+                    if (!this.mouse.locked && !this.isMobile) {
+                        try {
+                            await document.body.requestPointerLock();
+                            this.mouse.locked = true;
+                        } catch (error) {
+                            console.error('Failed to lock pointer:', error);
+                        }
+                    }
+                });
+                document.addEventListener('pointerlockchange', () => {
+                    this.mouse.locked = document.pointerLockElement === document.body;
+                });
+                document.addEventListener('mousemove', (e) => {
+                    if (this.mouse.locked) {
+                        this.player.rotation.y -= e.movementX * TEXAS_CONFIG.MOUSE_SENSITIVITY;
+                        this.player.rotation.x -= e.movementY * TEXAS_CONFIG.MOUSE_SENSITIVITY;
+                        this.player.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.player.rotation.x));
+                    }
+                });
+                // Texas mobile controls
+                if (this.isMobile) {
+                    this.initTexasMobileControls();
+                }
+            }
+            initTexasMobileControls() {
+                const texasJoystick = document.getElementById('texasJoystick');
+                const joystickKnob = document.getElementById('joystickKnob');
+                const jumpBtn = document.getElementById('jumpBtn');
+                const buildBtn = document.getElementById('buildBtn');
+                const claimBtn = document.getElementById('claimBtn');
+                // Texas-sized joystick controls
+                const handleTexasJoystick = (e) => {
+                    const touch = e.touches[0];
+                    const rect = texasJoystick.getBoundingClientRect();
+                    const centerX = rect.left  rect.width / 2;
+                    const centerY = rect.top  rect.height / 2;
+                    let deltaX = touch.clientX - centerX;
+                    let deltaY = touch.clientY - centerY;
+                    const distance = Math.sqrt(deltaX * deltaX  deltaY * deltaY);
+                    const maxDistance = rect.width / 2 - 25;
+                    if (distance > maxDistance) {
+                        deltaX = (deltaX / distance) * maxDistance;
+                        deltaY = (deltaY / distance) * maxDistance;
+                    }
+                    joystickKnob.style.transform = `translate(calc(-50%  ${deltaX}px), calc(-50%  ${deltaY}px))`;
+                    this.joystick.x = deltaX / maxDistance;
+                    this.joystick.y = -deltaY / maxDistance;
+                    this.joystick.active = true;
+                };
+                texasJoystick.addEventListener('touchstart', handleTexasJoystick);
+                texasJoystick.addEventListener('touchmove', handleTexasJoystick);
+                texasJoystick.addEventListener('touchend', () => {
+                    joystickKnob.style.transform = 'translate(-50%, -50%)';
+                    this.joystick.x = 0;
+                    this.joystick.y = 0;
+                    this.joystick.active = false;
+                });
+                // Championship action buttons
+                jumpBtn.addEventListener('touchstart', () => this.keys['Space'] = true);
+                jumpBtn.addEventListener('touchend', () => this.keys['Space'] = false);
+                buildBtn.addEventListener('touchstart', () => this.keys['KeyB'] = true);
+                buildBtn.addEventListener('touchend', () => this.keys['KeyB'] = false);
+                claimBtn.addEventListener('touchstart', () => this.toggleClaimMode());
+            }
+            async initTexasWorld() {
+                // Generate the heart of Texas
+                const playerChunkX = Math.floor(this.player.position.x / TEXAS_CONFIG.CHUNK_SIZE);
+                const playerChunkZ = Math.floor(this.player.position.z / TEXAS_CONFIG.CHUNK_SIZE);
+                for (let x = -TEXAS_CONFIG.RENDER_DISTANCE; x <= TEXAS_CONFIG.RENDER_DISTANCE; x++) {
+                    for (let z = -TEXAS_CONFIG.RENDER_DISTANCE; z <= TEXAS_CONFIG.RENDER_DISTANCE; z++) {
+                        await this.generateTexasChunk(playerChunkX  x, playerChunkZ  z);
+                    }
+                }
+            }
+            async generateTexasChunk(chunkX, chunkZ) {
+                const key = `${chunkX},${chunkZ}`;
+                if (this.chunks.has(key)) {
+                    return;
+                }
+                const chunk = new TexasChunk(chunkX, chunkZ, this);
+                await chunk.generateTexasTerrain();
+                this.chunks.set(key, chunk);
+                this.scene.add(chunk.mesh);
+                this.championshipStats.chunks = this.chunks.size;
+            }
+            async initChampionshipLighting() {
+                // Texas sunrise lighting
+                const texasAmbient = new THREE.AmbientLight(0xffffff, 0.4);
+                this.scene.add(texasAmbient);
+                // Championship sun
+                const texasSun = new THREE.DirectionalLight(0xffd700, 0.9);
+                texasSun.position.set(150, 250, 100);
+                texasSun.castShadow = true;
+                texasSun.shadow.camera.left = -150;
+                texasSun.shadow.camera.right = 150;
+                texasSun.shadow.camera.top = 150;
+                texasSun.shadow.camera.bottom = -150;
+                texasSun.shadow.camera.near = 0.5;
+                texasSun.shadow.camera.far = 600;
+                texasSun.shadow.mapSize.width = 4096;
+                texasSun.shadow.mapSize.height = 4096;
+                this.scene.add(texasSun);
+                // Texas sky gradient
+                const texasHemi = new THREE.HemisphereLight(0x87ceeb, 0x8b7355, 0.3);
+                this.scene.add(texasHemi);
+            }
+            async initWeatherSystem() {
+                this.weatherSystem = new TexasWeatherSystem(this);
+                await this.weatherSystem.init();
+            }
+            async initTexasAudio() {
+                // Future: Add Texas ambiance, cattle sounds, oil derricks
+            }
+            async initChampionshipSystems() {
+                console.log('🏆 Initializing Championship Enhancement Systems...');
+                try {
+                    // Create basic terrain system interface for economy system
+                    this.terrainSystem = {
+                        getBiomeAt: (x, z) => {
+                            const biomeNoise = this.biomeNoise ? this.biomeNoise.noise2D(x * TEXAS_CONFIG.BIOME_SCALE, z * TEXAS_CONFIG.BIOME_SCALE) : 0;
+                            const biome = this.getTexasBiome(biomeNoise);
+                            // Map biome to simple names for economy system
+                            if (biome === TEXAS_BIOMES.EAST_TEXAS_PINEY_WOODS) return 'forest';
+                            if (biome === TEXAS_BIOMES.HILL_COUNTRY) return 'hills';
+                            if (biome === TEXAS_BIOMES.COASTAL_PLAINS) return 'plains';
+                            if (biome === TEXAS_BIOMES.WEST_TEXAS_DESERT) return 'desert';
+                            if (biome === TEXAS_BIOMES.PANHANDLE_PLAINS) return 'plains';
+                            if (biome === TEXAS_BIOMES.BIG_BEND_MOUNTAINS) return 'mountains';
+                            return 'plains';
+                        }
+                    };
+                    // Initialize Advanced Particle System
+                    if (typeof AdvancedParticleSystem !== 'undefined') {
+                        this.particleSystem = new AdvancedParticleSystem(this.scene, this.renderer, this.camera);
+                        console.log('✨ Advanced Particle System initialized');
+                        // Add some initial Texas atmosphere effects
+                        setTimeout(() => {
+                            this.particleSystem.createEffect('dust_storm', { x: 50, y: 10, z: 50 }, { intensity: 0.3 });
+                        }, 2000);
+                    }
+                    // Initialize Advanced Lighting System
+                    if (typeof AdvancedLightingSystem !== 'undefined') {
+                        this.lightingSystem = new AdvancedLightingSystem(this.scene, this.renderer, this.camera);
+                        console.log('💡 Advanced Lighting System initialized');
+                    }
+                    // Initialize Hero Unit System
+                    if (typeof HeroUnitSystem !== 'undefined') {
+                        this.heroSystem = new HeroUnitSystem(this.scene, this, this.camera);
+                        console.log('🦸 Hero Unit System initialized');
+                        // Spawn starting hero near player
+                        const heroPosition = {
+                            x: this.player.object.position.x  5,
+                            y: this.player.object.position.y,
+                            z: this.player.object.position.z  5
+                        };
+                        this.heroSystem.spawnHero('texasRanger', heroPosition);
+                    }
+                    // Initialize Economy and Building System
+                    if (typeof EconomyBuildingSystem !== 'undefined') {
+                        this.economySystem = new EconomyBuildingSystem(
+                            this.scene,
+                            this,
+                            this.terrainSystem,
+                            this.heroSystem
+                        );
+                        console.log('💰 Economy and Building System initialized');
+                    }
+                    // Initialize RTS Command Interface
+                    if (typeof RTSCommandInterface !== 'undefined') {
+                        this.commandInterface = new RTSCommandInterface(
+                            this.scene,
+                            this.camera,
+                            this,
+                            this.heroSystem,
+                            this.economySystem
+                        );
+                        console.log('🎮 RTS Command Interface initialized');
+                    }
+                    console.log('🏆 All Championship Systems initialized successfully!');
+                    this.showChampionshipNotification('Championship Systems Online! Press F1 for hotkeys!', 4000);
+                } catch (error) {
+                    console.error('Failed to initialize Championship Systems:', error);
+                    this.showChampionshipNotification('Some systems failed to load - check console', 4000);
+                }
+            }
+            toggleClaimMode() {
+                this.player.claimMode = !this.player.claimMode;
+                const mode = this.player.claimMode ? 'Territory Claiming' : 'Exploration';
+                this.showChampionshipNotification(`${mode} Mode Activated`, 2000);
+            }
+            toggleFlyMode() {
+                this.player.flying = !this.player.flying;
+                const mode = this.player.flying ? 'Eagle Vision' : 'Ground Level';
+                this.showChampionshipNotification(`${mode} Mode`, 2000);
+            }
+            showChampionshipNotification(text, duration = 3000) {
+                const notification = document.getElementById('championshipNotification');
+                notification.textContent = text;
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, duration);
+            }
+            getTexasBiome(noiseValue) {
+                // Map noise to authentic Texas biomes
+                if (noiseValue < -0.4) return TEXAS_BIOMES.GULF_COASTAL_PLAINS;
+                if (noiseValue < -0.1) return TEXAS_BIOMES.EAST_TEXAS_PINEY_WOODS;
+                if (noiseValue < 0.2) return TEXAS_BIOMES.HILL_COUNTRY;
+                if (noiseValue < 0.5) return TEXAS_BIOMES.PANHANDLE_PLAINS;
+                if (noiseValue < 0.7) return TEXAS_BIOMES.WEST_TEXAS_DESERT;
+                return TEXAS_BIOMES.BIG_BEND_MOUNTAINS;
+            }
+            getTexasGroundHeight(x, z) {
+                const biomeValue = this.biomeNoise.noise2D(x * TEXAS_CONFIG.BIOME_SCALE, z * TEXAS_CONFIG.BIOME_SCALE);
+                const biome = this.getTexasBiome(biomeValue);
+                const terrainHeight = this.terrainNoise.noise3D(
+                    x * TEXAS_CONFIG.TERRAIN_SCALE,
+                    0,
+                    z * TEXAS_CONFIG.TERRAIN_SCALE
+                );
+                return biome.baseHeight  terrainHeight * biome.variance;
+            }
+            updateChampionPlayer(deltaTime) {
+                const moveSpeed = TEXAS_CONFIG.MOVE_SPEED * (this.player.sprinting ? TEXAS_CONFIG.SPRINT_MULTIPLIER : 1);
+                // Handle Texas-style movement
+                let moveX = 0;
+                let moveZ = 0;
+                if (this.isMobile && this.joystick.active) {
+                    moveX = this.joystick.x;
+                    moveZ = this.joystick.y;
+                } else {
+                    if (this.keys['KeyW']) moveZ = 1;
+                    if (this.keys['KeyS']) moveZ = -1;
+                    if (this.keys['KeyA']) moveX = -1;
+                    if (this.keys['KeyD']) moveX = 1;
+                }
+                // Calculate movement direction
+                const forward = new THREE.Vector3(
+                    Math.sin(this.player.rotation.y),
+                    0,
+                    Math.cos(this.player.rotation.y)
+                );
+                const right = new THREE.Vector3(
+                    Math.sin(this.player.rotation.y - Math.PI / 2),
+                    0,
+                    Math.cos(this.player.rotation.y - Math.PI / 2)
+                );
+                // Apply movement
+                this.player.velocity.x = (forward.x * moveZ  right.x * moveX) * moveSpeed;
+                this.player.velocity.z = (forward.z * moveZ  right.z * moveX) * moveSpeed;
+                // Handle jumping/flying
+                if (this.keys['Space']) {
+                    if (this.player.flying) {
+                        this.player.velocity.y = moveSpeed;
+                    } else if (this.player.onGround) {
+                        this.player.velocity.y = TEXAS_CONFIG.JUMP_FORCE;
+                        this.player.onGround = false;
+                    }
+                }
+                // Apply gravity
+                if (!this.player.flying) {
+                    this.player.velocity.y = TEXAS_CONFIG.GRAVITY * deltaTime;
+                }
+                // Update position
+                this.player.position.x = this.player.velocity.x * deltaTime;
+                this.player.position.y = this.player.velocity.y * deltaTime;
+                this.player.position.z = this.player.velocity.z * deltaTime;
+                // Ground collision
+                const groundHeight = this.getTexasGroundHeight(this.player.position.x, this.player.position.z);
+                if (this.player.position.y <= groundHeight  2) {
+                    this.player.position.y = groundHeight  2;
+                    this.player.velocity.y = 0;
+                    this.player.onGround = true;
+                }
+                // Update camera
+                this.camera.position.copy(this.player.position);
+                this.camera.rotation.x = this.player.rotation.x;
+                this.camera.rotation.y = this.player.rotation.y;
+                // Update player mesh
+                this.playerMesh.position.copy(this.player.position);
+                this.playerMesh.position.y -= 1;
+                // Update stats
+                this.championshipStats.position = {
+                    x: Math.floor(this.player.position.x),
+                    y: Math.floor(this.player.position.y),
+                    z: Math.floor(this.player.position.z)
+                };
+                // Sprint toggle
+                this.player.sprinting = this.keys['ShiftLeft'] || this.keys['ShiftRight'];
+                // Update biome
+                const biomeValue = this.biomeNoise.noise2D(
+                    this.player.position.x * TEXAS_CONFIG.BIOME_SCALE,
+                    this.player.position.z * TEXAS_CONFIG.BIOME_SCALE
+                );
+                this.championshipStats.biome = this.getTexasBiome(biomeValue).name;
+            }
+            updateTexasChunks() {
+                const playerChunkX = Math.floor(this.player.position.x / TEXAS_CONFIG.CHUNK_SIZE);
+                const playerChunkZ = Math.floor(this.player.position.z / TEXAS_CONFIG.CHUNK_SIZE);
+                // Generate new chunks
+                for (let x = -TEXAS_CONFIG.RENDER_DISTANCE; x <= TEXAS_CONFIG.RENDER_DISTANCE; x++) {
+                    for (let z = -TEXAS_CONFIG.RENDER_DISTANCE; z <= TEXAS_CONFIG.RENDER_DISTANCE; z++) {
+                        const chunkX = playerChunkX  x;
+                        const chunkZ = playerChunkZ  z;
+                        const key = `${chunkX},${chunkZ}`;
+                        if (!this.chunks.has(key)) {
+                            this.generateTexasChunk(chunkX, chunkZ);
+                        }
+                    }
+                }
+                // Remove distant chunks
+                for (const [key, chunk] of this.chunks) {
+                    const dx = Math.abs(chunk.x - playerChunkX);
+                    const dz = Math.abs(chunk.z - playerChunkZ);
+                    if (dx > TEXAS_CONFIG.RENDER_DISTANCE  3 || dz > TEXAS_CONFIG.RENDER_DISTANCE  3) {
+                        this.scene.remove(chunk.mesh);
+                        chunk.dispose();
+                        this.chunks.delete(key);
+                    }
+                }
+            }
+            updateChampionshipHUD() {
+                // Update championship statistics
+                document.getElementById('territoryStat').textContent = this.championshipStats.territory;
+                document.getElementById('victoryStat').textContent = this.championshipStats.victories;
+                document.getElementById('honorStat').textContent = Math.floor(this.championshipStats.honor);
+                document.getElementById('fpsStat').textContent = this.championshipStats.fps;
+                document.getElementById('chunksStat').textContent = this.championshipStats.chunks;
+                document.getElementById('entitiesStat').textContent = this.championshipStats.entities;
+                document.getElementById('biomeStat').textContent = this.championshipStats.biome.split(' ')[0];
+            }
+            updateTexasMinimap() {
+                const canvas = document.getElementById('texasMinimap');
+                const ctx = canvas.getContext('2d');
+                // Clear Texas map
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                // Draw Texas terrain
+                const playerChunkX = Math.floor(this.player.position.x / TEXAS_CONFIG.CHUNK_SIZE);
+                const playerChunkZ = Math.floor(this.player.position.z / TEXAS_CONFIG.CHUNK_SIZE);
+                const scale = 8;
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                for (const [key, chunk] of this.chunks) {
+                    const relX = (chunk.x - playerChunkX) * scale  centerX;
+                    const relZ = (chunk.z - playerChunkZ) * scale  centerY;
+                    if (relX >= 0 && relX < canvas.width && relZ >= 0 && relZ < canvas.height) {
+                        // Color by biome
+                        const biomeValue = this.biomeNoise.noise2D(
+                            chunk.x * TEXAS_CONFIG.CHUNK_SIZE * TEXAS_CONFIG.BIOME_SCALE,
+                            chunk.z * TEXAS_CONFIG.CHUNK_SIZE * TEXAS_CONFIG.BIOME_SCALE
+                        );
+                        const biome = this.getTexasBiome(biomeValue);
+                        ctx.fillStyle = `#${biome.color.getHexString()}`;
+                        ctx.fillRect(relX - scale/2, relZ - scale/2, scale, scale);
+                    }
+                }
+                // Draw player position (Texas star)
+                ctx.fillStyle = '#BF5700';
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 4, 0, Math.PI * 2);
+                ctx.fill();
+                // Draw direction indicator
+                ctx.strokeStyle = '#BF5700';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(
+                    centerX  Math.sin(this.player.rotation.y) * 12,
+                    centerY  Math.cos(this.player.rotation.y) * 12
+                );
+                ctx.stroke();
+                // Update minimap overlay
+                document.getElementById('minimapOverlay').textContent =
+                    `${this.championshipStats.biome.split(' ')[0]} Territory`;
+            }
+            update(deltaTime) {
+                // Update championship player
+                this.updateChampionPlayer(deltaTime);
+                // Update Texas world
+                this.updateTexasChunks();
+                // Update weather system
+                if (this.weatherSystem) {
+                    this.weatherSystem.update(deltaTime);
+                }
+                // Update championship HUD
+                this.updateChampionshipHUD();
+                // Update Texas minimap
+                this.updateTexasMinimap();
+                // Update performance stats
+                this.championshipStats.fps = Math.round(1 / deltaTime);
+                this.championshipStats.entities = this.entities.length;
+            }
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                const deltaTime = Math.min(this.clock.getDelta(), 0.1);
+                this.update(deltaTime);
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+        // Texas Chunk Class - Heart of the terrain system
+        class TexasChunk {
+            constructor(x, z, world) {
+                this.x = x;
+                this.z = z;
+                this.world = world;
+                this.blocks = new Uint8Array(TEXAS_CONFIG.CHUNK_SIZE * TEXAS_CONFIG.CHUNK_HEIGHT * TEXAS_CONFIG.CHUNK_SIZE);
+                this.mesh = null;
+                this.oilWells = [];
+                this.vegetation = [];
+            }
+            async generateTexasTerrain() {
+                // Generate authentic Texas terrain
+                for (let x = 0; x < TEXAS_CONFIG.CHUNK_SIZE; x++) {
+                    for (let z = 0; z < TEXAS_CONFIG.CHUNK_SIZE; z++) {
+                        const worldX = this.x * TEXAS_CONFIG.CHUNK_SIZE  x;
+                        const worldZ = this.z * TEXAS_CONFIG.CHUNK_SIZE  z;
+                        // Get Texas biome
+                        const biomeValue = this.world.biomeNoise.noise2D(
+                            worldX * TEXAS_CONFIG.BIOME_SCALE,
+                            worldZ * TEXAS_CONFIG.BIOME_SCALE
+                        );
+                        const biome = this.world.getTexasBiome(biomeValue);
+                        // Generate height
+                        const terrainHeight = this.world.terrainNoise.noise3D(
+                            worldX * TEXAS_CONFIG.TERRAIN_SCALE,
+                            0,
+                            worldZ * TEXAS_CONFIG.TERRAIN_SCALE
+                        );
+                        const height = Math.floor(biome.baseHeight  terrainHeight * biome.variance);
+                        // Fill blocks based on Texas geology
+                        for (let y = 0; y < height; y++) {
+                            const index = this.getIndex(x, y, z);
+                            if (y < height - 6) {
+                                // Deep rock - limestone in Hill Country, sandstone elsewhere
+                                this.blocks[index] = biome === TEXAS_BIOMES.HILL_COUNTRY ?
+                                    TEXAS_BLOCKS.LIMESTONE : TEXAS_BLOCKS.STONE;
+                            } else if (y < height - 1) {
+                                this.blocks[index] = TEXAS_BLOCKS.DIRT;
+                            } else {
+                                // Surface blocks based on biome
+                                if (biome === TEXAS_BIOMES.WEST_TEXAS_DESERT ||
+                                    biome === TEXAS_BIOMES.GULF_COASTAL_PLAINS) {
+                                    this.blocks[index] = TEXAS_BLOCKS.SAND;
+                                } else {
+                                    this.blocks[index] = TEXAS_BLOCKS.GRASS;
+                                }
+                            }
+                        }
+                        // Add Texas vegetation
+                        if (Math.random() < biome.treeChance && height > 40) {
+                            this.generateTexasTree(x, height, z, biome);
+                        }
+                        // Add oil deposits
+                        if (Math.random() < biome.oilChance) {
+                            this.generateOilDeposit(x, height, z);
+                        }
+                        // Add Texas wildflowers (bluebonnets in spring)
+                        if (biome === TEXAS_BIOMES.HILL_COUNTRY && Math.random() < 0.1) {
+                            if (height < TEXAS_CONFIG.CHUNK_HEIGHT - 1) {
+                                this.blocks[this.getIndex(x, height, z)] = TEXAS_BLOCKS.BLUEBONNET;
+                            }
+                        }
+                    }
+                }
+                // Build the mesh
+                this.buildTexasMesh();
+            }
+            generateTexasTree(x, groundY, z, biome) {
+                const treeHeight = biome === TEXAS_BIOMES.EAST_TEXAS_PINEY_WOODS ?
+                    8  Math.floor(Math.random() * 6) : 4  Math.floor(Math.random() * 3);
+                const woodType = biome === TEXAS_BIOMES.EAST_TEXAS_PINEY_WOODS ?
+                    TEXAS_BLOCKS.PINE_WOOD : TEXAS_BLOCKS.OAK_WOOD;
+                const leavesType = biome === TEXAS_BIOMES.EAST_TEXAS_PINEY_WOODS ?
+                    TEXAS_BLOCKS.PINE_LEAVES : TEXAS_BLOCKS.OAK_LEAVES;
+                // Trunk
+                for (let y = 0; y < treeHeight; y++) {
+                    if (groundY  y < TEXAS_CONFIG.CHUNK_HEIGHT) {
+                        this.blocks[this.getIndex(x, groundY  y, z)] = woodType;
+                    }
+                }
+                // Crown
+                const crownRadius = biome === TEXAS_BIOMES.EAST_TEXAS_PINEY_WOODS ? 2 : 3;
+                for (let dx = -crownRadius; dx <= crownRadius; dx++) {
+                    for (let dy = -1; dy <= 2; dy++) {
+                        for (let dz = -crownRadius; dz <= crownRadius; dz++) {
+                            const dist = Math.sqrt(dx*dx  dz*dz);
+                            if (dist <= crownRadius && Math.random() > 0.3) {
+                                const lx = x  dx;
+                                const ly = groundY  treeHeight  dy;
+                                const lz = z  dz;
+                                if (lx >= 0 && lx < TEXAS_CONFIG.CHUNK_SIZE &&
+                                    ly >= 0 && ly < TEXAS_CONFIG.CHUNK_HEIGHT &&
+                                    lz >= 0 && lz < TEXAS_CONFIG.CHUNK_SIZE) {
+                                    const index = this.getIndex(lx, ly, lz);
+                                    if (this.blocks[index] === TEXAS_BLOCKS.AIR) {
+                                        this.blocks[index] = leavesType;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            generateOilDeposit(x, groundY, z) {
+                // Create underground oil deposits
+                const oilDepth = 3  Math.floor(Math.random() * 5);
+                for (let y = Math.max(0, groundY - oilDepth); y < groundY - 2; y++) {
+                    const index = this.getIndex(x, y, z);
+                    this.blocks[index] = TEXAS_BLOCKS.OIL_SAND;
+                }
+                this.oilWells.push({ x, y: groundY, z });
+            }
+            getIndex(x, y, z) {
+                return x  y * TEXAS_CONFIG.CHUNK_SIZE  z * TEXAS_CONFIG.CHUNK_SIZE * TEXAS_CONFIG.CHUNK_HEIGHT;
+            }
+            buildTexasMesh() {
+                const geometry = new THREE.BufferGeometry();
+                const vertices = [];
+                const normals = [];
+                const colors = [];
+                const uvs = [];
+                // Texas block colors
+                const texasColors = {
+                    [TEXAS_BLOCKS.GRASS]: new THREE.Color(0x7fb069),
+                    [TEXAS_BLOCKS.DIRT]: new THREE.Color(0x8b6635),
+                    [TEXAS_BLOCKS.STONE]: new THREE.Color(0x8b8680),
+                    [TEXAS_BLOCKS.SAND]: new THREE.Color(0xc19a6b),
+                    [TEXAS_BLOCKS.PINE_WOOD]: new THREE.Color(0x8b4513),
+                    [TEXAS_BLOCKS.PINE_LEAVES]: new THREE.Color(0x2d5016),
+                    [TEXAS_BLOCKS.OAK_WOOD]: new THREE.Color(0x654321),
+                    [TEXAS_BLOCKS.OAK_LEAVES]: new THREE.Color(0x228b22),
+                    [TEXAS_BLOCKS.OIL_SAND]: new THREE.Color(0x2f2f2f),
+                    [TEXAS_BLOCKS.LIMESTONE]: new THREE.Color(0xf0f0f0),
+                    [TEXAS_BLOCKS.BLUEBONNET]: new THREE.Color(0x4169e1),
+                    [TEXAS_BLOCKS.PRICKLY_PEAR]: new THREE.Color(0x8fbc8f)
+                };
+                // Build mesh for visible blocks
+                for (let x = 0; x < TEXAS_CONFIG.CHUNK_SIZE; x++) {
+                    for (let y = 0; y < TEXAS_CONFIG.CHUNK_HEIGHT; y++) {
+                        for (let z = 0; z < TEXAS_CONFIG.CHUNK_SIZE; z++) {
+                            const block = this.blocks[this.getIndex(x, y, z)];
+                            if (block === TEXAS_BLOCKS.AIR) continue;
+                            const worldX = this.x * TEXAS_CONFIG.CHUNK_SIZE  x;
+                            const worldZ = this.z * TEXAS_CONFIG.CHUNK_SIZE  z;
+                            const color = texasColors[block] || new THREE.Color(0xffffff);
+                            // Check each face for visibility
+                            const faces = [
+                                { dir: [0, 1, 0], normal: [0, 1, 0] },
+                                { dir: [0, -1, 0], normal: [0, -1, 0] },
+                                { dir: [1, 0, 0], normal: [1, 0, 0] },
+                                { dir: [-1, 0, 0], normal: [-1, 0, 0] },
+                                { dir: [0, 0, 1], normal: [0, 0, 1] },
+                                { dir: [0, 0, -1], normal: [0, 0, -1] }
+                            ];
+                            for (const face of faces) {
+                                const nx = x  face.dir[0];
+                                const ny = y  face.dir[1];
+                                const nz = z  face.dir[2];
+                                let exposed = false;
+                                if (nx < 0 || nx >= TEXAS_CONFIG.CHUNK_SIZE ||
+                                    ny < 0 || ny >= TEXAS_CONFIG.CHUNK_HEIGHT ||
+                                    nz < 0 || nz >= TEXAS_CONFIG.CHUNK_SIZE) {
+                                    exposed = true;
+                                } else {
+                                    const neighborBlock = this.blocks[this.getIndex(nx, ny, nz)];
+                                    exposed = neighborBlock === TEXAS_BLOCKS.AIR;
+                                }
+                                if (exposed) {
+                                    this.addTexasFace(
+                                        vertices, normals, colors, uvs,
+                                        worldX, y, worldZ,
+                                        face.normal,
+                                        color
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+                // Set geometry attributes
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+                geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+                geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+                geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+                // Create championship-quality material
+                const material = new THREE.MeshLambertMaterial({
+                    vertexColors: true,
+                    side: THREE.FrontSide
+                });
+                // Create mesh
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.castShadow = true;
+                this.mesh.receiveShadow = true;
+            }
+            addTexasFace(vertices, normals, colors, uvs, x, y, z, normal, color) {
+                const size = TEXAS_CONFIG.BLOCK_SIZE;
+                const faceVertices = {
+                    '0,1,0': [
+                        [x, y  size, z], [x  size, y  size, z],
+                        [x  size, y  size, z  size], [x, y  size, z  size]
+                    ],
+                    '0,-1,0': [
+                        [x, y, z  size], [x  size, y, z  size],
+                        [x  size, y, z], [x, y, z]
+                    ],
+                    '1,0,0': [
+                        [x  size, y, z], [x  size, y, z  size],
+                        [x  size, y  size, z  size], [x  size, y  size, z]
+                    ],
+                    '-1,0,0': [
+                        [x, y, z  size], [x, y, z],
+                        [x, y  size, z], [x, y  size, z  size]
+                    ],
+                    '0,0,1': [
+                        [x, y, z  size], [x  size, y, z  size],
+                        [x  size, y  size, z  size], [x, y  size, z  size]
+                    ],
+                    '0,0,-1': [
+                        [x  size, y, z], [x, y, z],
+                        [x, y  size, z], [x  size, y  size, z]
+                    ]
+                };
+                const key = `${normal[0]},${normal[1]},${normal[2]}`;
+                const verts = faceVertices[key];
+                if (!verts) return;
+                const indices = [0, 1, 2, 0, 2, 3];
+                for (const i of indices) {
+                    vertices.push(...verts[i]);
+                    normals.push(...normal);
+                    colors.push(color.r, color.g, color.b);
+                    uvs.push((verts[i][0]  verts[i][2]) % 1, (verts[i][1]  verts[i][2]) % 1);
+                }
+            }
+            dispose() {
+                if (this.mesh) {
+                    this.mesh.geometry.dispose();
+                    this.mesh.material.dispose();
+                }
+            }
+        }
+        // Texas Weather System - Authentic frontier weather
+        class TexasWeatherSystem {
+            constructor(game) {
+                this.game = game;
+                this.currentWeather = 'clear';
+                this.weatherTimer = 0;
+                this.particles = null;
+            }
+            async init() {
+                // Initialize weather particle system
+                const particleCount = 2000;
+                const geometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(particleCount * 3);
+                for (let i = 0; i < particleCount * 3; i = 3) {
+                    positions[i] = (Math.random() - 0.5) * 400;
+                    positions[i  1] = Math.random() * 150;
+                    positions[i  2] = (Math.random() - 0.5) * 400;
+                }
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                const material = new THREE.PointsMaterial({
+                    color: 0xFFFFFF,
+                    size: 1.2,
+                    transparent: true,
+                    opacity: 0
+                });
+                this.particles = new THREE.Points(geometry, material);
+                this.game.scene.add(this.particles);
+            }
+            setTexasWeather(type) {
+                this.currentWeather = type;
+                const weatherOverlay = document.getElementById('weatherOverlay');
+                switch(type) {
+                    case 'thunderstorm':
+                        this.particles.material.opacity = 0.8;
+                        this.game.scene.fog.density = 0.003;
+                        weatherOverlay.className = 'weather-overlay thunderstorm';
+                        break;
+                    case 'dust_storm':
+                        this.particles.material.opacity = 0.6;
+                        this.particles.material.color.setHex(0xc19a6b);
+                        this.game.scene.fog.density = 0.004;
+                        weatherOverlay.className = 'weather-overlay dust-storm';
+                        break;
+                    case 'clear':
+                    default:
+                        this.particles.material.opacity = 0;
+                        this.game.scene.fog.density = 0.001;
+                        weatherOverlay.className = 'weather-overlay';
+                        break;
+                }
+                this.game.championshipStats.weather = type;
+            }
+            update(deltaTime) {
+                this.weatherTimer = deltaTime;
+                // Change weather every 2-5 minutes
+                if (this.weatherTimer > 120  Math.random() * 180) {
+                    const weatherTypes = ['clear', 'thunderstorm', 'dust_storm'];
+                    const newWeather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
+                    this.setTexasWeather(newWeather);
+                    this.weatherTimer = 0;
+                    this.game.showChampionshipNotification(`Weather: ${newWeather.replace('_', ' ')}`, 2000);
+                }
+                // Animate weather particles
+                if (this.currentWeather !== 'clear' && this.particles) {
+                    const positions = this.particles.geometry.attributes.position.array;
+                    for (let i = 1; i < positions.length; i = 3) {
+                        positions[i] -= deltaTime * (this.currentWeather === 'dust_storm' ? 20 : 60);
+                        if (positions[i] < 0) {
+                            positions[i] = 150;
+                        }
+                    }
+                    this.particles.geometry.attributes.position.needsUpdate = true;
+                }
+            }
+        }
+        // Initialize the Texas Championship
+        window.addEventListener('DOMContentLoaded', () => {
+            const texasChampionship = new BlazeWorldsTexasChampionship();
+            window.blazeWorldsTexas = texasChampionship; // Export for debugging
+            console.log('🤠 Welcome to the Texas Championship Edition!');
+            console.log('🏆 May the frontier spirit guide your journey!');
+        });
+    </script>
+</body>
+</html>

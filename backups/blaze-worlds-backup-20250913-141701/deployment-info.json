@@ -1,0 +1,20 @@
+{
+    "version": "1.0.0-texas",
+    "environment": "production",
+    "buildTime": "2025-09-13T18:21:10Z",
+    "buildHost": "Mac.lan",
+    "gitCommit": "7b2e14769fecaaaa34660b71c8b5407e6c579fbd",
+    "gameVariants": [
+        "texas-championship",
+        "conquest-mode",
+        "championship-classic"
+    ],
+    "features": [
+        "texas-biomes",
+        "dynamic-weather",
+        "territory-claiming",
+        "oil-discovery",
+        "sports-analytics",
+        "mobile-optimized"
+    ]
+}

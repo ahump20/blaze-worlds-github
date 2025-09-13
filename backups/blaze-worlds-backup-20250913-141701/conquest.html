@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BLAZE WORLDS | Championship Frontiers</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/simplex-noise@4.0.0/dist/esm/simplex-noise.min.js" type="module"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 100%);
+            color: #FAFAFA;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        #gameCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* HUD Interface */
+        .hud {
+            position: absolute;
+            pointer-events: none;
+            user-select: none;
+            z-index: 100;
+        }
+        
+        .hud-top {
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .hud-bottom {
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        
+        .hud-panel {
+            background: rgba(10, 14, 26, 0.9);
+            border: 1px solid #BF5700;
+            border-radius: 8px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(191, 87, 0, 0.3);
+        }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            min-width: 200px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: #9BCBEB;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #BF5700;
+        }
+        
+        .minimap {
+            width: 200px;
+            height: 200px;
+            border: 2px solid #9BCBEB;
+            border-radius: 8px;
+            position: relative;
+            background: rgba(0, 0, 0, 0.8);
+        }
+        
+        .minimap-canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 6px;
+        }
+        
+        .controls-panel {
+            background: rgba(10, 14, 26, 0.95);
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 300px;
+        }
+        
+        .control-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(155, 203, 235, 0.2);
+        }
+        
+        .control-key {
+            color: #BF5700;
+            font-weight: 600;
+        }
+        
+        .control-action {
+            color: #9BCBEB;
+        }
+        
+        /* Loading Screen */
+        .loading-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-logo {
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #BF5700, #9BCBEB);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .loading-bar {
+            width: 300px;
+            height: 4px;
+            background: rgba(155, 203, 235, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #BF5700, #9BCBEB);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .loading-status {
+            margin-top: 15px;
+            color: #9BCBEB;
+            font-size: 14px;
+        }
+        
+        /* Performance Monitor */
+        .perf-monitor {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(10, 14, 26, 0.9);
+            border: 1px solid #BF5700;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+        }
+        
+        .perf-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 3px 0;
+            min-width: 150px;
+        }
+        
+        .perf-label {
+            color: #9BCBEB;
+        }
+        
+        .perf-value {
+            color: #BF5700;
+            font-weight: 600;
+        }
+        
+        /* Mobile Controls */
+        .mobile-controls {
+            display: none;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+        }
+        
+        @media (max-width: 768px) and (pointer: coarse) {
+            .mobile-controls {
+                display: flex;
+                gap: 20px;
+            }
+            
+            .controls-panel {
+                display: none;
+            }
+        }
+        
+        .joystick {
+            width: 120px;
+            height: 120px;
+            background: rgba(10, 14, 26, 0.8);
+            border: 2px solid #BF5700;
+            border-radius: 50%;
+            position: relative;
+            touch-action: none;
+        }
+        
+        .joystick-handle {
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, #BF5700, #9BCBEB);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: none;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            width: 60px;
+            height: 60px;
+            background: rgba(10, 14, 26, 0.8);
+            border: 2px solid #9BCBEB;
+            border-radius: 50%;
+            color: #9BCBEB;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: none;
+        }
+        
+        .action-btn:active {
+            background: rgba(155, 203, 235, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    
+    <div class="perf-monitor" id="perfMonitor">
+        <div class="perf-item">
+            <span class="perf-label">FPS:</span>
+            <span class="perf-value" id="fpsStat">60</span>
+        </div>
+        <div class="perf-item">
+            <span class="perf-label">Chunks:</span>
+            <span class="perf-value" id="chunksStat">0</span>
+        </div>
+        <div class="perf-item">
+            <span class="perf-label">Entities:</span>
+            <span class="perf-value" id="entitiesStat">0</span>
+        </div>
+        <div class="perf-item">
+            <span class="perf-label">Draw Calls:</span>
+            <span class="perf-value" id="drawCallsStat">0</span>
+        </div>
+    </div>
+    
+    <div class="mobile-controls">
+        <div class="joystick" id="moveJoystick">
+            <div class="joystick-handle" id="moveHandle"></div>
+        </div>
+        <div class="action-buttons">
+            <button class="action-btn" id="jumpBtn">↑</button>
+            <button class="action-btn" id="interactBtn">E</button>
+        </div>
+    </div>
+    
+    <script type="module">
+        // Import SimplexNoise for procedural generation
+        import { createNoise3D, createNoise2D } from 'https://cdn.jsdelivr.net/npm/simplex-noise@4.0.0/dist/esm/simplex-noise.min.js';
+        
+        // Game Configuration
+        const CONFIG = {
+            CHUNK_SIZE: 16,
+            CHUNK_HEIGHT: 64,
+            RENDER_DISTANCE: 8,
+            BLOCK_SIZE: 1,
+            GRAVITY: -30,
+            JUMP_FORCE: 12,
+            MOVE_SPEED: 10,
+            SPRINT_MULTIPLIER: 2,
+            MOUSE_SENSITIVITY: 0.002,
+            FOV: 75,
+            NEAR_PLANE: 0.1,
+            FAR_PLANE: 1000,
+            FOG_NEAR: 50,
+            FOG_FAR: 200,
+            
+            // Biome thresholds
+            BIOME_SCALE: 0.005,
+            TERRAIN_SCALE: 0.02,
+            CAVE_SCALE: 0.05,
+            
+            // Performance
+            LOD_DISTANCES: [50, 100, 200],
+            MAX_CHUNKS_PER_FRAME: 2,
+            OCCLUSION_CULLING: true,
+            FRUSTUM_CULLING: true
+        };
+        
+        // Biome Definitions
+        const BIOMES = {
+            PLAINS: {
+                name: 'Plains',
+                baseHeight: 32,
+                variance: 8,
+                color: new THREE.Color(0x7fb069),
+                fogColor: new THREE.Color(0x87ceeb),
+                treeChance: 0.02,
+                grassChance: 0.3
+            },
+            DESERT: {
+                name: 'Desert',
+                baseHeight: 28,
+                variance: 12,
+                color: new THREE.Color(0xc19a6b),
+                fogColor: new THREE.Color(0xffd4a3),
+                treeChance: 0.001,
+                grassChance: 0.05
+            },
+            FOREST: {
+                name: 'Forest',
+                baseHeight: 35,
+                variance: 10,
+                color: new THREE.Color(0x228b22),
+                fogColor: new THREE.Color(0x4a5d23),
+                treeChance: 0.15,
+                grassChance: 0.4
+            },
+            MOUNTAINS: {
+                name: 'Mountains',
+                baseHeight: 45,
+                variance: 25,
+                color: new THREE.Color(0x8b8680),
+                fogColor: new THREE.Color(0xb0b0b0),
+                treeChance: 0.05,
+                grassChance: 0.1
+            },
+            OCEAN: {
+                name: 'Ocean',
+                baseHeight: 20,
+                variance: 3,
+                color: new THREE.Color(0x006994),
+                fogColor: new THREE.Color(0x4682b4),
+                treeChance: 0,
+                grassChance: 0
+            },
+            TUNDRA: {
+                name: 'Tundra',
+                baseHeight: 30,
+                variance: 6,
+                color: new THREE.Color(0xe0e0e0),
+                fogColor: new THREE.Color(0xf0f8ff),
+                treeChance: 0.01,
+                grassChance: 0.1
+            }
+        };
+        
+        // Block Types
+        const BLOCKS = {
+            AIR: 0,
+            GRASS: 1,
+            DIRT: 2,
+            STONE: 3,
+            WATER: 4,
+            SAND: 5,
+            SNOW: 6,
+            WOOD: 7,
+            LEAVES: 8,
+            CRYSTAL: 9,
+            LAVA: 10
+        };
+        
+        class BlazeWorlds {
+            constructor() {
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+                this.controls = null;
+                this.chunks = new Map();
+                this.entities = [];
+                this.player = null;
+                this.clock = new THREE.Clock();
+                this.stats = {
+                    fps: 60,
+                    chunks: 0,
+                    entities: 0,
+                    drawCalls: 0,
+                    position: { x: 0, y: 64, z: 0 },
+                    biome: 'Plains',
+                    resources: 0,
+                    discoveries: 0
+                };
+                
+                // Noise generators
+                this.terrainNoise = null;
+                this.biomeNoise = null;
+                this.caveNoise = null;
+                
+                // Input state
+                this.keys = {};
+                this.mouse = { x: 0, y: 0, locked: false };
+                this.velocity = new THREE.Vector3();
+                
+                // Mobile controls
+                this.joystick = { x: 0, y: 0, active: false };
+                this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                
+                this.init();
+            }
+            
+            async init() {
+                try {
+                    await this.showLoadingScreen();
+                    await this.initThree();
+                    await this.initNoise();
+                    await this.initPlayer();
+                    await this.initControls();
+                    await this.initWorld();
+                    await this.initLighting();
+                    await this.initPostProcessing();
+                    
+                    this.hideLoadingScreen();
+                    this.animate();
+                } catch (error) {
+                    console.error('Failed to initialize game:', error);
+                    this.showError('Failed to initialize Championship Frontiers');
+                }
+            }
+            
+            async showLoadingScreen() {
+                const loadingProgress = document.getElementById('loadingProgress');
+                const loadingStatus = document.getElementById('loadingStatus');
+                
+                const steps = [
+                    { progress: 10, status: 'Loading Three.js engine...' },
+                    { progress: 25, status: 'Generating noise functions...' },
+                    { progress: 40, status: 'Creating player entity...' },
+                    { progress: 55, status: 'Initializing controls...' },
+                    { progress: 70, status: 'Building world chunks...' },
+                    { progress: 85, status: 'Setting up lighting...' },
+                    { progress: 100, status: 'Ready to explore!' }
+                ];
+                
+                for (const step of steps) {
+                    loadingProgress.style.width = `${step.progress}%`;
+                    loadingStatus.textContent = step.status;
+                    await this.sleep(300);
+                }
+            }
+            
+            hideLoadingScreen() {
+                const loadingScreen = document.getElementById('loadingScreen');
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }
+            
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            
+            async initThree() {
+                // Scene setup
+                this.scene = new THREE.Scene();
+                this.scene.fog = new THREE.Fog(0x87ceeb, CONFIG.FOG_NEAR, CONFIG.FOG_FAR);
+                
+                // Camera setup
+                this.camera = new THREE.PerspectiveCamera(
+                    CONFIG.FOV,
+                    window.innerWidth / window.innerHeight,
+                    CONFIG.NEAR_PLANE,
+                    CONFIG.FAR_PLANE
+                );
+                this.camera.position.set(0, CONFIG.CHUNK_HEIGHT  20, 0);
+                
+                // Renderer setup
+                this.renderer = new THREE.WebGLRenderer({
+                    canvas: document.getElementById('gameCanvas'),
+                    antialias: true,
+                    alpha: false,
+                    powerPreference: 'high-performance'
+                });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                
+                // Window resize handler
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            }
+            
+            async initNoise() {
+                // Initialize noise generators for procedural generation
+                const seed = Math.random();
+                this.terrainNoise = createNoise3D(() => seed);
+                this.biomeNoise = createNoise2D(() => seed * 2);
+                this.caveNoise = createNoise3D(() => seed * 3);
+            }
+            
+            async initPlayer() {
+                // Create player entity
+                this.player = {
+                    position: new THREE.Vector3(0, CONFIG.CHUNK_HEIGHT  20, 0),
+                    rotation: new THREE.Euler(0, 0, 0),
+                    velocity: new THREE.Vector3(0, 0, 0),
+                    onGround: false,
+                    sprinting: false,
+                    flying: false,
+                    inventory: new Map(),
+                    health: 100,
+                    stamina: 100
+                };
+                
+                // Player collision box
+                const playerGeometry = new THREE.BoxGeometry(0.8, 1.8, 0.8);
+                const playerMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0xBF5700,
+                    transparent: true,
+                    opacity: 0
+                });
+                this.playerMesh = new THREE.Mesh(playerGeometry, playerMaterial);
+                this.scene.add(this.playerMesh);
+            }
+            
+            async initControls() {
+                // Keyboard controls
+                document.addEventListener('keydown', (e) => {
+                    this.keys[e.code] = true;
+                    
+                    if (e.code === 'Tab') {
+                        e.preventDefault();
+                        this.toggleInventory();
+                    }
+                });
+                
+                document.addEventListener('keyup', (e) => {
+                    this.keys[e.code] = false;
+                });
+                
+                // Mouse controls
+                document.addEventListener('click', async () => {
+                    if (!this.mouse.locked && !this.isMobile) {
+                        try {
+                            await document.body.requestPointerLock();
+                            this.mouse.locked = true;
+                        } catch (error) {
+                            console.error('Failed to lock pointer:', error);
+                        }
+                    }
+                });
+                
+                document.addEventListener('pointerlockchange', () => {
+                    this.mouse.locked = document.pointerLockElement === document.body;
+                });
+                
+                document.addEventListener('mousemove', (e) => {
+                    if (this.mouse.locked) {
+                        this.player.rotation.y -= e.movementX * CONFIG.MOUSE_SENSITIVITY;
+                        this.player.rotation.x -= e.movementY * CONFIG.MOUSE_SENSITIVITY;
+                        this.player.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.player.rotation.x));
+                    }
+                });
+                
+                // Mobile controls
+                if (this.isMobile) {
+                    this.initMobileControls();
+                }
+            }
+            
+            initMobileControls() {
+                const moveJoystick = document.getElementById('moveJoystick');
+                const moveHandle = document.getElementById('moveHandle');
+                const jumpBtn = document.getElementById('jumpBtn');
+                const interactBtn = document.getElementById('interactBtn');
+                
+                // Joystick controls
+                const handleJoystick = (e) => {
+                    const touch = e.touches[0];
+                    const rect = moveJoystick.getBoundingClientRect();
+                    const centerX = rect.left  rect.width / 2;
+                    const centerY = rect.top  rect.height / 2;
+                    
+                    let deltaX = touch.clientX - centerX;
+                    let deltaY = touch.clientY - centerY;
+                    
+                    const distance = Math.sqrt(deltaX * deltaX  deltaY * deltaY);
+                    const maxDistance = rect.width / 2 - 20;
+                    
+                    if (distance > maxDistance) {
+                        deltaX = (deltaX / distance) * maxDistance;
+                        deltaY = (deltaY / distance) * maxDistance;
+                    }
+                    
+                    moveHandle.style.transform = `translate(calc(-50%  ${deltaX}px), calc(-50%  ${deltaY}px))`;
+                    
+                    this.joystick.x = deltaX / maxDistance;
+                    this.joystick.y = -deltaY / maxDistance;
+                    this.joystick.active = true;
+                };
+                
+                moveJoystick.addEventListener('touchstart', handleJoystick);
+                moveJoystick.addEventListener('touchmove', handleJoystick);
+                moveJoystick.addEventListener('touchend', () => {
+                    moveHandle.style.transform = 'translate(-50%, -50%)';
+                    this.joystick.x = 0;
+                    this.joystick.y = 0;
+                    this.joystick.active = false;
+                });
+                
+                // Action buttons
+                jumpBtn.addEventListener('touchstart', () => {
+                    this.keys['Space'] = true;
+                });
+                jumpBtn.addEventListener('touchend', () => {
+                    this.keys['Space'] = false;
+                });
+                
+                interactBtn.addEventListener('touchstart', () => {
+                    this.keys['KeyE'] = true;
+                });
+                interactBtn.addEventListener('touchend', () => {
+                    this.keys['KeyE'] = false;
+                });
+                
+                // Touch look controls
+                let lookTouch = null;
+                document.addEventListener('touchstart', (e) => {
+                    if (e.touches.length === 2) {
+                        lookTouch = e.touches[1];
+                    }
+                });
+                
+                document.addEventListener('touchmove', (e) => {
+                    if (lookTouch && e.touches.length === 2) {
+                        const touch = e.touches[1];
+                        const deltaX = touch.clientX - lookTouch.clientX;
+                        const deltaY = touch.clientY - lookTouch.clientY;
+                        
+                        this.player.rotation.y -= deltaX * CONFIG.MOUSE_SENSITIVITY * 2;
+                        this.player.rotation.x -= deltaY * CONFIG.MOUSE_SENSITIVITY * 2;
+                        this.player.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.player.rotation.x));
+                        
+                        lookTouch = touch;
+                    }
+                });
+                
+                document.addEventListener('touchend', () => {
+                    lookTouch = null;
+                });
+            }
+            
+            async initWorld() {
+                // Generate initial chunks around spawn
+                const playerChunkX = Math.floor(this.player.position.x / CONFIG.CHUNK_SIZE);
+                const playerChunkZ = Math.floor(this.player.position.z / CONFIG.CHUNK_SIZE);
+                
+                for (let x = -CONFIG.RENDER_DISTANCE; x <= CONFIG.RENDER_DISTANCE; x++) {
+                    for (let z = -CONFIG.RENDER_DISTANCE; z <= CONFIG.RENDER_DISTANCE; z++) {
+                        await this.generateChunk(playerChunkX  x, playerChunkZ  z);
+                    }
+                }
+            }
+            
+            async generateChunk(chunkX, chunkZ) {
+                const key = `${chunkX},${chunkZ}`;
+                
+                if (this.chunks.has(key)) {
+                    return;
+                }
+                
+                const chunk = new Chunk(chunkX, chunkZ, this);
+                await chunk.generate();
+                this.chunks.set(key, chunk);
+                this.scene.add(chunk.mesh);
+                
+                this.stats.chunks = this.chunks.size;
+            }
+            
+            async initLighting() {
+                // Ambient light
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+                this.scene.add(ambientLight);
+                
+                // Directional light (sun)
+                const sunLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                sunLight.position.set(100, 200, 50);
+                sunLight.castShadow = true;
+                sunLight.shadow.camera.left = -100;
+                sunLight.shadow.camera.right = 100;
+                sunLight.shadow.camera.top = 100;
+                sunLight.shadow.camera.bottom = -100;
+                sunLight.shadow.camera.near = 0.5;
+                sunLight.shadow.camera.far = 500;
+                sunLight.shadow.mapSize.width = 2048;
+                sunLight.shadow.mapSize.height = 2048;
+                this.scene.add(sunLight);
+                
+                // Hemisphere light for better ambient
+                const hemiLight = new THREE.HemisphereLight(0x87ceeb, 0x545454, 0.3);
+                this.scene.add(hemiLight);
+            }
+            
+            async initPostProcessing() {
+                // Future: Add post-processing effects
+                // Could use EffectComposer from Three.js examples
+            }
+            
+            update(deltaTime) {
+                // Update player physics
+                this.updatePlayer(deltaTime);
+                
+                // Update chunks
+                this.updateChunks();
+                
+                // Update entities
+                this.updateEntities(deltaTime);
+                
+                // Update HUD
+                this.updateHUD();
+                
+                // Update minimap
+                this.updateMinimap();
+                
+                // Update performance stats
+                this.updatePerformance();
+            }
+            
+            updatePlayer(deltaTime) {
+                const moveSpeed = CONFIG.MOVE_SPEED * (this.player.sprinting ? CONFIG.SPRINT_MULTIPLIER : 1);
+                
+                // Handle input
+                let moveX = 0;
+                let moveZ = 0;
+                
+                if (this.isMobile && this.joystick.active) {
+                    moveX = this.joystick.x;
+                    moveZ = this.joystick.y;
+                } else {
+                    if (this.keys['KeyW']) moveZ = 1;
+                    if (this.keys['KeyS']) moveZ = -1;
+                    if (this.keys['KeyA']) moveX = -1;
+                    if (this.keys['KeyD']) moveX = 1;
+                }
+                
+                // Calculate movement direction
+                const forward = new THREE.Vector3(
+                    Math.sin(this.player.rotation.y),
+                    0,
+                    Math.cos(this.player.rotation.y)
+                );
+                const right = new THREE.Vector3(
+                    Math.sin(this.player.rotation.y - Math.PI / 2),
+                    0,
+                    Math.cos(this.player.rotation.y - Math.PI / 2)
+                );
+                
+                // Apply movement
+                this.player.velocity.x = (forward.x * moveZ  right.x * moveX) * moveSpeed;
+                this.player.velocity.z = (forward.z * moveZ  right.z * moveX) * moveSpeed;
+                
+                // Handle jumping/flying
+                if (this.keys['Space']) {
+                    if (this.player.flying) {
+                        this.player.velocity.y = moveSpeed;
+                    } else if (this.player.onGround) {
+                        this.player.velocity.y = CONFIG.JUMP_FORCE;
+                        this.player.onGround = false;
+                    }
+                }
+                
+                // Apply gravity
+                if (!this.player.flying) {
+                    this.player.velocity.y = CONFIG.GRAVITY * deltaTime;
+                }
+                
+                // Update position
+                this.player.position.x = this.player.velocity.x * deltaTime;
+                this.player.position.y = this.player.velocity.y * deltaTime;
+                this.player.position.z = this.player.velocity.z * deltaTime;
+                
+                // Ground collision
+                const groundHeight = this.getGroundHeight(this.player.position.x, this.player.position.z);
+                if (this.player.position.y <= groundHeight  1.8) {
+                    this.player.position.y = groundHeight  1.8;
+                    this.player.velocity.y = 0;
+                    this.player.onGround = true;
+                }
+                
+                // Update camera
+                this.camera.position.copy(this.player.position);
+                this.camera.rotation.x = this.player.rotation.x;
+                this.camera.rotation.y = this.player.rotation.y;
+                
+                // Update player mesh
+                this.playerMesh.position.copy(this.player.position);
+                this.playerMesh.position.y -= 0.9;
+                
+                // Update stats
+                this.stats.position = {
+                    x: Math.floor(this.player.position.x),
+                    y: Math.floor(this.player.position.y),
+                    z: Math.floor(this.player.position.z)
+                };
+                
+                // Sprint toggle
+                this.player.sprinting = this.keys['ShiftLeft'] || this.keys['ShiftRight'];
+                
+                // Flying toggle
+                if (this.keys['KeyF']) {
+                    this.player.flying = !this.player.flying;
+                    this.keys['KeyF'] = false; // Prevent rapid toggling
+                }
+            }
+            
+            getGroundHeight(x, z) {
+                // Sample terrain height at position
+                const biomeValue = this.biomeNoise(x * CONFIG.BIOME_SCALE, z * CONFIG.BIOME_SCALE);
+                const biome = this.getBiomeAt(biomeValue);
+                
+                const terrainHeight = this.terrainNoise(
+                    x * CONFIG.TERRAIN_SCALE,
+                    0,
+                    z * CONFIG.TERRAIN_SCALE
+                );
+                
+                return biome.baseHeight  terrainHeight * biome.variance;
+            }
+            
+            getBiomeAt(noiseValue) {
+                // Map noise value to biome
+                if (noiseValue < -0.5) return BIOMES.OCEAN;
+                if (noiseValue < -0.2) return BIOMES.DESERT;
+                if (noiseValue < 0.0) return BIOMES.PLAINS;
+                if (noiseValue < 0.3) return BIOMES.FOREST;
+                if (noiseValue < 0.6) return BIOMES.MOUNTAINS;
+                return BIOMES.TUNDRA;
+            }
+            
+            updateChunks() {
+                const playerChunkX = Math.floor(this.player.position.x / CONFIG.CHUNK_SIZE);
+                const playerChunkZ = Math.floor(this.player.position.z / CONFIG.CHUNK_SIZE);
+                
+                // Generate new chunks
+                for (let x = -CONFIG.RENDER_DISTANCE; x <= CONFIG.RENDER_DISTANCE; x++) {
+                    for (let z = -CONFIG.RENDER_DISTANCE; z <= CONFIG.RENDER_DISTANCE; z++) {
+                        const chunkX = playerChunkX  x;
+                        const chunkZ = playerChunkZ  z;
+                        const key = `${chunkX},${chunkZ}`;
+                        
+                        if (!this.chunks.has(key)) {
+                            this.generateChunk(chunkX, chunkZ);
+                        }
+                    }
+                }
+                
+                // Remove distant chunks
+                for (const [key, chunk] of this.chunks) {
+                    const dx = Math.abs(chunk.x - playerChunkX);
+                    const dz = Math.abs(chunk.z - playerChunkZ);
+                    
+                    if (dx > CONFIG.RENDER_DISTANCE  2 || dz > CONFIG.RENDER_DISTANCE  2) {
+                        this.scene.remove(chunk.mesh);
+                        chunk.dispose();
+                        this.chunks.delete(key);
+                    }
+                }
+                
+                // Update biome
+                const biomeValue = this.biomeNoise(
+                    this.player.position.x * CONFIG.BIOME_SCALE,
+                    this.player.position.z * CONFIG.BIOME_SCALE
+                );
+                this.stats.biome = this.getBiomeAt(biomeValue).name;
+            }
+            
+            updateEntities(deltaTime) {
+                // Update entity AI and physics
+                for (const entity of this.entities) {
+                    entity.update(deltaTime);
+                }
+                
+                this.stats.entities = this.entities.length;
+            }
+            
+            updateHUD() {
+                // Update HUD elements
+                document.getElementById('positionStat').textContent = 
+                    `${this.stats.position.x}, ${this.stats.position.y}, ${this.stats.position.z}`;
+                document.getElementById('biomeStat').textContent = this.stats.biome;
+                document.getElementById('resourceStat').textContent = this.stats.resources;
+                document.getElementById('discoveryStat').textContent = this.stats.discoveries;
+            }
+            
+            updateMinimap() {
+                const canvas = document.getElementById('minimapCanvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Clear canvas
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw chunks
+                const playerChunkX = Math.floor(this.player.position.x / CONFIG.CHUNK_SIZE);
+                const playerChunkZ = Math.floor(this.player.position.z / CONFIG.CHUNK_SIZE);
+                
+                const scale = 10;
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                
+                for (const [key, chunk] of this.chunks) {
+                    const relX = (chunk.x - playerChunkX) * scale  centerX;
+                    const relZ = (chunk.z - playerChunkZ) * scale  centerY;
+                    
+                    if (relX >= 0 && relX < canvas.width && relZ >= 0 && relZ < canvas.height) {
+                        ctx.fillStyle = '#9BCBEB';
+                        ctx.fillRect(relX - scale/2, relZ - scale/2, scale, scale);
+                    }
+                }
+                
+                // Draw player
+                ctx.fillStyle = '#BF5700';
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Draw direction indicator
+                ctx.strokeStyle = '#BF5700';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(
+                    centerX  Math.sin(this.player.rotation.y) * 10,
+                    centerY  Math.cos(this.player.rotation.y) * 10
+                );
+                ctx.stroke();
+            }
+            
+            updatePerformance() {
+                // Calculate FPS
+                this.stats.fps = Math.round(1 / this.clock.getDelta());
+                
+                // Update performance display
+                document.getElementById('fpsStat').textContent = this.stats.fps;
+                document.getElementById('chunksStat').textContent = this.stats.chunks;
+                document.getElementById('entitiesStat').textContent = this.stats.entities;
+                document.getElementById('drawCallsStat').textContent = this.renderer.info.render.calls;
+            }
+            
+            toggleInventory() {
+                // Future: Implement inventory UI
+                console.log('Inventory:', this.player.inventory);
+            }
+            
+            showError(message) {
+                const loadingScreen = document.getElementById('loadingScreen');
+                const loadingStatus = document.getElementById('loadingStatus');
+                loadingStatus.textContent = `Error: ${message}`;
+                loadingStatus.style.color = '#ff4444';
+            }
+            
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                
+                const deltaTime = Math.min(this.clock.getDelta(), 0.1);
+                
+                this.update(deltaTime);
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+        
+        // Chunk class for world generation
+        class Chunk {
+            constructor(x, z, world) {
+                this.x = x;
+                this.z = z;
+                this.world = world;
+                this.blocks = new Uint8Array(CONFIG.CHUNK_SIZE * CONFIG.CHUNK_HEIGHT * CONFIG.CHUNK_SIZE);
+                this.mesh = null;
+            }
+            
+            async generate() {
+                // Generate terrain
+                for (let x = 0; x < CONFIG.CHUNK_SIZE; x++) {
+                    for (let z = 0; z < CONFIG.CHUNK_SIZE; z++) {
+                        const worldX = this.x * CONFIG.CHUNK_SIZE  x;
+                        const worldZ = this.z * CONFIG.CHUNK_SIZE  z;
+                        
+                        // Get biome
+                        const biomeValue = this.world.biomeNoise(
+                            worldX * CONFIG.BIOME_SCALE,
+                            worldZ * CONFIG.BIOME_SCALE
+                        );
+                        const biome = this.world.getBiomeAt(biomeValue);
+                        
+                        // Generate height
+                        const terrainHeight = this.world.terrainNoise(
+                            worldX * CONFIG.TERRAIN_SCALE,
+                            0,
+                            worldZ * CONFIG.TERRAIN_SCALE
+                        );
+                        
+                        const height = Math.floor(biome.baseHeight  terrainHeight * biome.variance);
+                        
+                        // Fill blocks
+                        for (let y = 0; y < height; y++) {
+                            const index = this.getIndex(x, y, z);
+                            
+                            if (y < height - 4) {
+                                this.blocks[index] = BLOCKS.STONE;
+                            } else if (y < height - 1) {
+                                this.blocks[index] = BLOCKS.DIRT;
+                            } else {
+                                if (biome === BIOMES.DESERT) {
+                                    this.blocks[index] = BLOCKS.SAND;
+                                } else if (biome === BIOMES.TUNDRA) {
+                                    this.blocks[index] = BLOCKS.SNOW;
+                                } else if (biome === BIOMES.OCEAN && y < 25) {
+                                    this.blocks[index] = BLOCKS.WATER;
+                                } else {
+                                    this.blocks[index] = BLOCKS.GRASS;
+                                }
+                            }
+                        }
+                        
+                        // Add caves
+                        for (let y = 0; y < height - 5; y++) {
+                            const caveValue = this.world.caveNoise(
+                                worldX * CONFIG.CAVE_SCALE,
+                                y * CONFIG.CAVE_SCALE,
+                                worldZ * CONFIG.CAVE_SCALE
+                            );
+                            
+                            if (caveValue > 0.7) {
+                                this.blocks[this.getIndex(x, y, z)] = BLOCKS.AIR;
+                            }
+                        }
+                        
+                        // Add trees
+                        if (Math.random() < biome.treeChance && height > 30) {
+                            this.generateTree(x, height, z);
+                        }
+                    }
+                }
+                
+                // Build mesh
+                this.buildMesh();
+            }
+            
+            generateTree(x, groundY, z) {
+                const treeHeight = 5  Math.floor(Math.random() * 3);
+                
+                // Trunk
+                for (let y = 0; y < treeHeight; y++) {
+                    if (groundY  y < CONFIG.CHUNK_HEIGHT) {
+                        this.blocks[this.getIndex(x, groundY  y, z)] = BLOCKS.WOOD;
+                    }
+                }
+                
+                // Leaves
+                const leafRadius = 2;
+                for (let dx = -leafRadius; dx <= leafRadius; dx++) {
+                    for (let dy = -leafRadius; dy <= leafRadius; dy++) {
+                        for (let dz = -leafRadius; dz <= leafRadius; dz++) {
+                            const dist = Math.sqrt(dx*dx  dy*dy  dz*dz);
+                            if (dist <= leafRadius) {
+                                const lx = x  dx;
+                                const ly = groundY  treeHeight  dy;
+                                const lz = z  dz;
+                                
+                                if (lx >= 0 && lx < CONFIG.CHUNK_SIZE &&
+                                    ly >= 0 && ly < CONFIG.CHUNK_HEIGHT &&
+                                    lz >= 0 && lz < CONFIG.CHUNK_SIZE) {
+                                    
+                                    const index = this.getIndex(lx, ly, lz);
+                                    if (this.blocks[index] === BLOCKS.AIR) {
+                                        this.blocks[index] = BLOCKS.LEAVES;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            getIndex(x, y, z) {
+                return x  y * CONFIG.CHUNK_SIZE  z * CONFIG.CHUNK_SIZE * CONFIG.CHUNK_HEIGHT;
+            }
+            
+            buildMesh() {
+                const geometry = new THREE.BufferGeometry();
+                const vertices = [];
+                const normals = [];
+                const colors = [];
+                const uvs = [];
+                
+                // Define block colors
+                const blockColors = {
+                    [BLOCKS.GRASS]: new THREE.Color(0x7fb069),
+                    [BLOCKS.DIRT]: new THREE.Color(0x8b6635),
+                    [BLOCKS.STONE]: new THREE.Color(0x8b8680),
+                    [BLOCKS.WATER]: new THREE.Color(0x006994),
+                    [BLOCKS.SAND]: new THREE.Color(0xc19a6b),
+                    [BLOCKS.SNOW]: new THREE.Color(0xe0e0e0),
+                    [BLOCKS.WOOD]: new THREE.Color(0x8b4513),
+                    [BLOCKS.LEAVES]: new THREE.Color(0x228b22),
+                    [BLOCKS.CRYSTAL]: new THREE.Color(0x9b59b6),
+                    [BLOCKS.LAVA]: new THREE.Color(0xff4500)
+                };
+                
+                // Generate mesh for visible blocks
+                for (let x = 0; x < CONFIG.CHUNK_SIZE; x++) {
+                    for (let y = 0; y < CONFIG.CHUNK_HEIGHT; y++) {
+                        for (let z = 0; z < CONFIG.CHUNK_SIZE; z++) {
+                            const block = this.blocks[this.getIndex(x, y, z)];
+                            
+                            if (block === BLOCKS.AIR) continue;
+                            
+                            const worldX = this.x * CONFIG.CHUNK_SIZE  x;
+                            const worldZ = this.z * CONFIG.CHUNK_SIZE  z;
+                            
+                            const color = blockColors[block] || new THREE.Color(0xffffff);
+                            
+                            // Check each face visibility
+                            const faces = [
+                                { dir: [0, 1, 0], normal: [0, 1, 0] }, // Top
+                                { dir: [0, -1, 0], normal: [0, -1, 0] }, // Bottom
+                                { dir: [1, 0, 0], normal: [1, 0, 0] }, // Right
+                                { dir: [-1, 0, 0], normal: [-1, 0, 0] }, // Left
+                                { dir: [0, 0, 1], normal: [0, 0, 1] }, // Front
+                                { dir: [0, 0, -1], normal: [0, 0, -1] } // Back
+                            ];
+                            
+                            for (const face of faces) {
+                                const nx = x  face.dir[0];
+                                const ny = y  face.dir[1];
+                                const nz = z  face.dir[2];
+                                
+                                // Check if face is exposed
+                                let exposed = false;
+                                if (nx < 0 || nx >= CONFIG.CHUNK_SIZE ||
+                                    ny < 0 || ny >= CONFIG.CHUNK_HEIGHT ||
+                                    nz < 0 || nz >= CONFIG.CHUNK_SIZE) {
+                                    exposed = true;
+                                } else {
+                                    const neighborBlock = this.blocks[this.getIndex(nx, ny, nz)];
+                                    exposed = neighborBlock === BLOCKS.AIR || 
+                                             (block !== BLOCKS.WATER && neighborBlock === BLOCKS.WATER);
+                                }
+                                
+                                if (exposed) {
+                                    this.addFace(
+                                        vertices, normals, colors, uvs,
+                                        worldX, y, worldZ,
+                                        face.normal,
+                                        color
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Set geometry attributes
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+                geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+                geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+                geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+                
+                // Create material
+                const material = new THREE.MeshLambertMaterial({
+                    vertexColors: true,
+                    side: THREE.FrontSide
+                });
+                
+                // Create mesh
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.castShadow = true;
+                this.mesh.receiveShadow = true;
+            }
+            
+            addFace(vertices, normals, colors, uvs, x, y, z, normal, color) {
+                const size = CONFIG.BLOCK_SIZE;
+                
+                // Define vertices for each face
+                const faceVertices = {
+                    '0,1,0': [ // Top
+                        [x, y  size, z],
+                        [x  size, y  size, z],
+                        [x  size, y  size, z  size],
+                        [x, y  size, z  size]
+                    ],
+                    '0,-1,0': [ // Bottom
+                        [x, y, z  size],
+                        [x  size, y, z  size],
+                        [x  size, y, z],
+                        [x, y, z]
+                    ],
+                    '1,0,0': [ // Right
+                        [x  size, y, z],
+                        [x  size, y, z  size],
+                        [x  size, y  size, z  size],
+                        [x  size, y  size, z]
+                    ],
+                    '-1,0,0': [ // Left
+                        [x, y, z  size],
+                        [x, y, z],
+                        [x, y  size, z],
+                        [x, y  size, z  size]
+                    ],
+                    '0,0,1': [ // Front
+                        [x, y, z  size],
+                        [x  size, y, z  size],
+                        [x  size, y  size, z  size],
+                        [x, y  size, z  size]
+                    ],
+                    '0,0,-1': [ // Back
+                        [x  size, y, z],
+                        [x, y, z],
+                        [x, y  size, z],
+                        [x  size, y  size, z]
+                    ]
+                };
+                
+                const key = `${normal[0]},${normal[1]},${normal[2]}`;
+                const verts = faceVertices[key];
+                
+                if (!verts) return;
+                
+                // Add two triangles for the face
+                const indices = [0, 1, 2, 0, 2, 3];
+                
+                for (const i of indices) {
+                    vertices.push(...verts[i]);
+                    normals.push(...normal);
+                    colors.push(color.r, color.g, color.b);
+                    uvs.push(
+                        (verts[i][0]  verts[i][2]) % 1,
+                        (verts[i][1]  verts[i][2]) % 1
+                    );
+                }
+            }
+            
+            dispose() {
+                if (this.mesh) {
+                    this.mesh.geometry.dispose();
+                    this.mesh.material.dispose();
+                }
+            }
+        }
+        
+        // Initialize game
+        window.addEventListener('DOMContentLoaded', () => {
+            const game = new BlazeWorlds();
+            window.blazeWorlds = game; // Export for debugging
+        });
+    </script>
+</body>
+</html>
