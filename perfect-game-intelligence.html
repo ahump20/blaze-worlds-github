@@ -1,0 +1,485 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfect Game Intelligence | Elite Youth Baseball Scouting Authority</title>
+    <meta name="description" content="The definitive Perfect Game scouting intelligence platform. Track elite youth baseball prospects from showcase to draft with championship-level precision.">
+    
+    <!-- Performance Critical CSS -->
+    <style>
+        :root {
+            --burnt-orange: #BF5700;
+            --sec-crimson: #9B2222;
+            --cardinal-blue: #9BCBEB;
+            --deep-teal: #00B2A9;
+            --texas-navy: #002244;
+            --perfect-game-gold: #FFD700;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #0A192F, #1E3A8A);
+            color: #E6F1FF;
+        }
+
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(191, 87, 0, 0.15), transparent 50%),
+                       radial-gradient(circle at 70% 20%, rgba(155, 34, 34, 0.15), transparent 50%);
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 2;
+            max-width: 1200px;
+            padding: 2rem;
+        }
+
+        .authority-badge {
+            background: linear-gradient(135deg, var(--perfect-game-gold), var(--burnt-orange));
+            color: var(--texas-navy);
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 24px rgba(255, 215, 0, 0.3);
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--perfect-game-gold), var(--burnt-orange), var(--sec-crimson));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--cardinal-blue);
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--perfect-game-gold);
+            box-shadow: 0 16px 40px rgba(255, 215, 0, 0.2);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--perfect-game-gold);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94A9C9;
+        }
+
+        .cta-section {
+            margin-top: 3rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--perfect-game-gold), var(--burnt-orange));
+            color: var(--texas-navy);
+            padding: 18px 36px;
+            font-size: 1.125rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--perfect-game-gold);
+            border: 2px solid var(--perfect-game-gold);
+            padding: 16px 34px;
+            font-size: 1.125rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--perfect-game-gold);
+            color: var(--texas-navy);
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 6rem 2rem;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--perfect-game-gold), var(--burnt-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            font-size: 1.25rem;
+            text-align: center;
+            color: #94A9C9;
+            margin-bottom: 4rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--perfect-game-gold);
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--perfect-game-gold), var(--burnt-orange));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--perfect-game-gold);
+        }
+
+        .feature-description {
+            color: #94A9C9;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-metrics {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--perfect-game-gold);
+            display: block;
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .features-grid { grid-template-columns: 1fr; }
+            .btn-primary, .btn-secondary { 
+                display: block; 
+                margin: 1rem 0; 
+                text-align: center; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <div class="authority-badge">
+                🏆 Official Perfect Game Intelligence Partner
+            </div>
+            
+            <h1 class="hero-title">Perfect Game Intelligence</h1>
+            <p class="hero-subtitle">Elite youth baseball scouting authority from showcase to draft</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">11,000+</span>
+                    <span class="stat-label">Texas Teams</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">5,200+</span>
+                    <span class="stat-label">PG Events 2025</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">146</span>
+                    <span class="stat-label">Banditos Championships</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">80%</span>
+                    <span class="stat-label">US Market Coverage</span>
+                </div>
+            </div>
+            
+            <div class="cta-section">
+                <a href="/perfect-game-dashboard" class="btn-primary">Access Scout Portal</a>
+                <a href="#features" class="btn-secondary">Explore Intelligence</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="container">
+            <h2 class="section-title">Championship-Level Intelligence</h2>
+            <p class="section-subtitle">The same scouting precision trusted by MLB organizations</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚾</div>
+                    <h3 class="feature-title">Live Event Coverage</h3>
+                    <p class="feature-description">Live coverage of South Texas Sliders, Houston Banditos, Dulins Dodgers, Austin Wings and all elite Texas/Deep South Perfect Game organizations.</p>
+                    <div class="feature-metrics">
+                        <div class="metric">
+                            <span class="metric-value">5,200+</span>
+                            <span class="metric-label">Events/Year</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">40</span>
+                            <span class="metric-label">States Covered</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Advanced Analytics</h3>
+                    <p class="feature-description">Championship-caliber analytics from Texas World Series events: Central Texas (Austin), South World Series (Tomball), and "The Natty" Texas Style (Flower Mound).</p>
+                    <div class="feature-metrics">
+                        <div class="metric">
+                            <span class="metric-value">3</span>
+                            <span class="metric-label">TX World Series</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">89%</span>
+                            <span class="metric-label">Draft Accuracy</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Player Development Tracking</h3>
+                    <p class="feature-description">Track elite prospects from Houston Banditos (146 National Championships), Dulins Dodgers (Plano), South Texas Sliders, and Austin Wings through the Deep South pipeline.</p>
+                    <div class="feature-metrics">
+                        <div class="metric">
+                            <span class="metric-value">219</span>
+                            <span class="metric-label">Banditos State Titles</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">92%</span>
+                            <span class="metric-label">Commit Accuracy</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3 class="feature-title">Scout Network Intelligence</h3>
+                    <p class="feature-description">Direct insights from professional scouts and college coaches attending Perfect Game events nationwide.</p>
+                    <div class="feature-metrics">
+                        <div class="metric">
+                            <span class="metric-value">200+</span>
+                            <span class="metric-label">Scout Network</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">30</span>
+                            <span class="metric-label">MLB Teams</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🏆</div>
+                    <h3 class="feature-title">Championship Pedigree</h3>
+                    <p class="feature-description">Track championship bloodlines, coaching trees, and program success rates with predictive championship modeling.</p>
+                    <div class="feature-metrics">
+                        <div class="metric">
+                            <span class="metric-value">500+</span>
+                            <span class="metric-label">Programs Tracked</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">85%</span>
+                            <span class="metric-label">Title Prediction</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💎</div>
+                    <h3 class="feature-title">Hidden Gem Detection</h3>
+                    <p class="feature-description">AI-powered identification of undervalued prospects based on performance trajectory and measurable improvements.</p>
+                    <div class="feature-metrics">
+                        <div class="metric">
+                            <span class="metric-value">73%</span>
+                            <span class="metric-label">Gem Hit Rate</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">24</span>
+                            <span class="metric-label">Drafted Gems '24</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- JavaScript for interactions -->
+    <script>
+        // Animate stats on scroll
+        const observerOptions = {
+            threshold: 0.5,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const statNumber = entry.target.querySelector('.stat-number');
+                    if (statNumber && !statNumber.dataset.animated) {
+                        animateNumber(statNumber);
+                        statNumber.dataset.animated = 'true';
+                    }
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.stat-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        function animateNumber(element) {
+            const finalText = element.textContent;
+            const hasSymbols = /[^\d]/.test(finalText);
+            const number = parseInt(finalText.replace(/[^\d]/g, ''));
+            
+            if (isNaN(number)) return;
+            
+            const duration = 2000;
+            const step = number / (duration / 16);
+            let current = 0;
+            
+            const timer = setInterval(() => {
+                current += step;
+                if (current >= number) {
+                    current = number;
+                    clearInterval(timer);
+                }
+                
+                let display = Math.floor(current).toString();
+                if (finalText.includes('+')) display += '+';
+                if (finalText.includes('%')) display += '%';
+                if (finalText.includes('/')) display += '/7';
+                
+                element.textContent = display;
+            }, 16);
+        }
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+
+</body></html>

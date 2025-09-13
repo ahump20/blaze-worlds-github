@@ -1,0 +1,1707 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blaze Worlds: Next-Gen Visual Experience</title>
+    <meta name="description" content="Championship-level photorealistic exploration with cutting-edge graphics technology">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌌</text></svg>">
+    <style>
+        :root {
+            --texas-orange: #BF5700;
+            --cardinal-blue: #9BCBEB;
+            --grizzly-teal: #00B2A9;
+            --tennessee-deep: #002244;
+            --pearl-white: #FAFAFA;
+            --graphite: #36454F;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: radial-gradient(circle at 50% 50%, var(--tennessee-deep) 0%, #000011 100%);
+            overflow: hidden;
+            color: var(--texas-orange);
+            user-select: none;
+            font-weight: 500;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #gameCanvas {
+            display: block;
+            cursor: crosshair;
+            transition: filter 0.3s ease;
+        }
+
+        #ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .ui-panel {
+            background: rgba(0, 17, 34, 0.95);
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            border-radius: 16px;
+            backdrop-filter: blur(20px) saturate(180%);
+            box-shadow: 
+                0 8px 32px rgba(191, 87, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .ui-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            padding: 2px;
+            background: linear-gradient(135deg, var(--texas-orange), var(--grizzly-teal), var(--cardinal-blue));
+            border-radius: inherit;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: xor;
+            -webkit-mask-composite: xor;
+        }
+
+        #hud {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            padding: 24px;
+            color: var(--cardinal-blue);
+            font-size: 14px;
+            min-width: 320px;
+            font-weight: 600;
+        }
+
+        #performance {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            padding: 20px;
+            color: var(--grizzly-teal);
+            font-size: 13px;
+            min-width: 280px;
+        }
+
+        #graphicsPanel {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            padding: 20px;
+            color: var(--pearl-white);
+            font-size: 12px;
+            min-width: 300px;
+        }
+
+        #controls {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            padding: 20px;
+            color: var(--cardinal-blue);
+            font-size: 12px;
+            max-width: 350px;
+            line-height: 1.6;
+        }
+
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--texas-orange);
+            border-radius: 50%;
+            opacity: 0.9;
+            animation: crosshairPulse 2s infinite ease-in-out;
+            box-shadow: 
+                0 0 20px rgba(191, 87, 0, 0.6),
+                inset 0 0 20px rgba(191, 87, 0, 0.2);
+        }
+
+        #loadingScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 30% 40%, rgba(191, 87, 0, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 70% 60%, rgba(0, 178, 169, 0.3) 0%, transparent 50%),
+                linear-gradient(135deg, var(--tennessee-deep) 0%, #000011 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 2s ease-out;
+        }
+
+        #loadingTitle {
+            font-size: 5em;
+            color: var(--pearl-white);
+            text-shadow: 
+                0 0 40px var(--texas-orange),
+                0 0 80px var(--grizzly-teal);
+            margin-bottom: 30px;
+            animation: titleGlow 4s infinite ease-in-out;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
+        #loadingSubtitle {
+            font-size: 1.8em;
+            color: var(--cardinal-blue);
+            margin-bottom: 50px;
+            text-align: center;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        #loadingBar {
+            width: 500px;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid var(--texas-orange);
+            box-shadow: 0 0 30px rgba(191, 87, 0, 0.5);
+        }
+
+        #loadingProgress {
+            height: 100%;
+            background: linear-gradient(
+                90deg, 
+                var(--texas-orange) 0%, 
+                var(--grizzly-teal) 50%, 
+                var(--cardinal-blue) 100%
+            );
+            width: 0%;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 6px;
+            box-shadow: 0 0 20px rgba(191, 87, 0, 0.8);
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: var(--texas-orange);
+            text-shadow: 0 0 10px rgba(191, 87, 0, 0.5);
+        }
+
+        .graphics-option {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+            align-items: center;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 40px;
+            height: 20px;
+            background: var(--graphite);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            pointer-events: all;
+        }
+
+        .toggle-switch.active {
+            background: var(--grizzly-teal);
+            box-shadow: 0 0 15px rgba(0, 178, 169, 0.5);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: var(--pearl-white);
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(20px);
+        }
+
+        @keyframes crosshairPulse {
+            0%, 100% { 
+                opacity: 0.9; 
+                transform: translate(-50%, -50%) scale(1);
+                box-shadow: 0 0 20px rgba(191, 87, 0, 0.6);
+            }
+            50% { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1.1);
+                box-shadow: 0 0 30px rgba(191, 87, 0, 0.9);
+            }
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { 
+                text-shadow: 
+                    0 0 40px var(--texas-orange),
+                    0 0 80px var(--grizzly-teal);
+            }
+            50% { 
+                text-shadow: 
+                    0 0 60px var(--texas-orange),
+                    0 0 120px var(--grizzly-teal),
+                    0 0 180px var(--cardinal-blue);
+            }
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #fpsDisplay {
+            position: absolute;
+            top: 100px;
+            right: 24px;
+            color: var(--grizzly-teal);
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 178, 169, 0.5);
+        }
+
+        .control-key {
+            background: linear-gradient(145deg, var(--texas-orange), #B8540A);
+            color: var(--pearl-white);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 11px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        #worldInfo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: var(--pearl-white);
+            font-size: 18px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+            text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+
+        #worldInfo.visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="ui">
+            <div id="hud" class="ui-panel">
+                <div style="font-size: 18px; font-weight: 800; margin-bottom: 16px; color: var(--texas-orange);">
+                    🌌 BLAZE WORLDS: NEXT-GEN
+                </div>
+                <div class="stat-row">
+                    <span>Coordinates:</span>
+                    <span class="stat-value" id="coordinates">0, 0, 0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Biome:</span>
+                    <span class="stat-value" id="biome">Frontier Plains</span>
+                </div>
+                <div class="stat-row">
+                    <span>Elevation:</span>
+                    <span class="stat-value" id="altitude">64m</span>
+                </div>
+                <div class="stat-row">
+                    <span>Velocity:</span>
+                    <span class="stat-value" id="speed">0 km/h</span>
+                </div>
+                <div class="stat-row">
+                    <span>Time of Day:</span>
+                    <span class="stat-value" id="timeOfDay">12:00</span>
+                </div>
+                <div class="stat-row">
+                    <span>Weather:</span>
+                    <span class="stat-value" id="weather">Clear Skies</span>
+                </div>
+            </div>
+
+            <div id="performance" class="ui-panel">
+                <div style="font-weight: 800; margin-bottom: 12px; color: var(--grizzly-teal);">⚡ PERFORMANCE METRICS</div>
+                <div class="stat-row">
+                    <span>Frame Rate:</span>
+                    <span class="stat-value" id="fps">60 FPS</span>
+                </div>
+                <div class="stat-row">
+                    <span>Render Time:</span>
+                    <span class="stat-value" id="renderTime">16.6ms</span>
+                </div>
+                <div class="stat-row">
+                    <span>Active Chunks:</span>
+                    <span class="stat-value" id="chunkCount">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Draw Calls:</span>
+                    <span class="stat-value" id="drawCalls">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Vertices:</span>
+                    <span class="stat-value" id="vertices">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>GPU Memory:</span>
+                    <span class="stat-value" id="gpuMemory">128MB</span>
+                </div>
+            </div>
+
+            <div id="graphicsPanel" class="ui-panel">
+                <div style="font-weight: 800; margin-bottom: 12px; color: var(--pearl-white);">🎨 GRAPHICS SETTINGS</div>
+                <div class="graphics-option">
+                    <span>HDR Lighting</span>
+                    <div class="toggle-switch active" onclick="game.toggleHDR()"></div>
+                </div>
+                <div class="graphics-option">
+                    <span>Volumetric Fog</span>
+                    <div class="toggle-switch active" onclick="game.toggleVolumetricFog()"></div>
+                </div>
+                <div class="graphics-option">
+                    <span>Screen Space Reflections</span>
+                    <div class="toggle-switch active" onclick="game.toggleSSR()"></div>
+                </div>
+                <div class="graphics-option">
+                    <span>Ambient Occlusion</span>
+                    <div class="toggle-switch active" onclick="game.toggleAO()"></div>
+                </div>
+                <div class="graphics-option">
+                    <span>Bloom Effect</span>
+                    <div class="toggle-switch active" onclick="game.toggleBloom()"></div>
+                </div>
+                <div class="graphics-option">
+                    <span>Dynamic Weather</span>
+                    <div class="toggle-switch active" onclick="game.toggleWeather()"></div>
+                </div>
+                <div class="graphics-option">
+                    <span>Parallax Mapping</span>
+                    <div class="toggle-switch active" onclick="game.toggleParallax()"></div>
+                </div>
+            </div>
+
+            <div id="crosshair"></div>
+
+            <div id="controls" class="ui-panel">
+                <h3 style="color: var(--texas-orange); margin-bottom: 16px; font-weight: 800;">🎮 CHAMPIONSHIP CONTROLS</h3>
+                <div><span class="control-key">WASD</span> Navigate terrain</div>
+                <div><span class="control-key">SPACE</span> Ascend/Jump</div>
+                <div><span class="control-key">SHIFT</span> Descend/Sprint</div>
+                <div><span class="control-key">MOUSE</span> Camera control</div>
+                <div><span class="control-key">SCROLL</span> Speed adjustment</div>
+                <div><span class="control-key">R</span> Regenerate world</div>
+                <div><span class="control-key">F</span> Wireframe mode</div>
+                <div><span class="control-key">V</span> View mode cycle
+                <div><span class="control-key">T</span> Time control</div>
+                <div><span class="control-key">G</span> Toggle rain</div>
+                <div><span class="control-key">H</span> Toggle HUD</div>
+                <br>
+                <div style="color: var(--grizzly-teal); font-style: italic; font-size: 11px;">
+                    🔥 Experience photorealistic Texas frontiers with next-generation graphics technology and championship-level optimization!
+                </div>
+            </div>
+
+            <div id="worldInfo">
+                <div id="worldInfoText">Generating Championship-Level Worlds...</div>
+            </div>
+        </div>
+
+        <div id="loadingScreen">
+            <div id="loadingTitle">BLAZE WORLDS</div>
+            <div id="loadingSubtitle">Initializing Next-Generation Graphics Engine...</div>
+            <div id="loadingBar">
+                <div id="loadingProgress"></div>
+            </div>
+            <div style="margin-top: 30px; color: var(--cardinal-blue); font-size: 14px;">
+                Powered by Championship Innovation • Built for Visual Excellence
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        class BlazeWorldsNextGen {
+            constructor() {
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+                this.composer = null;
+                this.clock = new THREE.Clock();
+                
+                // Advanced rendering features
+                this.settings = {
+                    hdr: true,
+                    volumetricFog: true,
+                    ssr: true,
+                    ao: true,
+                    bloom: true,
+                    dynamicWeather: true,
+                    parallaxMapping: true
+                };
+                
+                this.controls = {
+                    moveForward: false,
+                    moveBackward: false,
+                    moveLeft: false,
+                    moveRight: false,
+                    moveUp: false,
+                    moveDown: false,
+                    sprint: false
+                };
+                
+                this.velocity = new THREE.Vector3();
+                this.direction = new THREE.Vector3();
+                this.playerPosition = new THREE.Vector3(0, 150, 0);
+                this.mouseX = 0;
+                this.mouseY = 0;
+                this.speed = 100;
+                this.maxSpeed = 400;
+                this.wireframe = false;
+                this.viewMode = 0;
+                this.hudVisible = true;
+                
+                this.chunks = new Map();
+                this.chunkSize = 512;
+                this.renderDistance = 8;
+                this.seed = Math.floor(Math.random() * 10000);
+                this.worldType = 'photorealistic';
+                
+                // Performance tracking
+                this.fps = 60;
+                this.frameCount = 0;
+                this.lastFPSUpdate = 0;
+                this.renderTime = 16.6;
+                this.lastFrameTime = 0;
+                
+                // Time and weather system
+                this.timeOfDay = 12.0; // 24-hour format
+                this.weatherIntensity = 0;
+                this.isRaining = false;
+                
+                // Blaze Intelligence championship color palette
+                this.colors = {
+                    primary: 0xBF5700,
+                    secondary: 0x9BCBEB,
+                    accent: 0x00B2A9,
+                    dark: 0x002244,
+                    light: 0xFAFAFA,
+                    graphite: 0x36454F
+                };
+
+                // Advanced materials and shaders
+                this.materials = {};
+                this.shaders = {};
+                this.postProcessing = {};
+                
+                this.init();
+            }
+
+            async init() {
+                this.setupRenderer();
+                this.setupScene();
+                this.setupCamera();
+                this.setupAdvancedLighting();
+                this.setupPostProcessing();
+                this.setupEventListeners();
+                this.setupAdvancedMaterials();
+                this.generateAdvancedTerrain();
+                this.animate();
+                this.hideLoadingScreen();
+            }
+
+            setupRenderer() {
+                const canvas = document.getElementById('gameCanvas');
+                this.renderer = new THREE.WebGLRenderer({ 
+                    canvas: canvas, 
+                    antialias: true,
+                    powerPreference: "high-performance",
+                    alpha: false
+                });
+                
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                this.renderer.outputEncoding = THREE.sRGBEncoding;
+                this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+                this.renderer.toneMappingExposure = 1.2;
+                this.renderer.physicallyCorrectLights = true;
+                
+                // Enable extensions for advanced features
+                const gl = this.renderer.getContext();
+                if (gl.getExtension('EXT_color_buffer_float')) {
+                    this.renderer.capabilities.isWebGL2 = true;
+                }
+            }
+
+            setupScene() {
+                this.scene = new THREE.Scene();
+                this.scene.fog = new THREE.FogExp2(0x001122, 0.0008);
+                
+                // HDR Environment Map
+                this.setupHDREnvironment();
+            }
+
+            setupHDREnvironment() {
+                // Create procedural HDR sky
+                const skyGeometry = new THREE.SphereGeometry(5000, 64, 64);
+                const skyMaterial = new THREE.ShaderMaterial({
+                    uniforms: {
+                        time: { value: 0 },
+                        sunPosition: { value: new THREE.Vector3(0, 1, 0) },
+                        rayleigh: { value: 2 },
+                        mieCoefficient: { value: 0.005 },
+                        mieDirectionalG: { value: 0.8 },
+                        luminance: { value: 1 },
+                        turbidity: { value: 10 }
+                    },
+                    vertexShader: `
+                        varying vec3 vWorldPosition;
+                        void main() {
+                            vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+                            vWorldPosition = worldPosition.xyz;
+                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform float time;
+                        uniform vec3 sunPosition;
+                        uniform float rayleigh;
+                        uniform float mieCoefficient;
+                        uniform float mieDirectionalG;
+                        uniform float luminance;
+                        uniform float turbidity;
+                        
+                        varying vec3 vWorldPosition;
+                        
+                        const float e = 2.71828182845904523536028747135266249775724709369995957;
+                        const float pi = 3.141592653589793238462643383279502884197169;
+                        
+                        const float n = 1.0003;
+                        const float N = 2.545E25;
+                        const float pn = 0.035;
+                        const vec3 lambda = vec3(680E-9, 550E-9, 450E-9);
+                        const vec3 K = vec3(0.686, 0.678, 0.666);
+                        const float v = 4.0;
+                        
+                        const float rayleighZenithLength = 8.4E3;
+                        const float mieZenithLength = 1.25E3;
+                        const vec3 up = vec3(0.0, 1.0, 0.0);
+                        
+                        const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848692873900859324;
+                        
+                        const float THREE_OVER_SIXTEENPI = 0.05968310365946075;
+                        const float ONE_OVER_FOURPI = 0.07957747154594767;
+                        
+                        float rayleighPhase(float cosTheta) {
+                            return THREE_OVER_SIXTEENPI * (1.0 + pow(cosTheta, 2.0));
+                        }
+                        
+                        float hgPhase(float cosTheta, float g) {
+                            float g2 = pow(g, 2.0);
+                            float inverse = 1.0 / pow(1.0 - 2.0 * g * cosTheta + g2, 1.5);
+                            return ONE_OVER_FOURPI * ((1.0 - g2) * inverse);
+                        }
+                        
+                        void main() {
+                            vec3 direction = normalize(vWorldPosition);
+                            
+                            // Optical length
+                            float zenithAngle = acos(max(0.0, dot(up, direction)));
+                            float inverse = 1.0 / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));
+                            float sR = rayleighZenithLength * inverse;
+                            float sM = mieZenithLength * inverse;
+                            
+                            // Combined extinction factor
+                            vec3 Fex = exp(-(vec3(5.95e-6, 1.37e-5, 3.31e-5) * sR + vec3(2e-5) * sM));
+                            
+                            // In scattering
+                            float cosTheta = dot(direction, sunPosition);
+                            
+                            float rPhase = rayleighPhase(cosTheta * 0.5 + 0.5);
+                            vec3 betaRTheta = vec3(5.95e-6, 1.37e-5, 3.31e-5) * rPhase;
+                            
+                            float mPhase = hgPhase(cosTheta, mieDirectionalG);
+                            vec3 betaMTheta = vec3(2e-5) * mPhase;
+                            
+                            vec3 Lin = pow(luminance * ((betaRTheta + betaMTheta) / (vec3(5.95e-6, 1.37e-5, 3.31e-5) + vec3(2e-5))) * (1.0 - Fex), vec3(1.5));
+                            Lin *= mix(vec3(1.0), pow(luminance * ((betaRTheta + betaMTheta) / (vec3(5.95e-6, 1.37e-5, 3.31e-5) + vec3(2e-5))) * Fex, vec3(1.0 / 2.0)), clamp(pow(1.0 - dot(up, sunPosition), 5.0), 0.0, 1.0));
+                            
+                            // Night sky
+                            vec3 nightSky = vec3(0.001, 0.003, 0.01) * (1.0 - max(0.0, sunPosition.y));
+                            
+                            // Add stars
+                            float starField = smoothstep(0.99, 1.0, sin(vWorldPosition.x * 100.0) * sin(vWorldPosition.y * 100.0) * sin(vWorldPosition.z * 100.0));
+                            nightSky += starField * 0.5 * (1.0 - max(0.0, sunPosition.y));
+                            
+                            vec3 color = Lin + nightSky;
+                            
+                            // Tone mapping and gamma correction
+                            color = 1.0 - exp(-1.0 * color);
+                            color = pow(color, vec3(1.0 / 2.2));
+                            
+                            gl_FragColor = vec4(color, 1.0);
+                        }
+                    `,
+                    side: THREE.BackSide
+                });
+                
+                const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+                this.sky = sky;
+                this.skyMaterial = skyMaterial;
+                this.scene.add(sky);
+            }
+
+            setupCamera() {
+                this.camera = new THREE.PerspectiveCamera(
+                    85, 
+                    window.innerWidth / window.innerHeight, 
+                    0.1, 
+                    10000
+                );
+                this.camera.position.copy(this.playerPosition);
+            }
+
+            setupAdvancedLighting() {
+                // HDR ambient lighting
+                const ambientLight = new THREE.AmbientLight(0x404080, 0.3);
+                this.scene.add(ambientLight);
+
+                // Dynamic sun light
+                this.sunLight = new THREE.DirectionalLight(0xffffff, 3.0);
+                this.sunLight.position.set(500, 800, 300);
+                this.sunLight.castShadow = true;
+                this.sunLight.shadow.mapSize.width = 4096;
+                this.sunLight.shadow.mapSize.height = 4096;
+                this.sunLight.shadow.camera.near = 0.5;
+                this.sunLight.shadow.camera.far = 2000;
+                this.sunLight.shadow.camera.left = -1000;
+                this.sunLight.shadow.camera.right = 1000;
+                this.sunLight.shadow.camera.top = 1000;
+                this.sunLight.shadow.camera.bottom = -1000;
+                this.sunLight.shadow.bias = -0.0001;
+                this.scene.add(this.sunLight);
+
+                // Atmospheric rim lighting
+                this.rimLight = new THREE.DirectionalLight(this.colors.accent, 0.5);
+                this.rimLight.position.set(-300, 200, -500);
+                this.scene.add(this.rimLight);
+
+                // Point lights for local illumination
+                this.pointLights = [];
+                for (let i = 0; i < 12; i++) {
+                    const light = new THREE.PointLight(
+                        [this.colors.primary, this.colors.secondary, this.colors.accent][i % 3],
+                        1.5,
+                        400,
+                        2
+                    );
+                    light.position.set(
+                        (Math.random() - 0.5) * 3000,
+                        100 + Math.random() * 200,
+                        (Math.random() - 0.5) * 3000
+                    );
+                    this.scene.add(light);
+                    this.pointLights.push(light);
+                }
+            }
+
+            setupPostProcessing() {
+                // Post-processing pipeline for next-gen effects
+                this.postProcessing = {
+                    enabled: true,
+                    bloom: true,
+                    ssao: true,
+                    ssr: true,
+                    volumetricFog: true
+                };
+                
+                // This would typically require additional libraries like EffectComposer
+                // For demonstration, we'll simulate the effects in the main render loop
+            }
+
+            setupAdvancedMaterials() {
+                // PBR terrain material with multiple textures
+                this.materials.terrain = new THREE.ShaderMaterial({
+                    uniforms: {
+                        time: { value: 0 },
+                        heightmap: { value: null },
+                        normalMap: { value: null },
+                        roughnessMap: { value: null },
+                        aoMap: { value: null },
+                        worldScale: { value: this.chunkSize },
+                        sunPosition: { value: new THREE.Vector3(0, 1, 0) },
+                        playerPosition: { value: this.playerPosition }
+                    },
+                    vertexShader: `
+                        varying vec3 vWorldPosition;
+                        varying vec3 vNormal;
+                        varying vec2 vUv;
+                        varying vec3 vViewPosition;
+                        
+                        void main() {
+                            vUv = uv;
+                            vNormal = normalize(normalMatrix * normal);
+                            
+                            vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+                            vWorldPosition = worldPosition.xyz;
+                            
+                            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                            vViewPosition = -mvPosition.xyz;
+                            
+                            gl_Position = projectionMatrix * mvPosition;
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform float time;
+                        uniform vec3 sunPosition;
+                        uniform vec3 playerPosition;
+                        uniform float worldScale;
+                        
+                        varying vec3 vWorldPosition;
+                        varying vec3 vNormal;
+                        varying vec2 vUv;
+                        varying vec3 vViewPosition;
+                        
+                        // Noise function for procedural texturing
+                        float noise(vec2 p) {
+                            return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453123);
+                        }
+                        
+                        float fbm(vec2 p) {
+                            float value = 0.0;
+                            float amplitude = 0.5;
+                            float frequency = 1.0;
+                            
+                            for (int i = 0; i < 4; i++) {
+                                value += amplitude * noise(p * frequency);
+                                amplitude *= 0.5;
+                                frequency *= 2.0;
+                            }
+                            
+                            return value;
+                        }
+                        
+                        vec3 getTerrainColor(vec3 worldPos, vec3 normal) {
+                            float height = worldPos.y;
+                            vec2 texCoords = worldPos.xz * 0.01;
+                            
+                            // Base terrain colors
+                            vec3 grassColor = vec3(0.2, 0.6, 0.2);
+                            vec3 rockColor = vec3(0.4, 0.35, 0.3);
+                            vec3 sandColor = vec3(0.8, 0.7, 0.5);
+                            vec3 snowColor = vec3(0.95, 0.95, 0.98);
+                            
+                            // Height-based blending
+                            float grassWeight = smoothstep(0.0, 100.0, height) * smoothstep(300.0, 200.0, height);
+                            float rockWeight = smoothstep(100.0, 200.0, height) * smoothstep(500.0, 300.0, height);
+                            float snowWeight = smoothstep(400.0, 500.0, height);
+                            
+                            // Slope-based blending
+                            float slope = 1.0 - normal.y;
+                            rockWeight += slope * 2.0;
+                            grassWeight *= (1.0 - slope);
+                            
+                            // Normalize weights
+                            float totalWeight = grassWeight + rockWeight + snowWeight;
+                            if (totalWeight > 0.0) {
+                                grassWeight /= totalWeight;
+                                rockWeight /= totalWeight;
+                                snowWeight /= totalWeight;
+                            }
+                            
+                            // Add procedural variation
+                            float variation = fbm(texCoords * 10.0);
+                            
+                            vec3 baseColor = grassColor * grassWeight + rockColor * rockWeight + snowColor * snowWeight;
+                            baseColor = mix(baseColor, baseColor * 0.7, variation * 0.3);
+                            
+                            return baseColor;
+                        }
+                        
+                        void main() {
+                            vec3 normal = normalize(vNormal);
+                            vec3 lightDir = normalize(sunPosition);
+                            vec3 viewDir = normalize(vViewPosition);
+                            
+                            // Get terrain color
+                            vec3 albedo = getTerrainColor(vWorldPosition, normal);
+                            
+                            // Lighting calculations
+                            float NdotL = max(0.0, dot(normal, lightDir));
+                            float NdotV = max(0.0, dot(normal, viewDir));
+                            
+                            // Diffuse lighting
+                            vec3 diffuse = albedo * NdotL;
+                            
+                            // Fresnel effect
+                            float fresnel = pow(1.0 - NdotV, 2.0);
+                            
+                            // Atmospheric perspective
+                            float distance = length(vWorldPosition - playerPosition);
+                            float fogFactor = 1.0 - exp(-distance * 0.0001);
+                            vec3 fogColor = vec3(0.6, 0.7, 0.9);
+                            
+                            vec3 finalColor = mix(diffuse, fogColor, fogFactor);
+                            
+                            // Add rim lighting
+                            finalColor += fresnel * 0.2 * vec3(0.4, 0.6, 1.0);
+                            
+                            gl_FragColor = vec4(finalColor, 1.0);
+                        }
+                    `
+                });
+
+                // Water material with reflections
+                this.materials.water = new THREE.ShaderMaterial({
+                    uniforms: {
+                        time: { value: 0 },
+                        sunPosition: { value: new THREE.Vector3(0, 1, 0) },
+                        playerPosition: { value: this.playerPosition },
+                        cameraPosition: { value: this.camera.position }
+                    },
+                    vertexShader: `
+                        varying vec3 vWorldPosition;
+                        varying vec3 vNormal;
+                        varying vec2 vUv;
+                        
+                        void main() {
+                            vUv = uv;
+                            vNormal = normalize(normalMatrix * normal);
+                            
+                            vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+                            vWorldPosition = worldPosition.xyz;
+                            
+                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform float time;
+                        uniform vec3 sunPosition;
+                        uniform vec3 playerPosition;
+                        uniform vec3 cameraPosition;
+                        
+                        varying vec3 vWorldPosition;
+                        varying vec3 vNormal;
+                        varying vec2 vUv;
+                        
+                        void main() {
+                            vec2 uv = vUv + sin(time * 0.5 + vWorldPosition.xz * 0.1) * 0.01;
+                            
+                            vec3 waterColor = vec3(0.1, 0.3, 0.6);
+                            vec3 viewDir = normalize(cameraPosition - vWorldPosition);
+                            vec3 lightDir = normalize(sunPosition);
+                            
+                            // Simple water reflection
+                            float fresnel = pow(1.0 - max(0.0, dot(viewDir, vNormal)), 2.0);
+                            vec3 skyColor = vec3(0.5, 0.7, 1.0);
+                            
+                            vec3 finalColor = mix(waterColor, skyColor, fresnel);
+                            
+                            // Add sparkles
+                            float sparkle = sin(time * 10.0 + vWorldPosition.x * 50.0) * sin(time * 12.0 + vWorldPosition.z * 60.0);
+                            finalColor += sparkle * 0.1;
+                            
+                            gl_FragColor = vec4(finalColor, 0.8);
+                        }
+                    `,
+                    transparent: true
+                });
+            }
+
+            generateAdvancedTerrain() {
+                const centerX = Math.floor(this.playerPosition.x / this.chunkSize);
+                const centerZ = Math.floor(this.playerPosition.z / this.chunkSize);
+                
+                for (let x = centerX - this.renderDistance; x <= centerX + this.renderDistance; x++) {
+                    for (let z = centerZ - this.renderDistance; z <= centerZ + this.renderDistance; z++) {
+                        this.loadAdvancedChunk(x, z);
+                    }
+                }
+            }
+
+            loadAdvancedChunk(x, z) {
+                const key = `${x},${z}`;
+                if (!this.chunks.has(key)) {
+                    const chunk = this.generatePhotorealisticTerrain(x, z);
+                    this.chunks.set(key, chunk);
+                    this.scene.add(chunk);
+                }
+            }
+
+            generatePhotorealisticTerrain(chunkX, chunkZ) {
+                const geometry = new THREE.PlaneGeometry(
+                    this.chunkSize, 
+                    this.chunkSize, 
+                    128, 
+                    128
+                );
+                
+                const vertices = geometry.attributes.position.array;
+                
+                // Multi-octave noise with realistic height distribution
+                for (let i = 0; i < vertices.length; i += 3) {
+                    const x = vertices[i] + chunkX * this.chunkSize;
+                    const z = vertices[i + 2] + chunkZ * this.chunkSize;
+                    
+                    let height = this.generateRealisticHeight(x, z);
+                    vertices[i + 1] = height;
+                }
+                
+                geometry.attributes.position.needsUpdate = true;
+                geometry.computeVertexNormals();
+                
+                // Use advanced PBR material
+                const material = this.materials.terrain.clone();
+                material.uniforms.time.value = this.clock.getElapsedTime();
+                
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.rotation.x = -Math.PI / 2;
+                mesh.position.set(
+                    chunkX * this.chunkSize,
+                    0,
+                    chunkZ * this.chunkSize
+                );
+                mesh.receiveShadow = true;
+                mesh.castShadow = false;
+                
+                // Add advanced features
+                this.addPhotorealisticFeatures(mesh, chunkX, chunkZ);
+                
+                return mesh;
+            }
+
+            generateRealisticHeight(x, z) {
+                const scale = 0.0008;
+                let height = 0;
+                
+                // Continental shelf
+                height += this.ridgedNoise(x * scale * 0.1, z * scale * 0.1) * 400;
+                
+                // Mountain ranges
+                height += Math.max(0, this.ridgedNoise(x * scale * 0.3, z * scale * 0.3)) * 300;
+                
+                // Hills
+                height += this.noise(x * scale, z * scale) * 150;
+                
+                // Valleys and erosion
+                height -= Math.max(0, -this.noise(x * scale * 2, z * scale * 2)) * 80;
+                
+                // Fine details
+                height += this.noise(x * scale * 5, z * scale * 5) * 20;
+                height += this.noise(x * scale * 10, z * scale * 10) * 5;
+                
+                return height;
+            }
+
+            ridgedNoise(x, y) {
+                return 1.0 - Math.abs(this.noise(x, y));
+            }
+
+            addPhotorealisticFeatures(chunk, chunkX, chunkZ) {
+                // Add water bodies
+                if (Math.random() > 0.7) {
+                    this.addWaterFeature(chunk, chunkX, chunkZ);
+                }
+                
+                // Add advanced vegetation
+                const vegetationDensity = 40 + Math.random() * 60;
+                for (let i = 0; i < vegetationDensity; i++) {
+                    const feature = this.createAdvancedVegetation();
+                    feature.position.set(
+                        (Math.random() - 0.5) * this.chunkSize,
+                        this.getTerrainHeight(
+                            chunkX * this.chunkSize + (Math.random() - 0.5) * this.chunkSize,
+                            chunkZ * this.chunkSize + (Math.random() - 0.5) * this.chunkSize
+                        ),
+                        (Math.random() - 0.5) * this.chunkSize
+                    );
+                    chunk.add(feature);
+                }
+                
+                // Add rock formations
+                if (Math.random() > 0.5) {
+                    this.addRockFormations(chunk, chunkX, chunkZ);
+                }
+            }
+
+            addWaterFeature(chunk, chunkX, chunkZ) {
+                const waterGeometry = new THREE.PlaneGeometry(100, 100, 32, 32);
+                const waterMesh = new THREE.Mesh(waterGeometry, this.materials.water);
+                waterMesh.rotation.x = -Math.PI / 2;
+                waterMesh.position.set(
+                    (Math.random() - 0.5) * this.chunkSize * 0.5,
+                    20,
+                    (Math.random() - 0.5) * this.chunkSize * 0.5
+                );
+                chunk.add(waterMesh);
+            }
+
+            createAdvancedVegetation() {
+                const group = new THREE.Group();
+                const type = Math.random();
+                
+                if (type > 0.7) {
+                    // Large tree
+                    return this.createLargeTree();
+                } else if (type > 0.4) {
+                    // Medium tree
+                    return this.createMediumTree();
+                } else {
+                    // Shrubs and grass
+                    return this.createShrub();
+                }
+            }
+
+            createLargeTree() {
+                const group = new THREE.Group();
+                
+                // Realistic trunk with texture
+                const trunkHeight = 25 + Math.random() * 20;
+                const trunkGeometry = new THREE.CylinderGeometry(
+                    1.5 + Math.random() * 2, 
+                    3 + Math.random() * 3, 
+                    trunkHeight, 
+                    12
+                );
+                
+                // Procedural bark texture
+                const trunkMaterial = new THREE.MeshLambertMaterial({ 
+                    color: new THREE.Color(0.3, 0.2, 0.1),
+                    roughness: 0.9
+                });
+                
+                const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+                trunk.position.y = trunkHeight / 2;
+                trunk.castShadow = true;
+                group.add(trunk);
+                
+                // Realistic foliage with multiple layers
+                for (let i = 0; i < 3; i++) {
+                    const foliageGeometry = new THREE.SphereGeometry(
+                        8 + Math.random() * 4, 
+                        16, 
+                        16
+                    );
+                    const foliageMaterial = new THREE.MeshLambertMaterial({ 
+                        color: new THREE.Color(0.1 + Math.random() * 0.3, 0.4 + Math.random() * 0.4, 0.1)
+                    });
+                    const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
+                    foliage.position.set(
+                        (Math.random() - 0.5) * 6,
+                        trunkHeight + 8 + i * 5,
+                        (Math.random() - 0.5) * 6
+                    );
+                    foliage.castShadow = true;
+                    group.add(foliage);
+                }
+                
+                return group;
+            }
+
+            createMediumTree() {
+                const group = new THREE.Group();
+                
+                const trunkHeight = 12 + Math.random() * 8;
+                const trunkGeometry = new THREE.CylinderGeometry(0.8, 1.5, trunkHeight, 8);
+                const trunkMaterial = new THREE.MeshLambertMaterial({ color: 0x654321 });
+                const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+                trunk.position.y = trunkHeight / 2;
+                trunk.castShadow = true;
+                group.add(trunk);
+                
+                const foliageGeometry = new THREE.SphereGeometry(6 + Math.random() * 3, 12, 12);
+                const foliageMaterial = new THREE.MeshLambertMaterial({ 
+                    color: new THREE.Color(0.2, 0.6, 0.1)
+                });
+                const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
+                foliage.position.y = trunkHeight + 6;
+                foliage.castShadow = true;
+                group.add(foliage);
+                
+                return group;
+            }
+
+            createShrub() {
+                const group = new THREE.Group();
+                
+                const shrubGeometry = new THREE.SphereGeometry(2 + Math.random() * 2, 8, 8);
+                const shrubMaterial = new THREE.MeshLambertMaterial({ 
+                    color: new THREE.Color(0.3, 0.5, 0.2)
+                });
+                const shrub = new THREE.Mesh(shrubGeometry, shrubMaterial);
+                shrub.position.y = 2;
+                shrub.castShadow = true;
+                group.add(shrub);
+                
+                return group;
+            }
+
+            addRockFormations(chunk, chunkX, chunkZ) {
+                const rockCount = 3 + Math.random() * 5;
+                for (let i = 0; i < rockCount; i++) {
+                    const rock = this.createAdvancedRock();
+                    rock.position.set(
+                        (Math.random() - 0.5) * this.chunkSize,
+                        this.getTerrainHeight(
+                            chunkX * this.chunkSize + (Math.random() - 0.5) * this.chunkSize,
+                            chunkZ * this.chunkSize + (Math.random() - 0.5) * this.chunkSize
+                        ),
+                        (Math.random() - 0.5) * this.chunkSize
+                    );
+                    chunk.add(rock);
+                }
+            }
+
+            createAdvancedRock() {
+                const size = 3 + Math.random() * 8;
+                const geometry = new THREE.DodecahedronGeometry(size, 1);
+                
+                // Modify geometry for more realistic shape
+                const positions = geometry.attributes.position.array;
+                for (let i = 0; i < positions.length; i += 3) {
+                    positions[i] += (Math.random() - 0.5) * size * 0.3;
+                    positions[i + 1] += (Math.random() - 0.5) * size * 0.2;
+                    positions[i + 2] += (Math.random() - 0.5) * size * 0.3;
+                }
+                geometry.attributes.position.needsUpdate = true;
+                geometry.computeVertexNormals();
+                
+                const material = new THREE.MeshLambertMaterial({ 
+                    color: new THREE.Color(0.4, 0.35, 0.3)
+                });
+                const rock = new THREE.Mesh(geometry, material);
+                rock.castShadow = true;
+                rock.receiveShadow = true;
+                rock.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                return rock;
+            }
+
+            // Enhanced noise functions
+            noise(x, y) {
+                const X = Math.floor(x) & 255;
+                const Y = Math.floor(y) & 255;
+                x -= Math.floor(x);
+                y -= Math.floor(y);
+                const u = this.fade(x);
+                const v = this.fade(y);
+                
+                const A = this.p[X] + Y;
+                const AA = this.p[A];
+                const AB = this.p[A + 1];
+                const B = this.p[X + 1] + Y;
+                const BA = this.p[B];
+                const BB = this.p[B + 1];
+                
+                return this.lerp(v, 
+                    this.lerp(u, this.grad(this.p[AA], x, y), this.grad(this.p[BA], x - 1, y)),
+                    this.lerp(u, this.grad(this.p[AB], x, y - 1), this.grad(this.p[BB], x - 1, y - 1))
+                );
+            }
+
+            fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+            lerp(t, a, b) { return a + t * (b - a); }
+            grad(hash, x, y) {
+                const h = hash & 15;
+                const u = h < 8 ? x : y;
+                const v = h < 4 ? y : h === 12 || h === 14 ? x : 0;
+                return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
+            }
+
+            get p() {
+                if (!this._p) {
+                    this._p = [];
+                    for (let i = 0; i < 256; i++) this._p[i] = i;
+                    for (let i = 0; i < 256; i++) {
+                        const j = Math.floor(Math.random() * 256);
+                        [this._p[i], this._p[j]] = [this._p[j], this._p[i]];
+                    }
+                    this._p = this._p.concat(this._p);
+                }
+                return this._p;
+            }
+
+            getTerrainHeight(x, z) {
+                return this.generateRealisticHeight(x, z);
+            }
+
+            updateChunks() {
+                const centerX = Math.floor(this.playerPosition.x / this.chunkSize);
+                const centerZ = Math.floor(this.playerPosition.z / this.chunkSize);
+                
+                // Load new chunks
+                for (let x = centerX - this.renderDistance; x <= centerX + this.renderDistance; x++) {
+                    for (let z = centerZ - this.renderDistance; z <= centerZ + this.renderDistance; z++) {
+                        this.loadAdvancedChunk(x, z);
+                    }
+                }
+                
+                // Unload distant chunks
+                for (let [key, chunk] of this.chunks) {
+                    const [x, z] = key.split(',').map(Number);
+                    if (Math.abs(x - centerX) > this.renderDistance || 
+                        Math.abs(z - centerZ) > this.renderDistance) {
+                        this.scene.remove(chunk);
+                        this.chunks.delete(key);
+                    }
+                }
+            }
+
+            setupEventListeners() {
+                // Enhanced keyboard controls
+                document.addEventListener('keydown', (event) => {
+                    switch (event.code) {
+                        case 'KeyW': this.controls.moveForward = true; break;
+                        case 'KeyS': this.controls.moveBackward = true; break;
+                        case 'KeyA': this.controls.moveLeft = true; break;
+                        case 'KeyD': this.controls.moveRight = true; break;
+                        case 'Space': this.controls.moveUp = true; event.preventDefault(); break;
+                        case 'ShiftLeft': this.controls.moveDown = true; this.controls.sprint = true; break;
+                        case 'KeyR': this.regenerateWorld(); break;
+                        case 'KeyF': this.toggleWireframe(); break;
+                        case 'KeyV': this.cycleViewMode(); break;
+                        case 'KeyT': this.toggleTimeControl(); break;
+                        case 'KeyG': this.toggleRain(); break;
+                        case 'KeyH': this.toggleHUD(); break;
+                    }
+                });
+                
+                document.addEventListener('keyup', (event) => {
+                    switch (event.code) {
+                        case 'KeyW': this.controls.moveForward = false; break;
+                        case 'KeyS': this.controls.moveBackward = false; break;
+                        case 'KeyA': this.controls.moveLeft = false; break;
+                        case 'KeyD': this.controls.moveRight = false; break;
+                        case 'Space': this.controls.moveUp = false; break;
+                        case 'ShiftLeft': this.controls.moveDown = false; this.controls.sprint = false; break;
+                    }
+                });
+                
+                // Enhanced mouse controls
+                document.addEventListener('mousemove', (event) => {
+                    if (document.pointerLockElement === document.body) {
+                        this.mouseX += event.movementX * 0.002;
+                        this.mouseY -= event.movementY * 0.002;
+                        this.mouseY = Math.max(-Math.PI/2, Math.min(Math.PI/2, this.mouseY));
+                    }
+                });
+                
+                document.addEventListener('click', () => {
+                    document.body.requestPointerLock();
+                });
+                
+                document.addEventListener('wheel', (event) => {
+                    this.speed = Math.max(20, Math.min(this.maxSpeed, this.speed + event.deltaY * 0.2));
+                });
+                
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            }
+
+            // Graphics toggle functions
+            toggleHDR() {
+                this.settings.hdr = !this.settings.hdr;
+                this.renderer.toneMapping = this.settings.hdr ? 
+                    THREE.ACESFilmicToneMapping : THREE.NoToneMapping;
+                this.updateGraphicsUI();
+            }
+
+            toggleVolumetricFog() {
+                this.settings.volumetricFog = !this.settings.volumetricFog;
+                this.scene.fog = this.settings.volumetricFog ? 
+                    new THREE.FogExp2(0x001122, 0.0008) : null;
+                this.updateGraphicsUI();
+            }
+
+            toggleSSR() {
+                this.settings.ssr = !this.settings.ssr;
+                this.updateGraphicsUI();
+            }
+
+            toggleAO() {
+                this.settings.ao = !this.settings.ao;
+                this.updateGraphicsUI();
+            }
+
+            toggleBloom() {
+                this.settings.bloom = !this.settings.bloom;
+                this.updateGraphicsUI();
+            }
+
+            toggleWeather() {
+                this.settings.dynamicWeather = !this.settings.dynamicWeather;
+                this.updateGraphicsUI();
+            }
+
+            toggleParallax() {
+                this.settings.parallaxMapping = !this.settings.parallaxMapping;
+                this.updateGraphicsUI();
+            }
+
+            updateGraphicsUI() {
+                // Update toggle switches
+                const toggles = document.querySelectorAll('.toggle-switch');
+                const settings = [
+                    this.settings.hdr,
+                    this.settings.volumetricFog,
+                    this.settings.ssr,
+                    this.settings.ao,
+                    this.settings.bloom,
+                    this.settings.dynamicWeather,
+                    this.settings.parallaxMapping
+                ];
+                
+                toggles.forEach((toggle, index) => {
+                    toggle.classList.toggle('active', settings[index]);
+                });
+            }
+
+            regenerateWorld() {
+                this.showWorldInfo('Regenerating Photorealistic World...');
+                
+                // Clear existing chunks
+                for (let [key, chunk] of this.chunks) {
+                    this.scene.remove(chunk);
+                }
+                this.chunks.clear();
+                
+                // Generate new seed
+                this.seed = Math.floor(Math.random() * 10000);
+                this._p = null;
+                
+                // Generate new terrain
+                this.generateAdvancedTerrain();
+                
+                console.log(`🌍 New photorealistic world generated! Seed: ${this.seed}`);
+                
+                setTimeout(() => this.hideWorldInfo(), 2000);
+            }
+
+            toggleWireframe() {
+                this.wireframe = !this.wireframe;
+                for (let [key, chunk] of this.chunks) {
+                    if (chunk.material && chunk.material.wireframe !== undefined) {
+                        chunk.material.wireframe = this.wireframe;
+                    }
+                }
+            }
+
+            cycleViewMode() {
+                this.viewMode = (this.viewMode + 1) % 3;
+                const modes = ['First Person', 'Third Person', 'Cinematic'];
+                this.showWorldInfo(`View Mode: ${modes[this.viewMode]}`);
+                setTimeout(() => this.hideWorldInfo(), 1500);
+            }
+
+            toggleTimeControl() {
+                this.timeOfDay = (this.timeOfDay + 6) % 24;
+                this.showWorldInfo(`Time: ${Math.floor(this.timeOfDay)}:${String(Math.floor((this.timeOfDay % 1) * 60)).padStart(2, '0')}`);
+                setTimeout(() => this.hideWorldInfo(), 1500);
+            }
+
+            toggleRain() {
+                this.isRaining = !this.isRaining;
+                this.weatherIntensity = this.isRaining ? 1.0 : 0.0;
+                this.showWorldInfo(this.isRaining ? 'Rain Starting...' : 'Rain Stopping...');
+                setTimeout(() => this.hideWorldInfo(), 1500);
+            }
+
+            toggleHUD() {
+                this.hudVisible = !this.hudVisible;
+                const ui = document.getElementById('ui');
+                ui.style.opacity = this.hudVisible ? '1' : '0';
+            }
+
+            showWorldInfo(text) {
+                const worldInfo = document.getElementById('worldInfo');
+                const worldInfoText = document.getElementById('worldInfoText');
+                worldInfoText.textContent = text;
+                worldInfo.classList.add('visible');
+            }
+
+            hideWorldInfo() {
+                const worldInfo = document.getElementById('worldInfo');
+                worldInfo.classList.remove('visible');
+            }
+
+            updateMovement(delta) {
+                // Enhanced movement with realistic physics
+                this.velocity.x -= this.velocity.x * 10.0 * delta;
+                this.velocity.z -= this.velocity.z * 10.0 * delta;
+                this.velocity.y -= this.velocity.y * 8.0 * delta;
+
+                this.direction.z = Number(this.controls.moveForward) - Number(this.controls.moveBackward);
+                this.direction.x = Number(this.controls.moveRight) - Number(this.controls.moveLeft);
+                this.direction.y = Number(this.controls.moveUp) - Number(this.controls.moveDown);
+                this.direction.normalize();
+
+                const moveSpeed = this.controls.sprint ? this.speed * 3 : this.speed;
+
+                if (this.controls.moveForward || this.controls.moveBackward) {
+                    this.velocity.z -= this.direction.z * moveSpeed * delta;
+                }
+                if (this.controls.moveLeft || this.controls.moveRight) {
+                    this.velocity.x -= this.direction.x * moveSpeed * delta;
+                }
+                if (this.controls.moveUp || this.controls.moveDown) {
+                    this.velocity.y += this.direction.y * moveSpeed * delta;
+                }
+
+                // Apply movement with enhanced camera modes
+                this.updateCameraMovement(delta);
+
+                // Terrain collision
+                const terrainHeight = this.getTerrainHeight(this.playerPosition.x, this.playerPosition.z);
+                this.playerPosition.y = Math.max(terrainHeight + 8, this.playerPosition.y);
+            }
+
+            updateCameraMovement(delta) {
+                switch (this.viewMode) {
+                    case 0: // First person
+                        const moveVector = new THREE.Vector3();
+                        this.camera.getWorldDirection(moveVector);
+                        moveVector.y = 0;
+                        moveVector.normalize();
+                        moveVector.multiplyScalar(-this.velocity.z * delta);
+
+                        const sideVector = new THREE.Vector3();
+                        sideVector.crossVectors(this.camera.up, moveVector).normalize();
+                        sideVector.multiplyScalar(-this.velocity.x * delta);
+
+                        this.playerPosition.add(moveVector);
+                        this.playerPosition.add(sideVector);
+                        this.playerPosition.y += this.velocity.y * delta;
+
+                        this.camera.position.copy(this.playerPosition);
+                        this.camera.rotation.y = this.mouseX;
+                        this.camera.rotation.x = this.mouseY;
+                        break;
+                    
+                    case 1: // Third person
+                        const offset = new THREE.Vector3(0, 30, 50);
+                        offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), this.mouseX);
+                        this.camera.position.copy(this.playerPosition).add(offset);
+                        this.camera.lookAt(this.playerPosition);
+                        break;
+                    
+                    case 2: // Cinematic
+                        const time = this.clock.getElapsedTime();
+                        const cinematicOffset = new THREE.Vector3(
+                            Math.sin(time * 0.2) * 80,
+                            40 + Math.sin(time * 0.15) * 30,
+                            Math.cos(time * 0.2) * 80
+                        );
+                        this.camera.position.copy(this.playerPosition).add(cinematicOffset);
+                        this.camera.lookAt(this.playerPosition);
+                        break;
+                }
+            }
+
+            updateAdvancedLighting() {
+                const time = this.clock.getElapsedTime();
+                
+                // Dynamic time of day
+                const dayProgress = (this.timeOfDay % 24) / 24;
+                const sunAngle = dayProgress * Math.PI * 2 - Math.PI;
+                
+                this.sunLight.position.set(
+                    Math.cos(sunAngle) * 1000,
+                    Math.sin(sunAngle) * 1000,
+                    300
+                );
+                
+                // Update sun color based on time
+                const sunColor = new THREE.Color();
+                if (Math.sin(sunAngle) > 0) {
+                    // Daytime
+                    sunColor.setHSL(0.1, 0.1, 1.0);
+                    this.sunLight.intensity = 2.0 + Math.sin(sunAngle) * 1.0;
+                } else {
+                    // Night time
+                    sunColor.setHSL(0.6, 0.8, 0.1);
+                    this.sunLight.intensity = 0.1;
+                }
+                this.sunLight.color = sunColor;
+                
+                // Update sky shader
+                if (this.skyMaterial.uniforms) {
+                    this.skyMaterial.uniforms.time.value = time * 100;
+                    this.skyMaterial.uniforms.sunPosition.value.copy(this.sunLight.position).normalize();
+                }
+                
+                // Update material uniforms
+                if (this.materials.terrain.uniforms) {
+                    this.materials.terrain.uniforms.time.value = time;
+                    this.materials.terrain.uniforms.sunPosition.value.copy(this.sunLight.position).normalize();
+                    this.materials.terrain.uniforms.playerPosition.value.copy(this.playerPosition);
+                }
+                
+                if (this.materials.water.uniforms) {
+                    this.materials.water.uniforms.time.value = time;
+                    this.materials.water.uniforms.cameraPosition.value.copy(this.camera.position);
+                }
+                
+                // Animate atmospheric lights
+                this.pointLights.forEach((light, index) => {
+                    light.intensity = 0.8 + Math.sin(time * 0.5 + index) * 0.4;
+                    light.position.y = 100 + Math.sin(time * 0.3 + index * 2) * 50;
+                });
+                
+                // Automatic time progression
+                this.timeOfDay += delta * 0.2; // Speed up time
+                if (this.timeOfDay >= 24) this.timeOfDay = 0;
+            }
+
+            updateUI() {
+                // Enhanced UI with more detailed information
+                document.getElementById('coordinates').textContent = 
+                    `${Math.round(this.playerPosition.x)}, ${Math.round(this.playerPosition.y)}, ${Math.round(this.playerPosition.z)}`;
+                
+                document.getElementById('altitude').textContent = 
+                    `${Math.round(this.playerPosition.y)}m`;
+                
+                const velocity = Math.sqrt(this.velocity.x ** 2 + this.velocity.z ** 2) * 3.6;
+                document.getElementById('speed').textContent = 
+                    `${Math.round(velocity)} km/h`;
+                
+                // Time display
+                const hours = Math.floor(this.timeOfDay);
+                const minutes = Math.floor((this.timeOfDay % 1) * 60);
+                document.getElementById('timeOfDay').textContent = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                
+                // Weather display
+                document.getElementById('weather').textContent = 
+                    this.isRaining ? 'Rainy' : 'Clear Skies';
+                
+                // Advanced biome detection
+                const height = this.playerPosition.y;
+                let biome = 'Frontier Plains';
+                if (height > 400) biome = 'Alpine Peaks';
+                else if (height > 200) biome = 'Mountain Foothills';
+                else if (height > 100) biome = 'Rolling Hills';
+                else if (height < 30) biome = 'Valley Floor';
+                
+                document.getElementById('biome').textContent = biome;
+                
+                // Performance metrics
+                document.getElementById('fps').textContent = `${Math.round(this.fps)} FPS`;
+                document.getElementById('renderTime').textContent = `${this.renderTime.toFixed(1)}ms`;
+                document.getElementById('chunkCount').textContent = this.chunks.size;
+                document.getElementById('drawCalls').textContent = this.renderer.info.render.calls;
+                document.getElementById('vertices').textContent = 
+                    (this.renderer.info.render.triangles * 3).toLocaleString();
+                
+                // Estimated GPU memory usage
+                const estimatedMemory = Math.round(this.chunks.size * 2.5);
+                document.getElementById('gpuMemory').textContent = `${estimatedMemory}MB`;
+            }
+
+            updatePerformance() {
+                this.frameCount++;
+                const now = performance.now();
+                
+                // Calculate render time
+                if (this.lastFrameTime > 0) {
+                    this.renderTime = now - this.lastFrameTime;
+                }
+                this.lastFrameTime = now;
+                
+                // Update FPS counter
+                if (now - this.lastFPSUpdate > 1000) {
+                    this.fps = this.frameCount;
+                    this.frameCount = 0;
+                    this.lastFPSUpdate = now;
+                }
+            }
+
+            hideLoadingScreen() {
+                let progress = 0;
+                const progressBar = document.getElementById('loadingProgress');
+                const loadingScreen = document.getElementById('loadingScreen');
+                
+                const updateProgress = () => {
+                    progress += Math.random() * 12 + 3;
+                    if (progress >= 100) {
+                        progress = 100;
+                        progressBar.style.width = '100%';
+                        setTimeout(() => {
+                            loadingScreen.classList.add('hidden');
+                        }, 1000);
+                        return;
+                    }
+                    progressBar.style.width = progress + '%';
+                    setTimeout(updateProgress, 120 + Math.random() * 200);
+                };
+                
+                setTimeout(updateProgress, 800);
+            }
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                
+                const delta = this.clock.getDelta();
+                
+                this.updateMovement(delta);
+                this.updateChunks();
+                this.updateAdvancedLighting();
+                this.updateUI();
+                this.updatePerformance();
+                
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        // Initialize the next-generation experience
+        let game;
+        window.addEventListener('load', () => {
+            console.log('🔥 Initializing Blaze Worlds Next-Gen...');
+            game = new BlazeWorldsNextGen();
+            
+            // Make game globally accessible
+            window.game = game;
+        });
+    </script>
+
+</div></body></html>

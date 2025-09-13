@@ -1,0 +1,250 @@
+<!DOCTYPE html><html lang="en" class="h-full bg-[#081423]"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Blaze Intelligence · System Status Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'blaze-orange': '#BF5700',
+            'blaze-blue': '#9BCBEB',
+            'blaze-navy': '#0A192F'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="h-full text-slate-200">
+  <!-- Professional Header -->
+  <header class="border-b border-white/5 bg-blaze-navy/90 backdrop-blur sticky top-0 z-50">
+    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+      <!-- Blaze Logo & Brand -->
+      <div class="flex items-center gap-3">
+        <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-blaze-orange to-amber-600 grid place-items-center font-bold text-black">🔥</div>
+        <span class="text-lg font-semibold tracking-wide">Blaze Intelligence</span>
+      </div>
+
+      <!-- Primary Navigation -->
+      <nav class="hidden md:flex items-center gap-6 text-sm">
+        <a href="/" class="hover:text-blaze-orange transition-colors">Home</a>
+        <a href="/dashboard.html" class="hover:text-blaze-orange transition-colors">Dashboard</a>
+        <a href="/live-demo.html" class="hover:text-blaze-orange transition-colors">Live Analytics</a>
+        <a href="/api/status" class="text-blaze-orange font-semibold">API Status</a>
+        <a href="/get-started.html" class="hover:text-blaze-orange transition-colors">Get Started</a>
+      </nav>
+
+      <!-- Live Status Indicator -->
+      <div id="main-status-indicator" class="hidden sm:flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+        <span class="text-xs text-green-400 font-medium">Checking...</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-7xl px-4 py-8">
+    <!-- Status Overview Hero -->
+    <div class="mb-8 rounded-2xl border border-blaze-orange/20 bg-gradient-to-r from-blaze-navy/80 to-slate-900/80 p-8">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-3xl font-bold text-white mb-2">🚀 System Status Dashboard</h1>
+          <p class="text-slate-300">Real-time monitoring of championship-level sports intelligence platform</p>
+        </div>
+        <div id="overall-status" class="text-right">
+          <div class="text-sm text-slate-400 mb-1">Platform Status</div>
+          <div id="platform-status" class="text-2xl font-bold text-green-400">🟢 Operational</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- System Components -->
+    <div id="status-content" class="space-y-6">
+      <div class="flex items-center justify-center py-12">
+        <div class="text-center">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blaze-orange mx-auto mb-4"></div>
+          <p class="text-slate-400">Loading championship-level system diagnostics...</p>
+        </div>
+      </div>
+    </div>
+  
+  <script>
+    (async () => {
+      const content = document.getElementById('status-content');
+      const blocks = [];
+      
+      // Try to fetch health data
+      try {
+        const healthRes = await fetch('/api/health');
+        if (healthRes.ok) {
+          const healthData = await healthRes.json();
+          blocks.push({
+            title: '🏥 System Health',
+            status: healthData.status === 'healthy' ? 'operational' : 'degraded',
+            data: healthData
+          });
+        }
+      } catch (e) {
+        console.log('Health endpoint not available:', e.message);
+      }
+      
+      // Try to fetch status data
+      try {
+        const statusRes = await fetch('/api/status');
+        if (statusRes.ok) {
+          const statusData = await statusRes.json();
+          blocks.push({
+            title: '📊 Platform Metrics',
+            status: statusData.status?.indicator === 'operational' ? 'operational' : 'degraded',
+            data: statusData
+          });
+        }
+      } catch (e) {
+        console.log('Status endpoint not available:', e.message);
+      }
+      
+      // Try to fetch Cardinals data
+      try {
+        const cardinalsRes = await fetch('/data/dashboard-config.json');
+        if (cardinalsRes.ok) {
+          const cardinalsData = await cardinalsRes.json();
+          blocks.push({
+            title: '⚾ Cardinals Intelligence',
+            status: 'operational',
+            data: {
+              readiness_score: `${cardinalsData.cardinals_readiness?.overall_score.toFixed(1)}%`,
+              trend: cardinalsData.cardinals_readiness?.trend,
+              last_update: cardinalsData.timestamp,
+              leverage_factor: cardinalsData.cardinals_readiness?.key_metrics?.leverage_factor
+            }
+          });
+        }
+      } catch (e) {
+        console.log('Cardinals data not available:', e.message);
+      }
+      
+      // Clear loading and render blocks
+      content.innerHTML = '';
+      
+      // Update main status indicator
+      const mainIndicator = document.getElementById('main-status-indicator');
+      const platformStatus = document.getElementById('platform-status');
+      const hasIssues = blocks.some(b => b.status !== 'operational');
+      
+      if (hasIssues) {
+        mainIndicator.innerHTML = `
+          <div class="w-2 h-2 rounded-full bg-yellow-400"></div>
+          <span class="text-xs text-yellow-400 font-medium">Degraded</span>
+        `;
+        platformStatus.innerHTML = '🟡 Degraded Performance';
+        platformStatus.className = 'text-2xl font-bold text-yellow-400';
+      } else if (blocks.length > 0) {
+        mainIndicator.innerHTML = `
+          <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+          <span class="text-xs text-green-400 font-medium">Operational</span>
+        `;
+        platformStatus.innerHTML = '🟢 All Systems Operational';
+        platformStatus.className = 'text-2xl font-bold text-green-400';
+      } else {
+        mainIndicator.innerHTML = `
+          <div class="w-2 h-2 rounded-full bg-red-400"></div>
+          <span class="text-xs text-red-400 font-medium">Unavailable</span>
+        `;
+        platformStatus.innerHTML = '🔴 Status Unavailable';
+        platformStatus.className = 'text-2xl font-bold text-red-400';
+      }
+      
+      if (blocks.length === 0) {
+        content.innerHTML = `
+          <div class="rounded-2xl border border-red-400/20 bg-red-400/5 p-8 text-center">
+            <div class="text-4xl mb-4">📡</div>
+            <h3 class="text-xl font-semibold text-red-400 mb-2">System Status Unavailable</h3>
+            <p class="text-slate-400 mb-4">Unable to connect to monitoring endpoints</p>
+            <p class="text-sm text-slate-500">The system may be initializing, undergoing maintenance, or experiencing connectivity issues.</p>
+            <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-blaze-orange text-black rounded-lg hover:bg-amber-600 transition-colors">Retry Connection</button>
+          </div>
+        `;
+        return;
+      }
+      
+      // Status indicator already updated above
+      
+      // Render each block with professional styling
+      for (const block of blocks) {
+        const blockEl = document.createElement('div');
+        blockEl.className = 'rounded-2xl border border-white/10 bg-white/5 p-6';
+        
+        const statusColor = block.status === 'operational' ? 'green' : block.status === 'degraded' ? 'yellow' : 'red';
+        const statusIcon = block.status === 'operational' ? '🟢' : block.status === 'degraded' ? '🟡' : '🔴';
+        const statusText = block.status === 'operational' ? 'Operational' : block.status === 'degraded' ? 'Degraded' : 'Down';
+        
+        blockEl.innerHTML = `
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <span class="text-xl">${statusIcon}</span>
+              <h3 class="text-lg font-semibold text-white">${block.title}</h3>
+            </div>
+            <span class="text-${statusColor}-400 font-semibold capitalize">${statusText}</span>
+          </div>
+          <div class="bg-slate-900/50 rounded-lg p-4 overflow-x-auto">
+            <pre class="text-sm text-slate-300">${JSON.stringify(block.data, null, 2)}</pre>
+          </div>
+        `;
+        content.appendChild(blockEl);
+      }
+      
+      // Add last updated timestamp with professional styling
+      const timestamp = document.createElement('div');
+      timestamp.className = 'mt-8 p-4 text-center border-t border-white/10';
+      timestamp.innerHTML = `
+        <div class="text-sm text-slate-400">
+          <span class="text-blaze-orange font-semibold">Last updated:</span> ${new Date().toLocaleString()}
+        </div>
+        <div class="text-xs text-slate-500 mt-2">
+          Auto-refresh every 30 seconds • 
+          <button onclick="location.reload()" class="text-blaze-orange hover:text-amber-400 underline">Manual Refresh</button>
+        </div>
+      `;
+      content.appendChild(timestamp);
+      
+      // Auto-refresh every 30 seconds with countdown
+      let countdown = 30;
+      const countdownEl = document.createElement('span');
+      countdownEl.className = 'text-xs text-slate-500';
+      countdownEl.textContent = ` (${countdown}s)`;
+      
+      const timestampDiv = content.querySelector('.text-sm');
+      if (timestampDiv) timestampDiv.appendChild(countdownEl);
+      
+      const countdownInterval = setInterval(() => {
+        countdown--;
+        if (countdownEl) countdownEl.textContent = ` (${countdown}s)`;
+        if (countdown <= 0) {
+          clearInterval(countdownInterval);
+          location.reload();
+        }
+      }, 1000);
+    })();
+  </script>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/5 bg-blaze-navy/50 py-6 mt-12">
+    <div class="mx-auto max-w-7xl px-4 text-center">
+      <p class="text-slate-400 text-sm">
+        <span class="text-blaze-orange font-semibold">Blaze Intelligence</span> • 
+        Championship-level sports analytics platform • 
+        <a href="/" class="text-blaze-blue hover:text-blue-300 underline">Return to Dashboard</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- Blaze Intelligence Championship Systems -->
+  <script src="/js/blaze-championship-visuals.js" defer=""></script>
+  <script src="/js/blaze-intelligence-optimizer.js" defer=""></script>
+  <script src="/js/blaze-brand-engine.js" defer=""></script>
+  <script src="/js/blaze-championship-master.js" defer=""></script>
+
+</body></html>

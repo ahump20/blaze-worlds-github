@@ -1,0 +1,2099 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blaze Frontier: Living Western World</title>
+    <meta name="description" content="Explore a living, breathing western frontier filled with iconic landmarks, missions, and stories">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤠</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Rye:wght@400&amp;family=Cinzel:wght@400;600;800&amp;display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dusty-orange: #CD853F;
+            --leather-brown: #654321;
+            --brass-gold: #B8860B;
+            --weathered-blue: #4F6D7A;
+            --sunset-red: #A0522D;
+            --bone-white: #F5F5DC;
+            --charcoal: #2F2F2F;
+            --dust-tan: #D2B48C;
+            --mesa-red: #8B4513;
+            --canyon-orange: #D2691E;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(180deg, #4A4A4A 0%, #2F2F2F 100%);
+            overflow: hidden;
+            color: var(--bone-white);
+            user-select: none;
+            cursor: crosshair;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #gameCanvas {
+            display: block;
+            filter: sepia(0.15) contrast(1.2) brightness(0.9) saturate(1.3);
+            transition: filter 0.5s ease;
+        }
+
+        .atmospheric-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 25% 75%, rgba(210, 180, 140, 0.12) 0%, transparent 60%),
+                radial-gradient(circle at 75% 25%, rgba(205, 133, 63, 0.08) 0%, transparent 50%),
+                linear-gradient(0deg, rgba(139, 69, 19, 0.05) 0%, transparent 30%);
+            pointer-events: none;
+            z-index: 10;
+            animation: atmosphericShift 25s infinite ease-in-out;
+        }
+
+        @keyframes atmosphericShift {
+            0%, 100% { opacity: 0.4; }
+            33% { opacity: 0.7; }
+            66% { opacity: 0.5; }
+        }
+
+        #ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            font-family: 'Rye', serif;
+        }
+
+        .ui-panel {
+            background: 
+                linear-gradient(135deg, 
+                    rgba(101, 67, 33, 0.95) 0%, 
+                    rgba(47, 47, 47, 0.90) 100%
+                );
+            border: 3px solid var(--brass-gold);
+            border-radius: 10px;
+            backdrop-filter: blur(15px) saturate(150%);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.7),
+                inset 0 1px 0 rgba(184, 134, 11, 0.4),
+                0 0 25px rgba(184, 134, 11, 0.3);
+            position: relative;
+        }
+
+        .ui-panel::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--brass-gold), var(--canyon-orange), var(--brass-gold));
+            border-radius: inherit;
+            z-index: -1;
+            animation: goldShimmer 4s infinite ease-in-out;
+        }
+
+        @keyframes goldShimmer {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 0.9; }
+        }
+
+        #missionInfo {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            padding: 24px;
+            color: var(--bone-white);
+            font-size: 14px;
+            min-width: 350px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+        }
+
+        #landmarkTracker {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            padding: 20px;
+            color: var(--bone-white);
+            font-size: 13px;
+            min-width: 320px;
+        }
+
+        .landmark-entry {
+            margin: 8px 0;
+            padding: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 3px solid var(--brass-gold);
+            border-radius: 4px;
+        }
+
+        .landmark-entry.discovered {
+            border-left-color: var(--canyon-orange);
+            background: rgba(210, 105, 30, 0.2);
+        }
+
+        #miniMap {
+            position: absolute;
+            top: 120px;
+            right: 24px;
+            width: 200px;
+            height: 150px;
+            border: 4px solid var(--brass-gold);
+            border-radius: 8px;
+            background: 
+                radial-gradient(circle at center, 
+                    rgba(101, 67, 33, 0.9) 0%, 
+                    rgba(47, 47, 47, 0.95) 100%
+                );
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--bone-white);
+            border-radius: 50%;
+            opacity: 0.9;
+            animation: crosshairPulse 2.5s infinite ease-in-out;
+            box-shadow: 
+                0 0 25px rgba(245, 245, 220, 0.7),
+                inset 0 0 15px rgba(245, 245, 220, 0.3);
+        }
+
+        .crosshair-lines {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .crosshair-line {
+            position: absolute;
+            background: var(--bone-white);
+            box-shadow: 0 0 6px rgba(245, 245, 220, 0.9);
+        }
+
+        .crosshair-line.h1 {
+            top: -1px;
+            left: -15px;
+            width: 10px;
+            height: 2px;
+        }
+
+        .crosshair-line.h2 {
+            top: -1px;
+            right: -15px;
+            width: 10px;
+            height: 2px;
+        }
+
+        .crosshair-line.v1 {
+            top: -15px;
+            left: -1px;
+            width: 2px;
+            height: 10px;
+        }
+
+        .crosshair-line.v2 {
+            bottom: -15px;
+            left: -1px;
+            width: 2px;
+            height: 10px;
+        }
+
+        @keyframes crosshairPulse {
+            0%, 100% { 
+                opacity: 0.9; 
+                transform: translate(-50%, -50%) scale(1);
+                box-shadow: 0 0 25px rgba(245, 245, 220, 0.7);
+            }
+            50% { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1.05);
+                box-shadow: 0 0 35px rgba(245, 245, 220, 0.9);
+            }
+        }
+
+        #narrativeDisplay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 600px;
+            padding: 30px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 1s ease;
+            pointer-events: none;
+            z-index: 200;
+        }
+
+        #narrativeDisplay.visible {
+            opacity: 1;
+        }
+
+        .narrative-text {
+            font-size: 18px;
+            line-height: 1.6;
+            color: var(--bone-white);
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9);
+            background: rgba(47, 47, 47, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid var(--brass-gold);
+        }
+
+        #objectiveTracker {
+            position: absolute;
+            bottom: 120px;
+            left: 24px;
+            padding: 20px;
+            color: var(--bone-white);
+            font-size: 12px;
+            min-width: 320px;
+        }
+
+        .objective {
+            margin: 6px 0;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 4px solid var(--weathered-blue);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .objective.completed {
+            border-left-color: var(--brass-gold);
+            background: rgba(184, 134, 11, 0.2);
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .objective.active {
+            border-left-color: var(--canyon-orange);
+            background: rgba(210, 105, 30, 0.3);
+            animation: objectivePulse 2s infinite ease-in-out;
+        }
+
+        @keyframes objectivePulse {
+            0%, 100% { background: rgba(210, 105, 30, 0.3); }
+            50% { background: rgba(210, 105, 30, 0.5); }
+        }
+
+        #environmentInfo {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            padding: 16px;
+            color: var(--bone-white);
+            font-size: 12px;
+            min-width: 280px;
+        }
+
+        #controls {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            padding: 20px;
+            color: var(--bone-white);
+            font-size: 11px;
+            max-width: 300px;
+            line-height: 1.6;
+        }
+
+        #loadingScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 30% 40%, rgba(160, 82, 45, 0.4) 0%, transparent 60%),
+                radial-gradient(circle at 70% 60%, rgba(101, 67, 33, 0.4) 0%, transparent 60%),
+                linear-gradient(135deg, #2F2F2F 0%, #654321 50%, #2F2F2F 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 2s ease-out;
+        }
+
+        #loadingTitle {
+            font-family: 'Rye', serif;
+            font-size: 6em;
+            color: var(--bone-white);
+            text-shadow: 
+                0 0 40px var(--brass-gold),
+                4px 4px 8px rgba(0, 0, 0, 0.8);
+            margin-bottom: 30px;
+            animation: titleGlow 4s infinite ease-in-out;
+            letter-spacing: 4px;
+        }
+
+        #loadingSubtitle {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8em;
+            color: var(--canyon-orange);
+            margin-bottom: 50px;
+            text-align: center;
+            font-weight: 400;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            color: var(--brass-gold);
+            text-shadow: 0 0 8px rgba(184, 134, 11, 0.6);
+        }
+
+        .control-key {
+            background: linear-gradient(145deg, var(--leather-brown), var(--charcoal));
+            color: var(--bone-white);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 10px;
+            box-shadow: 
+                0 2px 4px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(184, 134, 11, 0.3);
+            border: 1px solid var(--brass-gold);
+        }
+
+        .weather-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 60;
+        }
+
+        .dust-storm {
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(210, 180, 140, 0.3) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(160, 82, 45, 0.2) 0%, transparent 50%);
+            animation: dustStorm 8s infinite linear;
+        }
+
+        @keyframes dustStorm {
+            0% { background-position: -100% 0, 100% 0; }
+            100% { background-position: 100% 0, -100% 0; }
+        }
+
+        .landmark-beacon {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--brass-gold);
+            border: 2px solid var(--bone-white);
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(184, 134, 11, 0.8);
+            animation: beaconPulse 2s infinite ease-in-out;
+        }
+
+        @keyframes beaconPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+        }
+
+        #dynamicMusic {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--dust-tan);
+            font-size: 10px;
+            opacity: 0.7;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { 
+                text-shadow: 
+                    0 0 40px var(--brass-gold),
+                    4px 4px 8px rgba(0, 0, 0, 0.8);
+            }
+            50% { 
+                text-shadow: 
+                    0 0 60px var(--brass-gold),
+                    0 0 80px var(--canyon-orange),
+                    4px 4px 12px rgba(0, 0, 0, 0.8);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div class="atmospheric-overlay"></div>
+        <div class="weather-effect" id="weatherEffect"></div>
+        
+        <div id="ui">
+            <div id="missionInfo" class="ui-panel">
+                <div style="font-size: 18px; font-weight: 800; margin-bottom: 16px; color: var(--brass-gold);">
+                    🎯 FRONTIER INTELLIGENCE MISSION
+                </div>
+                <div class="stat-row">
+                    <span>Current Mission:</span>
+                    <span class="stat-value" id="currentMission">Scout the Badlands</span>
+                </div>
+                <div class="stat-row">
+                    <span>Progress:</span>
+                    <span class="stat-value" id="missionProgress">2/7 Landmarks</span>
+                </div>
+                <div class="stat-row">
+                    <span>Reputation:</span>
+                    <span class="stat-value" id="reputation">Reliable Scout</span>
+                </div>
+                <div class="stat-row">
+                    <span>Territory:</span>
+                    <span class="stat-value" id="currentTerritory">Devil's Canyon</span>
+                </div>
+                <div class="stat-row">
+                    <span>Nearest POI:</span>
+                    <span class="stat-value" id="nearestPOI">Widow's Peak - 850m NE</span>
+                </div>
+            </div>
+
+            <div id="landmarkTracker" class="ui-panel">
+                <div style="font-weight: 800; margin-bottom: 12px; color: var(--brass-gold);">🗺️ FRONTIER LANDMARKS</div>
+                <div class="landmark-entry discovered">
+                    <strong>🏔️ Thunder Mesa</strong><br>
+                    <small>Ancient fortress overlooking the valley</small>
+                </div>
+                <div class="landmark-entry discovered">
+                    <strong>🌵 Cactus Gardens</strong><br>
+                    <small>Hidden oasis with rare desert blooms</small>
+                </div>
+                <div class="landmark-entry">
+                    <strong>🏜️ Widow's Peak</strong><br>
+                    <small>Treacherous mountain pass</small>
+                </div>
+                <div class="landmark-entry">
+                    <strong>💀 Bone Canyon</strong><br>
+                    <small>Ancient burial ground of lost souls</small>
+                </div>
+                <div class="landmark-entry">
+                    <strong>⛰️ Eagle's Roost</strong><br>
+                    <small>Highest peak with panoramic views</small>
+                </div>
+                <div class="landmark-entry">
+                    <strong>💎 Crystal Caves</strong><br>
+                    <small>Underground caverns with precious gems</small>
+                </div>
+                <div class="landmark-entry">
+                    <strong>🌊 Mirage Springs</strong><br>
+                    <small>Life-giving water in the wasteland</small>
+                </div>
+            </div>
+
+            <canvas id="miniMap" width="200" height="150"></canvas>
+
+            <div id="crosshair">
+                <div class="crosshair-lines">
+                    <div class="crosshair-line h1"></div>
+                    <div class="crosshair-line h2"></div>
+                    <div class="crosshair-line v1"></div>
+                    <div class="crosshair-line v2"></div>
+                </div>
+            </div>
+
+            <div id="narrativeDisplay">
+                <div class="narrative-text">
+                    <div id="narrativeText">The frontier beckons with untold stories...</div>
+                </div>
+            </div>
+
+            <div id="objectiveTracker" class="ui-panel">
+                <div style="font-weight: 800; margin-bottom: 12px; color: var(--brass-gold);">📋 CURRENT OBJECTIVES</div>
+                <div class="objective completed">✓ Establish base camp at Thunder Mesa</div>
+                <div class="objective completed">✓ Survey the Cactus Gardens</div>
+                <div class="objective active">→ Navigate to Widow's Peak overlook</div>
+                <div class="objective">• Investigate strange sounds at Bone Canyon</div>
+                <div class="objective">• Scale Eagle's Roost for territorial mapping</div>
+                <div class="objective">• Discover the Crystal Caves entrance</div>
+                <div class="objective">• Report findings to headquarters</div>
+            </div>
+
+            <div id="environmentInfo" class="ui-panel">
+                <div style="font-weight: 800; margin-bottom: 8px; color: var(--brass-gold);">🌵 FRONTIER CONDITIONS</div>
+                <div class="stat-row">
+                    <span>Weather:</span>
+                    <span class="stat-value" id="currentWeather">Dust Storm Approaching</span>
+                </div>
+                <div class="stat-row">
+                    <span>Visibility:</span>
+                    <span class="stat-value" id="visibility">Limited - 200m</span>
+                </div>
+                <div class="stat-row">
+                    <span>Wind:</span>
+                    <span class="stat-value" id="windDirection">Strong SW Gusts</span>
+                </div>
+                <div class="stat-row">
+                    <span>Wildlife:</span>
+                    <span class="stat-value" id="wildlife">Coyotes Nearby</span>
+                </div>
+            </div>
+
+            <div id="controls" class="ui-panel">
+                <h3 style="color: var(--brass-gold); margin-bottom: 12px; font-weight: 800;">🎮 FRONTIER CONTROLS</h3>
+                <div><span class="control-key">WASD</span> Explore the frontier</div>
+                <div><span class="control-key">SHIFT</span> Sprint to objectives</div>
+                <div><span class="control-key">SPACE</span> Climb/Jump obstacles</div>
+                <div><span class="control-key">E</span> Investigate landmarks</div>
+                <div><span class="control-key">M</span> Open detailed map</div>
+                <div><span class="control-key">TAB</span> Mission journal</div>
+                <div><span class="control-key">R</span> Generate new territory</div>
+                <div><span class="control-key">F</span> Use spyglass</div>
+                <br>
+                <div style="color: var(--canyon-orange); font-style: italic; font-size: 10px; line-height: 1.4;">
+                    🔥 Experience a living western world filled with purpose, mystery, and legendary landmarks waiting to be discovered!
+                </div>
+            </div>
+
+            <div id="dynamicMusic">♪ "Frontier Dawn" - Dynamic Western Score ♪</div>
+        </div>
+
+        <div id="loadingScreen">
+            <div id="loadingTitle">LIVING FRONTIER</div>
+            <div id="loadingSubtitle">Building a World Worth Exploring...</div>
+            <div style="margin-top: 30px; color: var(--canyon-orange); font-size: 14px; text-align: center;">
+                Powered by Frontier Ambition • Built with Championship Vision
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        class LivingFrontierWorld {
+            constructor() {
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+                this.clock = new THREE.Clock();
+                
+                // World state
+                this.playerPosition = new THREE.Vector3(0, 120, 0);
+                this.mouseX = 0;
+                this.mouseY = 0;
+                this.speed = 80;
+                this.maxSpeed = 300;
+                
+                // Mission and narrative system
+                this.currentMission = "Scout the Badlands";
+                this.objectives = [
+                    { text: "Establish base camp at Thunder Mesa", completed: true },
+                    { text: "Survey the Cactus Gardens", completed: true },
+                    { text: "Navigate to Widow's Peak overlook", active: true },
+                    { text: "Investigate strange sounds at Bone Canyon", completed: false },
+                    { text: "Scale Eagle's Roost for territorial mapping", completed: false },
+                    { text: "Discover the Crystal Caves entrance", completed: false },
+                    { text: "Report findings to headquarters", completed: false }
+                ];
+                
+                // Dynamic world features
+                this.landmarks = [
+                    { 
+                        name: "Thunder Mesa", 
+                        position: new THREE.Vector3(-500, 180, -800),
+                        discovered: true,
+                        description: "An ancient fortress overlooking the valley",
+                        icon: "🏔️",
+                        type: "mesa"
+                    },
+                    { 
+                        name: "Cactus Gardens", 
+                        position: new THREE.Vector3(300, 90, 600),
+                        discovered: true,
+                        description: "Hidden oasis with rare desert blooms",
+                        icon: "🌵",
+                        type: "oasis"
+                    },
+                    { 
+                        name: "Widow's Peak", 
+                        position: new THREE.Vector3(850, 320, -400),
+                        discovered: false,
+                        description: "Treacherous mountain pass",
+                        icon: "🏜️",
+                        type: "peak"
+                    },
+                    { 
+                        name: "Bone Canyon", 
+                        position: new THREE.Vector3(-1200, 60, 200),
+                        discovered: false,
+                        description: "Ancient burial ground of lost souls",
+                        icon: "💀",
+                        type: "canyon"
+                    },
+                    { 
+                        name: "Eagle's Roost", 
+                        position: new THREE.Vector3(200, 450, -1100),
+                        discovered: false,
+                        description: "Highest peak with panoramic views",
+                        icon: "⛰️",
+                        type: "peak"
+                    },
+                    { 
+                        name: "Crystal Caves", 
+                        position: new THREE.Vector3(-800, 40, -600),
+                        discovered: false,
+                        description: "Underground caverns with precious gems",
+                        icon: "💎",
+                        type: "cave"
+                    },
+                    { 
+                        name: "Mirage Springs", 
+                        position: new THREE.Vector3(1000, 80, 800),
+                        discovered: false,
+                        description: "Life-giving water in the wasteland",
+                        icon: "🌊",
+                        type: "spring"
+                    }
+                ];
+                
+                // Environmental system
+                this.weather = {
+                    condition: 'dustStorm',
+                    intensity: 0.7,
+                    windDirection: 'SW',
+                    visibility: 200
+                };
+                
+                this.timeOfDay = 14.5; // 2:30 PM
+                this.wildlife = ['coyotes', 'eagles', 'rattlesnakes', 'jackrabbits'];
+                this.currentWildlife = 'coyotes';
+                
+                // Terrain and rendering
+                this.chunks = new Map();
+                this.chunkSize = 600;
+                this.renderDistance = 4;
+                this.seed = Math.floor(Math.random() * 10000);
+                
+                // Controls
+                this.controls = {
+                    moveForward: false,
+                    moveBackward: false,
+                    moveLeft: false,
+                    moveRight: false,
+                    sprint: false,
+                    jump: false
+                };
+                this.velocity = new THREE.Vector3();
+                this.direction = new THREE.Vector3();
+                
+                // Western colors
+                this.colors = {
+                    dustyOrange: 0xCD853F,
+                    leatherBrown: 0x654321,
+                    brassGold: 0xB8860B,
+                    mesaRed: 0x8B4513,
+                    canyonOrange: 0xD2691E,
+                    sunsetRed: 0xA0522D,
+                    boneWhite: 0xF5F5DC,
+                    charcoal: 0x2F2F2F,
+                    dustTan: 0xD2B48C
+                };
+
+                this.materials = {};
+                this.narratives = [
+                    "The wind carries whispers of ancient secrets...",
+                    "Somewhere in the distance, a coyote calls to its pack...",
+                    "The sun beats down mercilessly on this unforgiving land...",
+                    "Strange formations dot the horizon like sleeping giants...",
+                    "This territory holds stories that predate memory...",
+                    "The very rocks seem to watch your every move...",
+                    "A dust devil dances across the distant mesa...",
+                    "The frontier tests every soul who dares to venture forth..."
+                ];
+                
+                this.init();
+            }
+
+            async init() {
+                this.setupRenderer();
+                this.setupScene();
+                this.setupCamera();
+                this.setupDynamicLighting();
+                this.setupLivingMaterials();
+                this.setupEventListeners();
+                this.generateLivingWorld();
+                this.startNarrativeSystem();
+                this.animate();
+                this.hideLoadingScreen();
+            }
+
+            setupRenderer() {
+                const canvas = document.getElementById('gameCanvas');
+                this.renderer = new THREE.WebGLRenderer({ 
+                    canvas: canvas, 
+                    antialias: true,
+                    powerPreference: "high-performance"
+                });
+                
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                this.renderer.outputEncoding = THREE.sRGBEncoding;
+                this.renderer.toneMapping = THREE.ReinhardToneMapping;
+                this.renderer.toneMappingExposure = 1.3;
+                this.renderer.setClearColor(0x8B7355, 1);
+            }
+
+            setupScene() {
+                this.scene = new THREE.Scene();
+                this.scene.fog = new THREE.Fog(0x8B7355, 600, 4000);
+                this.setupDynamicSky();
+            }
+
+            setupDynamicSky() {
+                const skyGeometry = new THREE.SphereGeometry(5000, 64, 64);
+                const skyMaterial = new THREE.ShaderMaterial({
+                    uniforms: {
+                        time: { value: 0 },
+                        sunPosition: { value: new THREE.Vector3(0.3, 0.7, 0.4) },
+                        dustIntensity: { value: this.weather.intensity },
+                        weatherCondition: { value: this.weather.condition === 'dustStorm' ? 1.0 : 0.0 }
+                    },
+                    vertexShader: `
+                        varying vec3 vWorldPosition;
+                        void main() {
+                            vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+                            vWorldPosition = worldPosition.xyz;
+                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform float time;
+                        uniform vec3 sunPosition;
+                        uniform float dustIntensity;
+                        uniform float weatherCondition;
+                        
+                        varying vec3 vWorldPosition;
+                        
+                        vec3 getDynamicSkyColor(vec3 direction) {
+                            float sunDot = dot(direction, sunPosition);
+                            float elevation = max(direction.y, 0.0);
+                            
+                            // Dynamic sky colors based on weather
+                            vec3 clearHorizon = vec3(0.9, 0.7, 0.5);
+                            vec3 clearZenith = vec3(0.3, 0.5, 0.8);
+                            vec3 stormHorizon = vec3(0.7, 0.5, 0.3);
+                            vec3 stormZenith = vec3(0.4, 0.3, 0.2);
+                            
+                            vec3 horizonColor = mix(clearHorizon, stormHorizon, weatherCondition);
+                            vec3 zenithColor = mix(clearZenith, stormZenith, weatherCondition);
+                            vec3 sunColor = vec3(1.0, 0.8, 0.6);
+                            
+                            // Sky gradient
+                            float skyMix = pow(elevation, 0.7);
+                            vec3 skyColor = mix(horizonColor, zenithColor, skyMix);
+                            
+                            // Enhanced sun disc
+                            float sunDisc = smoothstep(0.995, 0.999, sunDot);
+                            float sunHalo = pow(max(sunDot, 0.0), 6.0) * (1.0 - weatherCondition * 0.5);
+                            
+                            skyColor = mix(skyColor, sunColor, sunDisc);
+                            skyColor += sunColor * sunHalo * 0.4;
+                            
+                            // Dynamic dust/storm effects
+                            float dustEffect = dustIntensity * (1.0 - elevation * 0.8);
+                            vec3 dustColor = vec3(0.6, 0.4, 0.2);
+                            skyColor = mix(skyColor, dustColor, dustEffect * 0.3);
+                            
+                            // Add some dynamic cloud-like formations
+                            float cloudNoise = sin(direction.x * 10.0 + time * 0.0005) * sin(direction.z * 8.0) * 0.1;
+                            skyColor += cloudNoise * (1.0 - weatherCondition);
+                            
+                            return skyColor;
+                        }
+                        
+                        void main() {
+                            vec3 direction = normalize(vWorldPosition);
+                            vec3 color = getDynamicSkyColor(direction);
+                            gl_FragColor = vec4(color, 1.0);
+                        }
+                    `,
+                    side: THREE.BackSide
+                });
+                
+                const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+                this.sky = sky;
+                this.skyMaterial = skyMaterial;
+                this.scene.add(sky);
+            }
+
+            setupCamera() {
+                this.camera = new THREE.PerspectiveCamera(
+                    75, 
+                    window.innerWidth / window.innerHeight, 
+                    0.1, 
+                    10000
+                );
+                this.camera.position.copy(this.playerPosition);
+            }
+
+            setupDynamicLighting() {
+                // Dynamic ambient based on weather
+                const ambientIntensity = this.weather.condition === 'dustStorm' ? 0.3 : 0.5;
+                const ambientLight = new THREE.AmbientLight(0x8B6914, ambientIntensity);
+                this.scene.add(ambientLight);
+
+                // Main sun with weather effects
+                this.sunLight = new THREE.DirectionalLight(0xFFE4B5, 2.0);
+                this.sunLight.position.set(1200, 1500, 600);
+                this.sunLight.castShadow = true;
+                this.sunLight.shadow.mapSize.width = 4096;
+                this.sunLight.shadow.mapSize.height = 4096;
+                this.sunLight.shadow.camera.near = 1;
+                this.sunLight.shadow.camera.far = 4000;
+                this.sunLight.shadow.camera.left = -2000;
+                this.sunLight.shadow.camera.right = 2000;
+                this.sunLight.shadow.camera.top = 2000;
+                this.sunLight.shadow.camera.bottom = -2000;
+                this.sunLight.shadow.bias = -0.0001;
+                this.scene.add(this.sunLight);
+
+                // Atmospheric fill lights
+                this.atmosphericLights = [];
+                for (let i = 0; i < 6; i++) {
+                    const light = new THREE.PointLight(
+                        [this.colors.canyonOrange, this.colors.mesaRed, this.colors.dustyOrange][i % 3],
+                        0.8,
+                        800,
+                        1.2
+                    );
+                    light.position.set(
+                        (Math.random() - 0.5) * 5000,
+                        200 + Math.random() * 300,
+                        (Math.random() - 0.5) * 5000
+                    );
+                    this.scene.add(light);
+                    this.atmosphericLights.push(light);
+                }
+            }
+
+            setupLivingMaterials() {
+                // Enhanced terrain material with landmark integration
+                this.materials.livingTerrain = new THREE.ShaderMaterial({
+                    uniforms: {
+                        time: { value: 0 },
+                        sunPosition: { value: new THREE.Vector3(0.3, 0.7, 0.4) },
+                        playerPosition: { value: this.playerPosition },
+                        weatherIntensity: { value: this.weather.intensity },
+                        landmarkInfluence: { value: new THREE.Vector4(0, 0, 0, 0) }
+                    },
+                    vertexShader: `
+                        varying vec3 vWorldPosition;
+                        varying vec3 vNormal;
+                        varying vec2 vUv;
+                        
+                        void main() {
+                            vUv = uv;
+                            vNormal = normalize(normalMatrix * normal);
+                            
+                            vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+                            vWorldPosition = worldPosition.xyz;
+                            
+                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform float time;
+                        uniform vec3 sunPosition;
+                        uniform vec3 playerPosition;
+                        uniform float weatherIntensity;
+                        uniform vec4 landmarkInfluence;
+                        
+                        varying vec3 vWorldPosition;
+                        varying vec3 vNormal;
+                        varying vec2 vUv;
+                        
+                        float hash(vec2 p) {
+                            return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+                        }
+                        
+                        float noise(vec2 p) {
+                            vec2 i = floor(p);
+                            vec2 f = fract(p);
+                            
+                            float a = hash(i);
+                            float b = hash(i + vec2(1.0, 0.0));
+                            float c = hash(i + vec2(0.0, 1.0));
+                            float d = hash(i + vec2(1.0, 1.0));
+                            
+                            vec2 u = f * f * (3.0 - 2.0 * f);
+                            
+                            return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+                        }
+                        
+                        float fbm(vec2 p) {
+                            float value = 0.0;
+                            float amplitude = 0.5;
+                            float frequency = 1.0;
+                            
+                            for (int i = 0; i < 6; i++) {
+                                value += amplitude * noise(p * frequency);
+                                amplitude *= 0.5;
+                                frequency *= 2.0;
+                            }
+                            
+                            return value;
+                        }
+                        
+                        vec3 getLivingTerrainColor(vec3 worldPos, vec3 normal) {
+                            float height = worldPos.y;
+                            vec2 texCoords = worldPos.xz * 0.005;
+                            
+                            // Base terrain colors with more variety
+                            vec3 desertSand = vec3(0.8, 0.6, 0.4);
+                            vec3 redRock = vec3(0.6, 0.3, 0.2);
+                            vec3 darkStone = vec3(0.4, 0.35, 0.3);
+                            vec3 dryGrass = vec3(0.5, 0.4, 0.2);
+                            vec3 canyonWalls = vec3(0.7, 0.4, 0.25);
+                            
+                            // Height-based terrain distribution
+                            float sandWeight = smoothstep(-50.0, 100.0, height) * smoothstep(300.0, 150.0, height);
+                            float rockWeight = smoothstep(100.0, 350.0, height) * smoothstep(800.0, 400.0, height);
+                            float stoneWeight = smoothstep(300.0, 600.0, height);
+                            float canyonWeight = max(0.0, 1.0 - abs(height - 200.0) / 100.0);
+                            
+                            // Slope-based weathering
+                            float slope = 1.0 - normal.y;
+                            rockWeight += slope * 1.8;
+                            sandWeight *= (1.0 - slope * 0.7);
+                            
+                            // Advanced weathering patterns
+                            float weathering = fbm(texCoords * 12.0);
+                            float erosion = fbm(texCoords * 25.0) * 0.4;
+                            float stratification = sin(height * 0.02) * 0.1;
+                            
+                            // Blend terrain types
+                            vec3 baseColor = desertSand * sandWeight + 
+                                           redRock * rockWeight + 
+                                           darkStone * stoneWeight + 
+                                           canyonWalls * canyonWeight +
+                                           dryGrass * (1.0 - sandWeight - rockWeight - stoneWeight - canyonWeight);
+                            
+                            // Apply weathering and geological features
+                            baseColor = mix(baseColor, redRock * 0.8, weathering * 0.3);
+                            baseColor = mix(baseColor, desertSand * 1.1, erosion);
+                            baseColor += vec3(stratification * 0.1, stratification * 0.05, 0.0);
+                            
+                            // Weather effects
+                            float dustAccum = (1.0 - slope) * weatherIntensity * 0.2;
+                            baseColor = mix(baseColor, vec3(0.7, 0.55, 0.4), dustAccum);
+                            
+                            // Landmark influence (special coloring near landmarks)
+                            float landmarkDist = length(worldPos.xz - landmarkInfluence.xy);
+                            if (landmarkInfluence.z > 0.5 && landmarkDist < landmarkInfluence.w) {
+                                float influence = 1.0 - smoothstep(0.0, landmarkInfluence.w, landmarkDist);
+                                vec3 specialColor = vec3(0.8, 0.4, 0.2); // Landmark glow
+                                baseColor = mix(baseColor, specialColor, influence * 0.3);
+                            }
+                            
+                            return baseColor;
+                        }
+                        
+                        void main() {
+                            vec3 normal = normalize(vNormal);
+                            vec3 lightDir = normalize(sunPosition);
+                            vec3 viewDir = normalize(cameraPosition - vWorldPosition);
+                            
+                            vec3 albedo = getLivingTerrainColor(vWorldPosition, normal);
+                            
+                            // Enhanced lighting
+                            float NdotL = max(0.0, dot(normal, lightDir));
+                            float shadow = NdotL * (1.0 - weatherIntensity * 0.3);
+                            
+                            vec3 diffuse = albedo * (0.4 + shadow * 0.6);
+                            
+                            // Atmospheric perspective with weather
+                            float distance = length(vWorldPosition - playerPosition);
+                            float fogFactor = 1.0 - exp(-distance * (0.0002 + weatherIntensity * 0.0003));
+                            vec3 atmosColor = vec3(0.7, 0.5, 0.35) * (1.0 + weatherIntensity * 0.5);
+                            
+                            vec3 finalColor = mix(diffuse, atmosColor, fogFactor);
+                            
+                            // Subtle rim lighting for drama
+                            float fresnel = pow(1.0 - dot(normal, viewDir), 2.0);
+                            finalColor += fresnel * 0.1 * vec3(0.9, 0.6, 0.4);
+                            
+                            gl_FragColor = vec4(finalColor, 1.0);
+                        }
+                    `
+                });
+            }
+
+            generateLivingWorld() {
+                // Generate world with meaningful landmarks
+                const centerX = Math.floor(this.playerPosition.x / this.chunkSize);
+                const centerZ = Math.floor(this.playerPosition.z / this.chunkSize);
+                
+                for (let x = centerX - this.renderDistance; x <= centerX + this.renderDistance; x++) {
+                    for (let z = centerZ - this.renderDistance; z <= centerZ + this.renderDistance; z++) {
+                        this.loadLivingChunk(x, z);
+                    }
+                }
+                
+                // Create landmark structures
+                this.createLandmarkStructures();
+            }
+
+            loadLivingChunk(x, z) {
+                const key = `${x},${z}`;
+                if (!this.chunks.has(key)) {
+                    const chunk = this.generateMeaningfulTerrain(x, z);
+                    this.chunks.set(key, chunk);
+                    this.scene.add(chunk);
+                }
+            }
+
+            generateMeaningfulTerrain(chunkX, chunkZ) {
+                const geometry = new THREE.PlaneGeometry(
+                    this.chunkSize, 
+                    this.chunkSize, 
+                    128, 
+                    128
+                );
+                
+                const vertices = geometry.attributes.position.array;
+                
+                // Generate varied, interesting terrain
+                for (let i = 0; i < vertices.length; i += 3) {
+                    const x = vertices[i] + chunkX * this.chunkSize;
+                    const z = vertices[i + 2] + chunkZ * this.chunkSize;
+                    
+                    let height = this.generateVariedHeight(x, z);
+                    vertices[i + 1] = height;
+                }
+                
+                geometry.attributes.position.needsUpdate = true;
+                geometry.computeVertexNormals();
+                
+                const material = this.materials.livingTerrain.clone();
+                material.uniforms.time.value = this.clock.getElapsedTime();
+                
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.rotation.x = -Math.PI / 2;
+                mesh.position.set(
+                    chunkX * this.chunkSize,
+                    0,
+                    chunkZ * this.chunkSize
+                );
+                mesh.receiveShadow = true;
+                
+                // Add meaningful features to this chunk
+                this.addMeaningfulFeatures(mesh, chunkX, chunkZ);
+                
+                return mesh;
+            }
+
+            generateVariedHeight(x, z) {
+                const scale = 0.0008;
+                let height = 0;
+                
+                // Create varied terrain types based on location
+                const regionNoise = this.noise(x * scale * 0.1, z * scale * 0.1);
+                
+                if (regionNoise > 0.3) {
+                    // Mesa/plateau region
+                    height += Math.max(0, this.ridgedNoise(x * scale * 0.3, z * scale * 0.3)) * 400;
+                    height += this.noise(x * scale * 1.5, z * scale * 1.5) * 60;
+                } else if (regionNoise > -0.2) {
+                    // Rolling hills region
+                    height += this.noise(x * scale * 0.5, z * scale * 0.5) * 200;
+                    height += this.noise(x * scale * 2, z * scale * 2) * 80;
+                } else {
+                    // Canyon/valley region
+                    const canyonDepth = Math.max(0, -this.noise(x * scale * 0.8, z * scale * 0.8)) * 150;
+                    height -= canyonDepth;
+                    height += this.noise(x * scale * 3, z * scale * 3) * 40;
+                }
+                
+                // Add landmark-influenced terrain
+                this.landmarks.forEach(landmark => {
+                    const dist = Math.sqrt((x - landmark.position.x) ** 2 + (z - landmark.position.z) ** 2);
+                    if (dist < 400) {
+                        const influence = 1.0 - Math.min(dist / 400, 1.0);
+                        switch (landmark.type) {
+                            case 'mesa':
+                                height += influence * 200;
+                                break;
+                            case 'peak':
+                                height += influence * 350;
+                                break;
+                            case 'canyon':
+                                height -= influence * 100;
+                                break;
+                            case 'cave':
+                                height += influence * influence * 150; // Sharp peak above caves
+                                break;
+                        }
+                    }
+                });
+                
+                // Fine surface details
+                height += this.noise(x * scale * 6, z * scale * 6) * 15;
+                height += this.noise(x * scale * 12, z * scale * 12) * 5;
+                
+                return height;
+            }
+
+            createLandmarkStructures() {
+                this.landmarks.forEach(landmark => {
+                    if (landmark.discovered) {
+                        this.createLandmarkStructure(landmark);
+                    }
+                });
+            }
+
+            createLandmarkStructure(landmark) {
+                const group = new THREE.Group();
+                
+                switch (landmark.type) {
+                    case 'mesa':
+                        this.createMesaStructure(group);
+                        break;
+                    case 'oasis':
+                        this.createOasisStructure(group);
+                        break;
+                    case 'peak':
+                        this.createPeakStructure(group);
+                        break;
+                    case 'canyon':
+                        this.createCanyonStructure(group);
+                        break;
+                    case 'cave':
+                        this.createCaveStructure(group);
+                        break;
+                    case 'spring':
+                        this.createSpringStructure(group);
+                        break;
+                }
+                
+                group.position.copy(landmark.position);
+                this.scene.add(group);
+            }
+
+            createMesaStructure(group) {
+                // Create dramatic mesa with ancient structures
+                const mesaGeometry = new THREE.CylinderGeometry(80, 120, 100, 12, 1);
+                const mesaMaterial = new THREE.MeshLambertMaterial({ 
+                    color: new THREE.Color(this.colors.mesaRed) 
+                });
+                const mesa = new THREE.Mesh(mesaGeometry, mesaMaterial);
+                mesa.position.y = 50;
+                mesa.castShadow = true;
+                mesa.receiveShadow = true;
+                group.add(mesa);
+                
+                // Ancient ruins on top
+                for (let i = 0; i < 5; i++) {
+                    const ruinGeometry = new THREE.BoxGeometry(8, 15, 6);
+                    const ruinMaterial = new THREE.MeshLambertMaterial({ 
+                        color: new THREE.Color(this.colors.charcoal) 
+                    });
+                    const ruin = new THREE.Mesh(ruinGeometry, ruinMaterial);
+                    const angle = (i / 5) * Math.PI * 2;
+                    ruin.position.set(
+                        Math.cos(angle) * 40,
+                        107,
+                        Math.sin(angle) * 40
+                    );
+                    ruin.castShadow = true;
+                    group.add(ruin);
+                }
+            }
+
+            createOasisStructure(group) {
+                // Palm trees
+                for (let i = 0; i < 6; i++) {
+                    const palmGroup = new THREE.Group();
+                    
+                    // Trunk
+                    const trunkGeometry = new THREE.CylinderGeometry(2, 3, 25, 8);
+                    const trunkMaterial = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
+                    const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+                    trunk.position.y = 12.5;
+                    trunk.castShadow = true;
+                    palmGroup.add(trunk);
+                    
+                    // Fronds
+                    for (let j = 0; j < 8; j++) {
+                        const frondGeometry = new THREE.CylinderGeometry(0.5, 0.5, 15, 4);
+                        const frondMaterial = new THREE.MeshLambertMaterial({ color: 0x228B22 });
+                        const frond = new THREE.Mesh(frondGeometry, frondMaterial);
+                        const frondAngle = (j / 8) * Math.PI * 2;
+                        frond.position.set(
+                            Math.cos(frondAngle) * 3,
+                            25,
+                            Math.sin(frondAngle) * 3
+                        );
+                        frond.rotation.z = Math.cos(frondAngle) * 0.3;
+                        frond.rotation.x = Math.sin(frondAngle) * 0.3;
+                        frond.castShadow = true;
+                        palmGroup.add(frond);
+                    }
+                    
+                    palmGroup.position.set(
+                        (Math.random() - 0.5) * 60,
+                        0,
+                        (Math.random() - 0.5) * 60
+                    );
+                    group.add(palmGroup);
+                }
+                
+                // Water pool
+                const poolGeometry = new THREE.CircleGeometry(30, 16);
+                const poolMaterial = new THREE.MeshLambertMaterial({ 
+                    color: 0x4169E1,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                const pool = new THREE.Mesh(poolGeometry, poolMaterial);
+                pool.rotation.x = -Math.PI / 2;
+                pool.position.y = 1;
+                group.add(pool);
+            }
+
+            createPeakStructure(group) {
+                // Jagged mountain peak
+                const peakGeometry = new THREE.ConeGeometry(40, 150, 8, 1);
+                
+                // Make it jagged
+                const positions = peakGeometry.attributes.position.array;
+                for (let i = 0; i < positions.length; i += 3) {
+                    positions[i] += (Math.random() - 0.5) * 15;
+                    positions[i + 1] += (Math.random() - 0.5) * 20;
+                    positions[i + 2] += (Math.random() - 0.5) * 15;
+                }
+                peakGeometry.attributes.position.needsUpdate = true;
+                peakGeometry.computeVertexNormals();
+                
+                const peakMaterial = new THREE.MeshLambertMaterial({ 
+                    color: new THREE.Color(this.colors.charcoal) 
+                });
+                const peak = new THREE.Mesh(peakGeometry, peakMaterial);
+                peak.position.y = 75;
+                peak.castShadow = true;
+                peak.receiveShadow = true;
+                group.add(peak);
+            }
+
+            createCanyonStructure(group) {
+                // Canyon walls
+                for (let i = 0; i < 4; i++) {
+                    const wallGeometry = new THREE.BoxGeometry(150, 80, 20);
+                    const wallMaterial = new THREE.MeshLambertMaterial({ 
+                        color: new THREE.Color(this.colors.canyonOrange) 
+                    });
+                    const wall = new THREE.Mesh(wallGeometry, wallMaterial);
+                    
+                    if (i < 2) {
+                        wall.position.set(i === 0 ? -80 : 80, 40, 0);
+                    } else {
+                        wall.position.set(0, 40, i === 2 ? -80 : 80);
+                        wall.rotation.y = Math.PI / 2;
+                    }
+                    
+                    wall.castShadow = true;
+                    wall.receiveShadow = true;
+                    group.add(wall);
+                }
+                
+                // Ancient petroglyphs (simple geometric shapes)
+                for (let i = 0; i < 8; i++) {
+                    const glyphGeometry = new THREE.CircleGeometry(2, 6);
+                    const glyphMaterial = new THREE.MeshLambertMaterial({ 
+                        color: new THREE.Color(this.colors.charcoal) 
+                    });
+                    const glyph = new THREE.Mesh(glyphGeometry, glyphMaterial);
+                    glyph.position.set(
+                        (Math.random() - 0.5) * 120,
+                        20 + Math.random() * 40,
+                        -78
+                    );
+                    glyph.rotation.x = Math.PI / 2;
+                    group.add(glyph);
+                }
+            }
+
+            createCaveStructure(group) {
+                // Cave entrance
+                const caveGeometry = new THREE.SphereGeometry(25, 16, 8, 0, Math.PI);
+                const caveMaterial = new THREE.MeshLambertMaterial({ 
+                    color: new THREE.Color(this.colors.charcoal),
+                    side: THREE.DoubleSide
+                });
+                const cave = new THREE.Mesh(caveGeometry, caveMaterial);
+                cave.position.y = 25;
+                cave.rotation.x = Math.PI / 2;
+                group.add(cave);
+                
+                // Crystal formations
+                for (let i = 0; i < 12; i++) {
+                    const crystalGeometry = new THREE.OctahedronGeometry(3 + Math.random() * 4);
+                    const crystalMaterial = new THREE.MeshLambertMaterial({ 
+                        color: new THREE.Color(0x87CEEB),
+                        transparent: true,
+                        opacity: 0.8
+                    });
+                    const crystal = new THREE.Mesh(crystalGeometry, crystalMaterial);
+                    crystal.position.set(
+                        (Math.random() - 0.5) * 40,
+                        Math.random() * 20,
+                        (Math.random() - 0.5) * 40
+                    );
+                    crystal.rotation.set(
+                        Math.random() * Math.PI,
+                        Math.random() * Math.PI,
+                        Math.random() * Math.PI
+                    );
+                    crystal.castShadow = true;
+                    group.add(crystal);
+                }
+            }
+
+            createSpringStructure(group) {
+                // Multiple water pools
+                for (let i = 0; i < 3; i++) {
+                    const poolSize = 15 + Math.random() * 10;
+                    const poolGeometry = new THREE.CircleGeometry(poolSize, 12);
+                    const poolMaterial = new THREE.MeshLambertMaterial({ 
+                        color: 0x4682B4,
+                        transparent: true,
+                        opacity: 0.9
+                    });
+                    const pool = new THREE.Mesh(poolGeometry, poolMaterial);
+                    pool.rotation.x = -Math.PI / 2;
+                    pool.position.set(
+                        (Math.random() - 0.5) * 50,
+                        1,
+                        (Math.random() - 0.5) * 50
+                    );
+                    group.add(pool);
+                }
+                
+                // Lush vegetation
+                for (let i = 0; i < 20; i++) {
+                    const vegGeometry = new THREE.SphereGeometry(2 + Math.random() * 3, 8, 8);
+                    const vegMaterial = new THREE.MeshLambertMaterial({ 
+                        color: new THREE.Color(0.2, 0.7 + Math.random() * 0.3, 0.1) 
+                    });
+                    const vegetation = new THREE.Mesh(vegGeometry, vegMaterial);
+                    vegetation.position.set(
+                        (Math.random() - 0.5) * 80,
+                        2,
+                        (Math.random() - 0.5) * 80
+                    );
+                    vegetation.castShadow = true;
+                    group.add(vegetation);
+                }
+            }
+
+            addMeaningfulFeatures(chunk, chunkX, chunkZ) {
+                const chunkCenter = new THREE.Vector2(
+                    chunkX * this.chunkSize,
+                    chunkZ * this.chunkSize
+                );
+                
+                // Add contextual vegetation based on nearby landmarks
+                let vegetationType = 'desert';
+                let vegetationDensity = 20;
+                
+                this.landmarks.forEach(landmark => {
+                    const dist = chunkCenter.distanceTo(new THREE.Vector2(landmark.position.x, landmark.position.z));
+                    if (dist < 500) {
+                        switch (landmark.type) {
+                            case 'oasis':
+                            case 'spring':
+                                vegetationType = 'lush';
+                                vegetationDensity = 40;
+                                break;
+                            case 'canyon':
+                                vegetationType = 'sparse';
+                                vegetationDensity = 10;
+                                break;
+                            case 'peak':
+                                vegetationType = 'alpine';
+                                vegetationDensity = 15;
+                                break;
+                        }
+                    }
+                });
+                
+                // Generate contextual vegetation
+                for (let i = 0; i < vegetationDensity; i++) {
+                    if (Math.random() > 0.3) {
+                        const plant = this.createContextualVegetation(vegetationType);
+                        plant.position.set(
+                            (Math.random() - 0.5) * this.chunkSize,
+                            this.getTerrainHeight(
+                                chunkX * this.chunkSize + (Math.random() - 0.5) * this.chunkSize,
+                                chunkZ * this.chunkSize + (Math.random() - 0.5) * this.chunkSize
+                            ),
+                            (Math.random() - 0.5) * this.chunkSize
+                        );
+                        chunk.add(plant);
+                    }
+                }
+                
+                // Add meaningful rock formations
+                const rockCount = 8 + Math.random() * 10;
+                for (let i = 0; i < rockCount; i++) {
+                    if (Math.random() > 0.4) {
+                        const rock = this.createMeaningfulRock();
+                        rock.position.set(
+                            (Math.random() - 0.5) * this.chunkSize,
+                            this.getTerrainHeight(
+                                chunkX * this.chunkSize + (Math.random() - 0.5) * this.chunkSize,
+                                chunkZ * this.chunkSize + (Math.random() - 0.5) * this.chunkSize
+                            ),
+                            (Math.random() - 0.5) * this.chunkSize
+                        );
+                        chunk.add(rock);
+                    }
+                }
+            }
+
+            createContextualVegetation(type) {
+                const group = new THREE.Group();
+                
+                switch (type) {
+                    case 'lush':
+                        // Dense, green vegetation
+                        const lushGeometry = new THREE.SphereGeometry(3 + Math.random() * 2, 8, 8);
+                        const lushMaterial = new THREE.MeshLambertMaterial({ 
+                            color: new THREE.Color(0.1, 0.8, 0.2) 
+                        });
+                        const lush = new THREE.Mesh(lushGeometry, lushMaterial);
+                        lush.position.y = 3;
+                        lush.castShadow = true;
+                        group.add(lush);
+                        break;
+                        
+                    case 'sparse':
+                        // Tiny desert shrubs
+                        const sparseGeometry = new THREE.SphereGeometry(1 + Math.random(), 6, 6);
+                        const sparseMaterial = new THREE.MeshLambertMaterial({ 
+                            color: new THREE.Color(0.4, 0.3, 0.1) 
+                        });
+                        const sparse = new THREE.Mesh(sparseGeometry, sparseMaterial);
+                        sparse.position.y = 1;
+                        sparse.castShadow = true;
+                        group.add(sparse);
+                        break;
+                        
+                    case 'alpine':
+                        // Hardy mountain plants
+                        const alpineGeometry = new THREE.ConeGeometry(1.5, 4 + Math.random() * 3, 6);
+                        const alpineMaterial = new THREE.MeshLambertMaterial({ 
+                            color: new THREE.Color(0.2, 0.4, 0.1) 
+                        });
+                        const alpine = new THREE.Mesh(alpineGeometry, alpineMaterial);
+                        alpine.position.y = 2;
+                        alpine.castShadow = true;
+                        group.add(alpine);
+                        break;
+                        
+                    default: // desert
+                        if (Math.random() > 0.7) {
+                            // Cactus
+                            const cactusGeometry = new THREE.CylinderGeometry(1, 1.5, 8 + Math.random() * 4, 6);
+                            const cactusMaterial = new THREE.MeshLambertMaterial({ 
+                                color: new THREE.Color(0.2, 0.5, 0.1) 
+                            });
+                            const cactus = new THREE.Mesh(cactusGeometry, cactusMaterial);
+                            cactus.position.y = 4;
+                            cactus.castShadow = true;
+                            group.add(cactus);
+                        } else {
+                            // Desert bush
+                            const bushGeometry = new THREE.SphereGeometry(2 + Math.random(), 6, 6);
+                            const bushMaterial = new THREE.MeshLambertMaterial({ 
+                                color: new THREE.Color(0.3, 0.3, 0.1) 
+                            });
+                            const bush = new THREE.Mesh(bushGeometry, bushMaterial);
+                            bush.position.y = 2;
+                            bush.castShadow = true;
+                            group.add(bush);
+                        }
+                        break;
+                }
+                
+                return group;
+            }
+
+            createMeaningfulRock() {
+                const size = 4 + Math.random() * 12;
+                const geometry = new THREE.DodecahedronGeometry(size, Math.random() > 0.7 ? 1 : 0);
+                
+                // Weather and shape the rock
+                const positions = geometry.attributes.position.array;
+                for (let i = 0; i < positions.length; i += 3) {
+                    const weathering = (Math.random() - 0.5) * size * 0.5;
+                    positions[i] += weathering;
+                    positions[i + 1] += Math.abs(weathering) * 0.3;
+                    positions[i + 2] += weathering * 0.8;
+                }
+                geometry.attributes.position.needsUpdate = true;
+                geometry.computeVertexNormals();
+                
+                // Color based on composition
+                const rockTypes = [
+                    this.colors.mesaRed,
+                    this.colors.canyonOrange,
+                    this.colors.leatherBrown,
+                    this.colors.charcoal
+                ];
+                
+                const material = new THREE.MeshLambertMaterial({ 
+                    color: new THREE.Color().setHex(rockTypes[Math.floor(Math.random() * rockTypes.length)])
+                });
+                const rock = new THREE.Mesh(geometry, material);
+                rock.castShadow = true;
+                rock.receiveShadow = true;
+                rock.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                return rock;
+            }
+
+            startNarrativeSystem() {
+                // Trigger narrative moments based on exploration
+                setInterval(() => {
+                    if (Math.random() > 0.7) {
+                        this.showNarrative();
+                    }
+                }, 15000); // Every 15 seconds, 30% chance
+                
+                // Check for landmark discoveries
+                setInterval(() => {
+                    this.checkLandmarkDiscovery();
+                }, 2000); // Check every 2 seconds
+            }
+
+            showNarrative() {
+                const narrativeText = this.narratives[Math.floor(Math.random() * this.narratives.length)];
+                const display = document.getElementById('narrativeDisplay');
+                const textElement = document.getElementById('narrativeText');
+                
+                textElement.textContent = narrativeText;
+                display.classList.add('visible');
+                
+                setTimeout(() => {
+                    display.classList.remove('visible');
+                }, 4000);
+            }
+
+            checkLandmarkDiscovery() {
+                this.landmarks.forEach((landmark, index) => {
+                    if (!landmark.discovered) {
+                        const distance = this.playerPosition.distanceTo(landmark.position);
+                        if (distance < 200) {
+                            landmark.discovered = true;
+                            this.createLandmarkStructure(landmark);
+                            this.showLandmarkDiscovery(landmark);
+                            this.updateUI();
+                        }
+                    }
+                });
+            }
+
+            showLandmarkDiscovery(landmark) {
+                const display = document.getElementById('narrativeDisplay');
+                const textElement = document.getElementById('narrativeText');
+                
+                textElement.innerHTML = `
+                    <strong style="color: #B8860B;">${landmark.icon} LANDMARK DISCOVERED!</strong><br><br>
+                    <em>${landmark.name}</em><br>
+                    ${landmark.description}
+                `;
+                display.classList.add('visible');
+                
+                setTimeout(() => {
+                    display.classList.remove('visible');
+                }, 6000);
+            }
+
+            // Enhanced noise functions
+            noise(x, y) {
+                const X = Math.floor(x) & 255;
+                const Y = Math.floor(y) & 255;
+                x -= Math.floor(x);
+                y -= Math.floor(y);
+                const u = this.fade(x);
+                const v = this.fade(y);
+                
+                const A = this.p[X] + Y;
+                const AA = this.p[A];
+                const AB = this.p[A + 1];
+                const B = this.p[X + 1] + Y;
+                const BA = this.p[B];
+                const BB = this.p[B + 1];
+                
+                return this.lerp(v, 
+                    this.lerp(u, this.grad(this.p[AA], x, y), this.grad(this.p[BA], x - 1, y)),
+                    this.lerp(u, this.grad(this.p[AB], x, y - 1), this.grad(this.p[BB], x - 1, y - 1))
+                );
+            }
+
+            ridgedNoise(x, y) {
+                return 1.0 - Math.abs(this.noise(x, y));
+            }
+
+            fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+            lerp(t, a, b) { return a + t * (b - a); }
+            grad(hash, x, y) {
+                const h = hash & 15;
+                const u = h < 8 ? x : y;
+                const v = h < 4 ? y : h === 12 || h === 14 ? x : 0;
+                return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
+            }
+
+            get p() {
+                if (!this._p) {
+                    this._p = [];
+                    for (let i = 0; i < 256; i++) this._p[i] = i;
+                    for (let i = 0; i < 256; i++) {
+                        const j = Math.floor(Math.random() * 256);
+                        [this._p[i], this._p[j]] = [this._p[j], this._p[i]];
+                    }
+                    this._p = this._p.concat(this._p);
+                }
+                return this._p;
+            }
+
+            getTerrainHeight(x, z) {
+                return this.generateVariedHeight(x, z);
+            }
+
+            updateChunks() {
+                const centerX = Math.floor(this.playerPosition.x / this.chunkSize);
+                const centerZ = Math.floor(this.playerPosition.z / this.chunkSize);
+                
+                for (let x = centerX - this.renderDistance; x <= centerX + this.renderDistance; x++) {
+                    for (let z = centerZ - this.renderDistance; z <= centerZ + this.renderDistance; z++) {
+                        this.loadLivingChunk(x, z);
+                    }
+                }
+                
+                for (let [key, chunk] of this.chunks) {
+                    const [x, z] = key.split(',').map(Number);
+                    if (Math.abs(x - centerX) > this.renderDistance || 
+                        Math.abs(z - centerZ) > this.renderDistance) {
+                        this.scene.remove(chunk);
+                        this.chunks.delete(key);
+                    }
+                }
+            }
+
+            setupEventListeners() {
+                document.addEventListener('keydown', (event) => {
+                    switch (event.code) {
+                        case 'KeyW': this.controls.moveForward = true; break;
+                        case 'KeyS': this.controls.moveBackward = true; break;
+                        case 'KeyA': this.controls.moveLeft = true; break;
+                        case 'KeyD': this.controls.moveRight = true; break;
+                        case 'Space': this.controls.jump = true; event.preventDefault(); break;
+                        case 'ShiftLeft': this.controls.sprint = true; break;
+                        case 'KeyE': this.investigateNearby(); break;
+                        case 'KeyR': this.regenerateTerritory(); break;
+                        case 'KeyM': this.toggleMap(); break;
+                        case 'Tab': this.showMissionJournal(); event.preventDefault(); break;
+                    }
+                });
+                
+                document.addEventListener('keyup', (event) => {
+                    switch (event.code) {
+                        case 'KeyW': this.controls.moveForward = false; break;
+                        case 'KeyS': this.controls.moveBackward = false; break;
+                        case 'KeyA': this.controls.moveLeft = false; break;
+                        case 'KeyD': this.controls.moveRight = false; break;
+                        case 'Space': this.controls.jump = false; break;
+                        case 'ShiftLeft': this.controls.sprint = false; break;
+                    }
+                });
+                
+                document.addEventListener('mousemove', (event) => {
+                    if (document.pointerLockElement === document.body) {
+                        this.mouseX += event.movementX * 0.002;
+                        this.mouseY -= event.movementY * 0.002;
+                        this.mouseY = Math.max(-Math.PI/2, Math.min(Math.PI/2, this.mouseY));
+                    }
+                });
+                
+                document.addEventListener('click', () => {
+                    document.body.requestPointerLock();
+                });
+                
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            }
+
+            investigateNearby() {
+                // Check if near any landmarks
+                let nearestLandmark = null;
+                let nearestDistance = Infinity;
+                
+                this.landmarks.forEach(landmark => {
+                    const distance = this.playerPosition.distanceTo(landmark.position);
+                    if (distance < 300 && distance < nearestDistance) {
+                        nearestDistance = distance;
+                        nearestLandmark = landmark;
+                    }
+                });
+                
+                if (nearestLandmark) {
+                    this.showLandmarkInvestigation(nearestLandmark);
+                } else {
+                    this.showNarrative();
+                }
+            }
+
+            showLandmarkInvestigation(landmark) {
+                const display = document.getElementById('narrativeDisplay');
+                const textElement = document.getElementById('narrativeText');
+                
+                const investigations = {
+                    'Thunder Mesa': "Ancient stone carvings suggest this was once a sacred meeting place. The elevation provides a commanding view of the entire territory.",
+                    'Cactus Gardens': "Rare desert flowers bloom here year-round. The water source seems to come from an underground spring system.",
+                    'Widow\'s Peak': "Treacherous winds and loose rock make this pass dangerous. Old wagon tracks suggest it was once a major trade route.",
+                    'Bone Canyon': "Scattered remains tell stories of those who didn't survive the harsh frontier. Strange echoes bounce off the canyon walls.",
+                    'Eagle\'s Roost': "From this height, you can see for miles in every direction. Eagles nest in the highest crags.",
+                    'Crystal Caves': "The crystals here are unlike anything you've seen. They seem to glow with an inner light.",
+                    'Mirage Springs': "This oasis has sustained travelers for generations. The water is surprisingly pure and sweet."
+                };
+                
+                textElement.innerHTML = `
+                    <strong style="color: #B8860B;">🔍 INVESTIGATING: ${landmark.name}</strong><br><br>
+                    ${investigations[landmark.name] || "You sense there's more to discover here..."}
+                `;
+                display.classList.add('visible');
+                
+                setTimeout(() => {
+                    display.classList.remove('visible');
+                }, 5000);
+            }
+
+            regenerateTerritory() {
+                for (let [key, chunk] of this.chunks) {
+                    this.scene.remove(chunk);
+                }
+                this.chunks.clear();
+                
+                this.seed = Math.floor(Math.random() * 10000);
+                this._p = null;
+                
+                // Reset landmarks
+                this.landmarks.forEach(landmark => {
+                    landmark.discovered = false;
+                });
+                this.landmarks[0].discovered = true; // Always start with Thunder Mesa
+                this.landmarks[1].discovered = true; // And Cactus Gardens
+                
+                this.generateLivingWorld();
+                this.updateUI();
+                
+                console.log('🗺️ New territory mapped!');
+            }
+
+            updateMovement(delta) {
+                this.velocity.x -= this.velocity.x * 8.0 * delta;
+                this.velocity.z -= this.velocity.z * 8.0 * delta;
+                this.velocity.y -= this.velocity.y * 6.0 * delta;
+
+                this.direction.z = Number(this.controls.moveForward) - Number(this.controls.moveBackward);
+                this.direction.x = Number(this.controls.moveRight) - Number(this.controls.moveLeft);
+                this.direction.y = Number(this.controls.jump) ? 1 : 0;
+                this.direction.normalize();
+
+                const moveSpeed = this.controls.sprint ? this.speed * 2.5 : this.speed;
+
+                if (this.controls.moveForward || this.controls.moveBackward) {
+                    this.velocity.z -= this.direction.z * moveSpeed * delta;
+                }
+                if (this.controls.moveLeft || this.controls.moveRight) {
+                    this.velocity.x -= this.direction.x * moveSpeed * delta;
+                }
+                if (this.controls.jump) {
+                    this.velocity.y += moveSpeed * delta;
+                }
+
+                const moveVector = new THREE.Vector3();
+                this.camera.getWorldDirection(moveVector);
+                moveVector.y = 0;
+                moveVector.normalize();
+                moveVector.multiplyScalar(-this.velocity.z * delta);
+
+                const sideVector = new THREE.Vector3();
+                sideVector.crossVectors(this.camera.up, moveVector).normalize();
+                sideVector.multiplyScalar(-this.velocity.x * delta);
+
+                this.playerPosition.add(moveVector);
+                this.playerPosition.add(sideVector);
+                this.playerPosition.y += this.velocity.y * delta;
+
+                const terrainHeight = this.getTerrainHeight(this.playerPosition.x, this.playerPosition.z);
+                this.playerPosition.y = Math.max(terrainHeight + 15, this.playerPosition.y);
+
+                this.camera.position.copy(this.playerPosition);
+                this.camera.rotation.y = this.mouseX;
+                this.camera.rotation.x = this.mouseY;
+            }
+
+            updateDynamicLighting() {
+                const time = this.clock.getElapsedTime();
+                
+                // Weather-affected lighting
+                const intensity = this.weather.condition === 'dustStorm' ? 1.4 : 2.0;
+                this.sunLight.intensity = intensity;
+                
+                // Sun movement based on time of day
+                const dayProgress = (this.timeOfDay % 24) / 24;
+                const sunAngle = dayProgress * Math.PI * 2 - Math.PI / 2;
+                
+                this.sunLight.position.set(
+                    Math.cos(sunAngle) * 1500,
+                    Math.sin(sunAngle) * 1500 + 300,
+                    600
+                );
+                
+                // Update sky
+                if (this.skyMaterial.uniforms) {
+                    this.skyMaterial.uniforms.time.value = time * 50;
+                    this.skyMaterial.uniforms.sunPosition.value.copy(this.sunLight.position).normalize();
+                    this.skyMaterial.uniforms.dustIntensity.value = this.weather.intensity;
+                    this.skyMaterial.uniforms.weatherCondition.value = this.weather.condition === 'dustStorm' ? 1.0 : 0.0;
+                }
+                
+                // Update terrain materials
+                for (let [key, chunk] of this.chunks) {
+                    if (chunk.material && chunk.material.uniforms) {
+                        chunk.material.uniforms.time.value = time;
+                        chunk.material.uniforms.sunPosition.value.copy(this.sunLight.position).normalize();
+                        chunk.material.uniforms.playerPosition.value.copy(this.playerPosition);
+                        chunk.material.uniforms.weatherIntensity.value = this.weather.intensity;
+                    }
+                }
+                
+                // Animate atmospheric lights
+                this.atmosphericLights.forEach((light, index) => {
+                    light.intensity = 0.6 + Math.sin(time * 0.3 + index) * 0.3;
+                    light.position.y = 200 + Math.sin(time * 0.2 + index * 1.8) * 80;
+                });
+            }
+
+            updateUI() {
+                // Update mission info
+                const discoveredCount = this.landmarks.filter(l => l.discovered).length;
+                document.getElementById('missionProgress').textContent = `${discoveredCount}/${this.landmarks.length} Landmarks`;
+                
+                // Find nearest undiscovered landmark
+                let nearestPOI = null;
+                let nearestDistance = Infinity;
+                
+                this.landmarks.forEach(landmark => {
+                    if (!landmark.discovered) {
+                        const distance = this.playerPosition.distanceTo(landmark.position);
+                        if (distance < nearestDistance) {
+                            nearestDistance = distance;
+                            nearestPOI = landmark;
+                        }
+                    }
+                });
+                
+                if (nearestPOI) {
+                    const direction = this.getDirection(this.playerPosition, nearestPOI.position);
+                    document.getElementById('nearestPOI').textContent = 
+                        `${nearestPOI.name} - ${Math.round(nearestDistance)}m ${direction}`;
+                } else {
+                    document.getElementById('nearestPOI').textContent = 'All landmarks discovered!';
+                }
+                
+                // Update territory based on location
+                const height = this.playerPosition.y;
+                let territory = 'Desert Plains';
+                if (height > 400) territory = 'High Mesa Country';
+                else if (height > 200) territory = 'Canyon Territories';
+                else if (height > 100) territory = 'Rolling Badlands';
+                else if (height < 50) territory = 'Deep Canyon Floor';
+                
+                document.getElementById('currentTerritory').textContent = territory;
+                
+                // Update weather effects
+                const weatherEffect = document.getElementById('weatherEffect');
+                weatherEffect.className = 'weather-effect';
+                if (this.weather.condition === 'dustStorm') {
+                    weatherEffect.classList.add('dust-storm');
+                }
+                
+                // Update landmark list
+                const landmarkEntries = document.querySelectorAll('.landmark-entry');
+                this.landmarks.forEach((landmark, index) => {
+                    if (landmarkEntries[index]) {
+                        if (landmark.discovered && !landmarkEntries[index].classList.contains('discovered')) {
+                            landmarkEntries[index].classList.add('discovered');
+                        }
+                    }
+                });
+                
+                // Update minimap
+                this.updateMinimap();
+            }
+
+            getDirection(from, to) {
+                const dx = to.x - from.x;
+                const dz = to.z - from.z;
+                const angle = Math.atan2(dx, dz) * 180 / Math.PI;
+                
+                if (angle >= -22.5 && angle < 22.5) return 'N';
+                if (angle >= 22.5 && angle < 67.5) return 'NE';
+                if (angle >= 67.5 && angle < 112.5) return 'E';
+                if (angle >= 112.5 && angle < 157.5) return 'SE';
+                if (angle >= 157.5 || angle < -157.5) return 'S';
+                if (angle >= -157.5 && angle < -112.5) return 'SW';
+                if (angle >= -112.5 && angle < -67.5) return 'W';
+                if (angle >= -67.5 && angle < -22.5) return 'NW';
+                return 'N';
+            }
+
+            updateMinimap() {
+                const canvas = document.getElementById('miniMap');
+                const ctx = canvas.getContext('2d');
+                
+                ctx.fillStyle = '#654321';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                const scale = 0.02;
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                
+                // Draw discovered landmarks
+                this.landmarks.forEach(landmark => {
+                    if (landmark.discovered) {
+                        const screenX = centerX + (landmark.position.x - this.playerPosition.x) * scale;
+                        const screenY = centerY + (landmark.position.z - this.playerPosition.z) * scale;
+                        
+                        if (screenX >= 0 && screenX < canvas.width && screenY >= 0 && screenY < canvas.height) {
+                            ctx.fillStyle = '#B8860B';
+                            ctx.beginPath();
+                            ctx.arc(screenX, screenY, 4, 0, Math.PI * 2);
+                            ctx.fill();
+                            
+                            ctx.fillStyle = '#F5F5DC';
+                            ctx.font = '10px Arial';
+                            ctx.textAlign = 'center';
+                            ctx.fillText(landmark.icon, screenX, screenY + 3);
+                        }
+                    }
+                });
+                
+                // Draw player
+                ctx.fillStyle = '#A0522D';
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Draw direction indicator
+                ctx.strokeStyle = '#A0522D';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(
+                    centerX + Math.sin(this.mouseX) * 15,
+                    centerY + Math.cos(this.mouseX) * 15
+                );
+                ctx.stroke();
+            }
+
+            hideLoadingScreen() {
+                const loadingScreen = document.getElementById('loadingScreen');
+                
+                setTimeout(() => {
+                    loadingScreen.classList.add('hidden');
+                }, 2000);
+                
+                // Show initial narrative
+                setTimeout(() => {
+                    const display = document.getElementById('narrativeDisplay');
+                    const textElement = document.getElementById('narrativeText');
+                    
+                    textElement.innerHTML = `
+                        <strong style="color: #B8860B;">Welcome to the Living Frontier</strong><br><br>
+                        The badlands stretch endlessly before you, filled with ancient secrets and legendary landmarks. Your mission: scout the territory and uncover its mysteries.<br><br>
+                        <em>Press E near landmarks to investigate them...</em>
+                    `;
+                    display.classList.add('visible');
+                    
+                    setTimeout(() => {
+                        display.classList.remove('visible');
+                    }, 8000);
+                }, 3000);
+            }
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                
+                const delta = this.clock.getDelta();
+                
+                this.updateMovement(delta);
+                this.updateChunks();
+                this.updateDynamicLighting();
+                this.updateUI();
+                
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        // Initialize the living world
+        let game;
+        window.addEventListener('load', () => {
+            console.log('🌍 Initializing Living Frontier World...');
+            game = new LivingFrontierWorld();
+            window.game = game;
+        });
+    </script>
+
+</body></html>

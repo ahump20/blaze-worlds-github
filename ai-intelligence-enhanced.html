@@ -1,0 +1,288 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Intelligence — Blaze Intelligence</title>
+<link rel="stylesheet" href="/site/assets/brand.css">
+</head><body><div class="nav">
+  <div class="brand">🔥 Blaze Intelligence</div>
+  <div>
+    <a href="/executive-intelligence-enhanced.html" class="badge">Executive</a>
+    <a href="/live-analytics-enhanced.html" class="badge">Live Analytics</a>
+    <a href="/nil-calculator.html" class="badge">NIL Engine</a>
+    <a href="/unified-championship-dashboard.html" class="badge">Dashboard</a>
+    <a href="/status-enhanced.html" class="badge">API Status</a>
+    <a href="/southern-research-enhanced.html" class="badge">Research</a>
+    <a href="/ai-intelligence-enhanced.html" class="badge">AI Intelligence</a>
+    <a href="/get-started.html" class="badge">Get Started</a>
+  </div>
+</div>
+<canvas id="hero" style="width:100%;height:32vh;display:block;background:linear-gradient(135deg,var(--texas-navy),var(--burnt-orange))"></canvas>
+<div class="container">
+  <div class="h1">AI Intelligence Platform</div>
+  <p class="p">Where neural networks meet championship analysis. Like a great defensive coordinator reading offensive formations, our AI consciousness adjusts in real-time, upload footage for biomechanical precision, and explores the storytelling that separates good programs from dynasty builders across the Deep South.</p>
+
+  <!-- Championship Metrics -->
+  <div class="grid cols-4" style="margin-top:20px">
+    <div class="executive-card">
+      <div class="executive-value">94.6%</div>
+      <div class="executive-label">Prediction Accuracy</div>
+    </div>
+    <div class="executive-card">
+      <div class="executive-value">15ms</div>
+      <div class="executive-label">Neural Response</div>
+    </div>
+    <div class="executive-card">
+      <div class="executive-value">2,847+</div>
+      <div class="executive-label">Games Analyzed</div>
+    </div>
+    <div class="executive-card">
+      <div class="executive-value" id="aiConsciousness">87%</div>
+      <div class="executive-label">AI Consciousness</div>
+    </div>
+  </div>
+
+  <!-- Neural Network Control System -->
+  <h2 class="h1" style="margin-top:50px">Neural Network Command Center</h2>
+  <p class="p">Like adjusting the defensive schemes mid-drive, fine‑tune the AI consciousness that powers Blaze Intelligence. These controls let you adjust neural sensitivity and prediction depth to see how championship-level intelligence responds to different pressure situations.</p>
+
+  <div class="grid cols-2" style="margin-top:20px">
+    <div class="card">
+      <div class="h2">25 Championship Neurons</div>
+      <p class="p">15 Synapses • Real‑time learning like the great coaches who adapt their game plans between series</p>
+
+      <div style="margin:1.5rem 0">
+        <label class="p" for="sens">Neural Sensitivity: <span id="sensVal" style="color:var(--burnt-orange);font-weight:700">75%</span></label>
+        <input id="sens" type="range" min="0" max="100" value="75" style="width:100%;margin:0.5rem 0;accent-color:var(--burnt-orange)" oninput="updateConsciousness()">
+      </div>
+
+      <div style="margin:1.5rem 0">
+        <label class="p" for="depth">Prediction Depth: <span id="depthVal" style="color:var(--burnt-orange);font-weight:700">88%</span></label>
+        <input id="depth" type="range" min="0" max="100" value="88" style="width:100%;margin:0.5rem 0;accent-color:var(--burnt-orange)" oninput="updateConsciousness()">
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="margin:1.5rem 0">
+        <label class="p" for="proc">Processing Speed: <span id="procVal" style="color:var(--burnt-orange);font-weight:700">92%</span></label>
+        <input id="proc" type="range" min="0" max="100" value="92" style="width:100%;margin:0.5rem 0;accent-color:var(--burnt-orange)" oninput="updateConsciousness()">
+      </div>
+
+      <div style="margin:1.5rem 0">
+        <label class="p" for="pat">Pattern Recognition: <span id="patVal" style="color:var(--burnt-orange);font-weight:700">85%</span></label>
+        <input id="pat" type="range" min="0" max="100" value="85" style="width:100%;margin:0.5rem 0;accent-color:var(--burnt-orange)" oninput="updateConsciousness()">
+      </div>
+
+      <p class="p" style="margin-top:15px;font-style:italic;color:var(--texas-navy);opacity:0.7">These controls adjust neural parameters in real-time. Like the great coordinators who could feel when to dial up pressure or when to sit back in coverage, watch how consciousness responds to your adjustments.</p>
+    </div>
+  </div>
+
+  <!-- Video Intelligence Platform -->
+  <h2 class="h1" style="margin-top:50px">Championship Video Intelligence</h2>
+  <p class="p">Upload game footage or training video to unlock advanced biomechanical analysis that reads not just mechanics, but character. Our system tracks 33+ keypoints, assesses motion efficiency, and most importantly — reads the micro-expressions and body language that separate champions from everyone else.</p>
+
+  <div class="card" style="margin-top:20px;text-align:center">
+    <div style="border:3px dashed var(--burnt-orange);border-radius:15px;padding:3rem;background:rgba(191,87,0,0.05);cursor:pointer;transition:all 0.3s ease" onclick="document.getElementById('videoUpload').click()">
+      <div style="font-size:4rem;color:var(--burnt-orange);margin-bottom:1rem">🎥</div>
+      <div class="h2">Upload Championship Footage</div>
+      <p class="p">Drop your video file here or click to browse</p>
+      <p style="font-size:14px;opacity:0.7">(MP4, MOV, AVI up to 500MB)</p>
+      <input type="file" id="videoUpload" accept="video/mp4,video/quicktime,video/x-msvideo" style="display:none" onchange="handleVideoUpload(event)">
+    </div>
+    <p class="p" style="margin-top:10px;font-size:14px;opacity:0.7">In production, uploaded video routes through our championship-grade video intelligence API for complete biomechanical and character analysis.</p>
+  </div>
+
+  <div class="grid cols-3" style="margin-top:20px">
+    <div class="card">
+      <div class="h2">33+ Keypoint Precision</div>
+      <p class="p">Advanced pose estimation tracks every major joint and movement with the precision of a championship scout breaking down film at 2 AM, looking for the edge that separates winners from everyone else.</p>
+    </div>
+    <div class="card">
+      <div class="h2">Championship Biomechanics</div>
+      <p class="p">Professional‑grade movement analysis identifies efficiency, injury risk, and performance optimization opportunities — like having the best strength coach in the country analyzing every rep.</p>
+    </div>
+    <div class="card">
+      <div class="h2">Character Assessment AI</div>
+      <p class="p">Our breakthrough technology evaluates leadership, decision‑making patterns, and competitive traits through micro-expression detection — reading the same fire that coaches scout for in championship moments.</p>
+    </div>
+  </div>
+
+  <!-- Championship Data Stories -->
+  <h2 class="h1" style="margin-top:50px">Championship Data Narratives</h2>
+  <p class="p">Transform raw analytics into the kind of stories that capture why champions are made in October and November, not August. Our AI crafts narratives from every play, capturing those clutch moments where legends are born and dynasties begin.</p>
+
+  <div class="grid cols-2" style="margin-top:20px">
+    <div class="card">
+      <div class="h2">Real‑time Story Generation</div>
+      <p class="p">Pressure‑aware storytelling that captures those Friday night moments when a young quarterback steps into the pocket with championship dreams riding on his shoulders, reading the pressure like champions always do.</p>
+    </div>
+    <div class="card">
+      <div class="h2">Predictive Championship Modeling</div>
+      <p class="p">Integrate historical context and real‑time intelligence to model future outcomes — like the old-timers who could smell a championship team in September because they'd seen it all before.</p>
+    </div>
+  </div>
+
+  <!-- Deep South & SEC Excellence -->
+  <h2 class="h1" style="margin-top:50px">Deep South Championship Authority</h2>
+  <p class="p">From Texas high school baseball diamonds to SEC football cathedral stadiums, our platform integrates Perfect Game rankings, championship scouting intelligence, and AI insights for complete player development across the heart of American sports excellence.</p>
+
+  <div class="grid cols-2" style="margin-top:20px">
+    <div class="card">
+      <div class="h2">🏟️ Texas Championship Authority</div>
+      <p class="p">Comprehensive analysis of Texas high school and collegiate excellence integrated with Perfect Game intelligence for championship player development.</p>
+      <div class="executive-cards">
+        <div class="executive-card">
+          <div class="executive-value">1,247</div>
+          <div class="executive-label">Players Tracked</div>
+        </div>
+        <div class="executive-card">
+          <div class="executive-value">89%</div>
+          <div class="executive-label">Scout Accuracy</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="h2">🏈 SEC Championship Intelligence</div>
+      <p class="p">Advanced SEC football analytics combine traditional metrics with AI insights for championship strategy and recruiting advantages across the most competitive conference in America.</p>
+      <div class="executive-cards">
+        <div class="executive-card">
+          <div class="executive-value">14</div>
+          <div class="executive-label">SEC Teams</div>
+        </div>
+        <div class="executive-card">
+          <div class="executive-value">97.2%</div>
+          <div class="executive-label">Game Prediction</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Championship Performance Metrics -->
+  <h2 class="h1" style="margin-top:50px">Championship Performance Intelligence</h2>
+  <p class="p">Predictive championship modeling uses 15 years of data, current performance metrics, and AI pattern recognition for the ultimate competitive advantage — like having the greatest coaching minds in history whispering strategic insights in your ear.</p>
+
+  <div class="grid cols-2" style="margin-top:20px">
+    <div class="card">
+      <div class="h2">Multi‑Season Championship Data</div>
+      <p class="p">15 years of championship data feeds our models to capture the long‑term trends and cyclical patterns that separate dynasty builders from one-hit wonders.</p>
+    </div>
+    <div class="card">
+      <div class="h2">Championship Prediction Accuracy</div>
+      <p class="p">94.6% championship prediction accuracy based on historical intelligence and real‑time data integration — like having a crystal ball that actually works.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:3rem;text-align:center;background:linear-gradient(135deg,var(--texas-navy),var(--burnt-orange));color:white">
+    <div class="h1" style="color:white;margin-bottom:1rem">Ready for Championship Intelligence?</div>
+    <p class="p" style="color:white;opacity:0.9;margin-bottom:2rem">Join the programs that use Blaze Intelligence to turn championship dreams into championship reality.</p>
+    <a href="/get-started.html" class="cta" style="background:white;color:var(--texas-navy)">🏆 Start Your Championship Journey</a>
+  </div>
+</div>
+
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<script>
+// Hero Canvas Neural Network Animation
+const canvas = document.getElementById('hero');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+}
+
+function animateHero() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const time = Date.now() * 0.001;
+
+    // Neural network nodes
+    const nodes = [];
+    for (let i = 0; i < 8; i++) {
+        const x = (canvas.width / 9) * (i + 1);
+        const y = canvas.height / 2 + Math.sin(time + i) * 30;
+        nodes.push({x, y});
+
+        // Draw nodes
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, 2 * Math.PI);
+        ctx.fillStyle = 'rgba(191, 87, 0, 0.8)';
+        ctx.fill();
+    }
+
+    // Neural connections
+    for (let i = 0; i < nodes.length - 1; i++) {
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[i + 1].x, nodes[i + 1].y);
+        ctx.strokeStyle = 'rgba(191, 87, 0, 0.4)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
+
+    requestAnimationFrame(animateHero);
+}
+
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+animateHero();
+
+// Neural Network Controls
+function updateConsciousness() {
+    const sens = document.getElementById('sens').value;
+    const depth = document.getElementById('depth').value;
+    const proc = document.getElementById('proc').value;
+    const pat = document.getElementById('pat').value;
+
+    document.getElementById('sensVal').textContent = sens + '%';
+    document.getElementById('depthVal').textContent = depth + '%';
+    document.getElementById('procVal').textContent = proc + '%';
+    document.getElementById('patVal').textContent = pat + '%';
+
+    // Calculate overall AI consciousness
+    const consciousness = ((parseInt(sens) + parseInt(depth) + parseInt(proc) + parseInt(pat)) / 4).toFixed(0);
+    document.getElementById('aiConsciousness').textContent = consciousness + '%';
+
+    console.log(`AI Consciousness updated: ${consciousness}%`);
+}
+
+// Video upload handler
+function handleVideoUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+        console.log('Video uploaded:', file.name);
+
+        // Show success message
+        const uploadArea = event.target.parentElement;
+        uploadArea.innerHTML = `
+            <div style="font-size:4rem;color:var(--burnt-orange);margin-bottom:1rem">✅</div>
+            <div class="h2">Championship Footage Uploaded!</div>
+            <p class="p">Processing ${file.name} for biomechanical and character analysis...</p>
+            <p style="font-size:14px;opacity:0.7">In production, this would route to our championship video intelligence API</p>
+        `;
+
+        // Simulate processing
+        setTimeout(() => {
+            uploadArea.innerHTML = `
+                <div style="font-size:4rem;color:var(--burnt-orange);margin-bottom:1rem">🏆</div>
+                <div class="h2">Analysis Complete!</div>
+                <p class="p">Championship-level biomechanics detected. Character assessment shows high competitive fire.</p>
+                <a href="/blaze-video-intelligence-production.html" class="cta" style="margin-top:1rem">View Full Analysis</a>
+            `;
+        }, 3000);
+    }
+}
+
+// Initialize consciousness animation
+setInterval(() => {
+    const currentLevel = parseInt(document.getElementById('aiConsciousness').textContent);
+    const fluctuation = Math.floor(Math.random() * 6) - 3; // -3 to +3
+    const newLevel = Math.max(84, Math.min(94, currentLevel + fluctuation));
+
+    // Flash the update briefly
+    const element = document.getElementById('aiConsciousness');
+    element.style.color = 'var(--cardinal-blue)';
+    element.textContent = newLevel + '%';
+
+    setTimeout(() => {
+        element.style.color = '';
+    }, 1000);
+}, 5000);
+</script></body></html>

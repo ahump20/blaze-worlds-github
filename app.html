@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Blaze Intelligence — Championship Sports Analytics Platform</title>
+    <link rel="stylesheet" href="/assets/brand.css">
+    <meta name="description" content="Championship-level sports intelligence for SEC/Texas baseball and football. Data-driven insights for coaches, scouts, and executives.">
+    <meta property="og:title" content="Blaze Intelligence — Championship Sports Analytics">
+    <meta property="og:description" content="Purpose-built intelligence for Deep South/SEC &amp; Texas sports">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://blaze-intelligence.netlify.app/">
+</head>
+<body>
+    <!-- SPA Navigation - Updates dynamically -->
+    <div class="nav" id="spa-nav">
+        <div class="brand">🔥 Blaze Intelligence</div>
+        <a href="/dashboard" class="badge">Dashboard</a>
+        <a href="/live-demo" class="badge">Live Demo</a>
+        <a href="/nil-calculator" class="badge">NIL Engine</a>
+        <a href="/quantum-platform" class="badge">Quantum</a>
+        <a href="/orioles-executive-intelligence" class="badge">Cardinals</a>
+        <a href="/status" class="badge">Status</a>
+        <a href="/get-started" class="badge">Get Started</a>
+    </div>
+
+    <!-- Dynamic Hero Canvas - Updates per page -->
+    <canvas id="hero" style="width:100%;height:42vh;display:block"></canvas>
+
+    <!-- Main Content Area - Dynamically loaded -->
+    <div class="container" id="spa-content">
+        <div class="h1">Loading Championship Platform...</div>
+        <p class="p">Initializing SEC/Texas sports intelligence systems.</p>
+    </div>
+
+    <!-- Loading indicator -->
+    <div id="spa-loading" style="display:none;position:fixed;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent-2));z-index:9999;"></div>
+
+    <!-- Core Scripts -->
+    <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+    <script src="/assets/hero.js"></script>
+    <script src="/assets/router.js"></script>
+    
+    <!-- SPA Initialization -->
+    <script>
+    // Enhanced SPA initialization for championship performance
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('🔥 Blaze Intelligence SPA initialized');
+        
+        // Set initial route based on current path
+        const currentPath = window.location.pathname;
+        
+        if (currentPath === '/app' || currentPath === '/app.html') {
+            // Default to live demo for app entry
+            window.blazeRouter.navigateTo('/live-demo', false);
+        } else if (currentPath !== '/' && window.blazeRouter) {
+            // Load the current page
+            window.blazeRouter.navigateTo(currentPath, false);
+        }
+        
+        // Championship-level performance monitoring
+        window.blazeAnalytics = {
+            track: (event, data) => {
+                console.log(`📊 Tracking: ${event}`, data);
+                // Integration point for GA4, Mixpanel, etc.
+                if (window.gtag) {
+                    gtag('event', event, data);
+                }
+            },
+            
+            performanceStart: Date.now(),
+            
+            trackPerformance: () => {
+                const loadTime = Date.now() - window.blazeAnalytics.performanceStart;
+                console.log(`⚡ SPA Load Time: ${loadTime}ms`);
+                
+                if (loadTime < 1000) {
+                    console.log('🏆 Championship load time achieved!');
+                } else if (loadTime < 2000) {
+                    console.log('✅ Professional load time');
+                } else {
+                    console.warn('⚠️ Load time needs optimization');
+                }
+            }
+        };
+        
+        // Track initial load performance
+        setTimeout(() => {
+            window.blazeAnalytics.trackPerformance();
+        }, 100);
+    });
+
+    // Handle direct navigation to /app
+    if (window.location.pathname === '/app' && window.blazeRouter) {
+        window.blazeRouter.navigateTo('/live-demo', true);
+    }
+    </script>
+
+</body></html>

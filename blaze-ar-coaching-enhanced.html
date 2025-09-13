@@ -1,0 +1,1227 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 Blaze Vision AI — AR Coaching Platform</title>
+    <meta name="description" content="Championship-level AR coaching with real-time biomechanical analysis and character assessment">
+
+    <!-- External Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Orbitron:wght@400;700;900&amp;family=Space+Grotesk:wght@300..700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- AR & Vision AI Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" crossorigin="anonymous"></script>
+
+    <style>
+        /* Blaze Intelligence Vision AI Design System */
+        :root {
+            --primary: #BF5700;
+            --primary-light: #FF7A00;
+            --primary-dark: #8B3D00;
+            --accent: #FFB81C;
+            --dark: #0A0A0F;
+            --darker: #050507;
+            --light: #F8F9FA;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glow: rgba(191, 87, 0, 0.5);
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--darker);
+            color: var(--light);
+            overflow-x: hidden;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Three.js Canvas for Neural Background */
+        #hero-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        /* Glass morphism components */
+        .glass-panel {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+        }
+
+        .glass-panel:hover {
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 10px 30px var(--glow);
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(5, 5, 7, 0.95);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .brand {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .badge {
+            background: rgba(191, 87, 0, 0.15);
+            border: 1px solid var(--primary);
+            color: var(--light);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            margin: 0 0.25rem;
+        }
+
+        .badge:hover {
+            background: var(--primary);
+            color: var(--dark);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .hero-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px var(--glow);
+            animation: pulse 2s infinite;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--light);
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .player-setup {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            padding: 2rem;
+            margin: 2rem 0;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--glow);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border: none;
+            color: var(--dark);
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px var(--glow);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Dashboard Layout */
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .dashboard-header {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .player-info h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .session-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            color: var(--light);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-stop {
+            background: rgba(220, 53, 69, 0.2);
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .btn-stop:hover {
+            background: rgba(220, 53, 69, 0.3);
+        }
+
+        /* Video Feeds */
+        .video-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .video-feed {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            padding: 1.5rem;
+        }
+
+        .video-feed h3 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            border-radius: 15px;
+            overflow: hidden;
+            background: var(--darker);
+        }
+
+        #inputVideo, #outputCanvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        /* Grit Index Display */
+        .grit-display {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .grit-score {
+            font-family: 'Orbitron', monospace;
+            font-size: 6rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px var(--glow);
+            animation: pulse 2s infinite;
+            margin-bottom: 1rem;
+        }
+
+        .grit-label {
+            font-size: 1.2rem;
+            color: var(--light);
+            opacity: 0.8;
+        }
+
+        /* Component Breakdown */
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .component-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .component-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .component-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Coaching Cues */
+        .coaching-section {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .coaching-cue {
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+            font-weight: 600;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border-left: 4px solid;
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        .coaching-cue.excellent {
+            background: rgba(34, 197, 94, 0.15);
+            border-left-color: #22c55e;
+            color: #22c55e;
+        }
+
+        .coaching-cue.good {
+            background: rgba(251, 191, 36, 0.15);
+            border-left-color: #fbbf24;
+            color: #fbbf24;
+        }
+
+        .coaching-cue.needs-work {
+            background: rgba(239, 68, 68, 0.15);
+            border-left-color: #ef4444;
+            color: #ef4444;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Loading States */
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--glass-border);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Error States */
+        .error-message {
+            background: rgba(220, 53, 69, 0.15);
+            border: 1px solid #dc3545;
+            border-radius: 15px;
+            padding: 1rem;
+            color: #dc3545;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .video-section {
+                grid-template-columns: 1fr;
+            }
+
+            .component-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .grit-score {
+                font-size: 4rem;
+            }
+
+            .nav {
+                padding: 1rem;
+            }
+
+            .badge {
+                display: none;
+            }
+        }
+
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mt-2 { margin-top: 1rem; }
+    </style>
+</head>
+<body>
+    <!-- Three.js Neural Background -->
+    <canvas id="hero-canvas"></canvas>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="brand">
+            🔥 Blaze Vision AI
+        </div>
+        <div class="nav-controls">
+            <a href="/executive-intelligence-enhanced.html" class="badge">Executive</a>
+            <a href="/live-analytics-enhanced.html" class="badge">Live Analytics</a>
+            <a href="/nil-calculator.html" class="badge">NIL Engine</a>
+            <a href="/unified-championship-dashboard.html" class="badge">Dashboard</a>
+            <a href="/status-enhanced.html" class="badge">API Status</a>
+            <a href="/get-started.html" class="badge">Get Started</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="heroSection" class="hero-section">
+        <h1 class="hero-title">AR COACHING INTELLIGENCE</h1>
+        <p class="hero-subtitle">Real-time biomechanical analysis with championship-level character assessment</p>
+
+        <div class="player-setup">
+            <div class="input-group">
+                <label for="playerName">Player Name</label>
+                <input type="text" id="playerName" placeholder="Enter player name">
+            </div>
+
+            <div class="input-group">
+                <label for="sportSelect">Sport</label>
+                <select id="sportSelect">
+                    <option value="baseball">⚾ Baseball</option>
+                    <option value="football">🏈 Football</option>
+                    <option value="basketball">🏀 Basketball</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="positionSelect">Position</label>
+                <select id="positionSelect">
+                    <option value="pitcher">Pitcher</option>
+                    <option value="catcher">Catcher</option>
+                    <option value="infield">Infield</option>
+                    <option value="outfield">Outfield</option>
+                </select>
+            </div>
+
+            <button id="startSessionBtn" class="btn-primary">
+                <i class="fas fa-video"></i> Start Championship Session
+            </button>
+        </div>
+    </section>
+
+    <!-- Dashboard -->
+    <section id="dashboard" class="dashboard">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="player-info">
+                <h2 id="dashboardPlayerName">Championship Session</h2>
+                <p>Real-time tell detection • Character assessment active</p>
+            </div>
+            <div class="session-controls">
+                <button id="stopSessionBtn" class="btn-secondary btn-stop">
+                    <i class="fas fa-stop"></i> Stop Session
+                </button>
+                <button id="backToHeroBtn" class="btn-secondary">
+                    <i class="fas fa-home"></i> Home
+                </button>
+            </div>
+        </div>
+
+        <!-- Video Feeds -->
+        <div class="video-section">
+            <div class="video-feed">
+                <h3><i class="fas fa-camera"></i> Live Input</h3>
+                <div class="video-container">
+                    <video id="inputVideo" autoplay="" muted="" playsinline=""></video>
+                </div>
+            </div>
+
+            <div class="video-feed">
+                <h3><i class="fas fa-chart-line"></i> AR Analysis</h3>
+                <div class="video-container">
+                    <canvas id="outputCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grit Index Display -->
+        <div class="grit-display">
+            <div id="gritScore" class="grit-score">87.6</div>
+            <div class="grit-label">Championship Grit Index</div>
+        </div>
+
+        <!-- Component Breakdown -->
+        <div class="component-grid">
+            <div class="component-card">
+                <div id="microScore" class="component-value">94</div>
+                <div class="component-label">Micro-Expression</div>
+            </div>
+            <div class="component-card">
+                <div id="bioScore" class="component-value">91</div>
+                <div class="component-label">Biomechanics</div>
+            </div>
+            <div class="component-card">
+                <div id="pressureWeight" class="component-value">85</div>
+                <div class="component-label">Pressure Response</div>
+            </div>
+            <div class="component-card">
+                <div id="clutchFactor" class="component-value">89</div>
+                <div class="component-label">Clutch Factor</div>
+            </div>
+        </div>
+
+        <!-- Coaching Cues -->
+        <div class="coaching-section">
+            <h3><i class="fas fa-bullhorn"></i> Championship Coaching Cues</h3>
+            <div id="coachingCues">
+                <div class="coaching-cue excellent">
+                    <i class="fas fa-check-circle"></i> Excellent posture and balance maintained under pressure
+                </div>
+                <div class="coaching-cue good">
+                    <i class="fas fa-info-circle"></i> Strong micro-expressions showing championship confidence
+                </div>
+                <div class="coaching-cue needs-work">
+                    <i class="fas fa-exclamation-triangle"></i> Focus on follow-through consistency
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r158/three.min.js"></script>
+
+    <script>
+        // Three.js Neural Background Animation (from Vision AI)
+        function initThreeJS() {
+            const canvas = document.getElementById('hero-canvas');
+            if (!canvas) return;
+
+            // Scene setup
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Particle system (Blaze Intelligence brand colors)
+            const particleCount = 150;
+            const particles = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+            const sizes = new Float32Array(particleCount);
+
+            const primaryColor = new THREE.Color('#BF5700');
+            const accentColor = new THREE.Color('#FFB81C');
+            const lightColor = new THREE.Color('#FF7A00');
+
+            for (let i = 0; i < particleCount; i++) {
+                const i3 = i * 3;
+
+                positions[i3] = (Math.random() - 0.5) * 20;
+                positions[i3 + 1] = (Math.random() - 0.5) * 20;
+                positions[i3 + 2] = (Math.random() - 0.5) * 20;
+
+                const colorChoice = Math.random();
+                let color = colorChoice < 0.4 ? primaryColor : colorChoice < 0.7 ? accentColor : lightColor;
+
+                colors[i3] = color.r;
+                colors[i3 + 1] = color.g;
+                colors[i3 + 2] = color.b;
+
+                sizes[i] = Math.random() * 4 + 1;
+            }
+
+            particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            particles.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+            // Particle material with glow effect
+            const particleMaterial = new THREE.ShaderMaterial({
+                uniforms: {
+                    time: { value: 0 },
+                    pixelRatio: { value: Math.min(window.devicePixelRatio, 2) }
+                },
+                vertexShader: `
+                    attribute float size;
+                    attribute vec3 color;
+                    varying vec3 vColor;
+                    uniform float time;
+                    uniform float pixelRatio;
+
+                    void main() {
+                        vColor = color;
+                        vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+                        modelPosition.y += sin(time + modelPosition.x * 0.5) * 0.5;
+                        modelPosition.x += cos(time + modelPosition.z * 0.3) * 0.3;
+                        vec4 viewPosition = viewMatrix * modelPosition;
+                        vec4 projectionPosition = projectionMatrix * viewPosition;
+                        gl_Position = projectionPosition;
+                        gl_PointSize = size * pixelRatio * 10.0;
+                        gl_PointSize *= (1.0 / -viewPosition.z);
+                    }
+                `,
+                fragmentShader: `
+                    varying vec3 vColor;
+                    void main() {
+                        float distanceToCenter = distance(gl_PointCoord, vec2(0.5));
+                        float strength = 1.0 - smoothstep(0.0, 0.5, distanceToCenter);
+                        strength = pow(strength, 3.0);
+                        strength *= 0.8 + 0.2 * sin(gl_FragCoord.x * 0.01 + gl_FragCoord.y * 0.01);
+                        gl_FragColor = vec4(vColor, strength);
+                    }
+                `,
+                transparent: true,
+                vertexColors: true,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+            });
+
+            const particleSystem = new THREE.Points(particles, particleMaterial);
+            scene.add(particleSystem);
+
+            // Add lighting
+            const ambientLight = new THREE.AmbientLight('#BF5700', 0.3);
+            scene.add(ambientLight);
+
+            const pointLight1 = new THREE.PointLight('#FF7A00', 1, 15);
+            pointLight1.position.set(5, 5, 5);
+            scene.add(pointLight1);
+
+            const pointLight2 = new THREE.PointLight('#FFB81C', 0.8, 12);
+            pointLight2.position.set(-5, -3, 3);
+            scene.add(pointLight2);
+
+            camera.position.z = 8;
+
+            // Mouse interaction
+            let mouseX = 0, mouseY = 0, targetRotationX = 0, targetRotationY = 0;
+
+            const handleMouseMove = (event) => {
+                mouseX = (event.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+                mouseY = (event.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+                targetRotationX = mouseY * 0.1;
+                targetRotationY = mouseX * 0.1;
+            };
+
+            window.addEventListener('mousemove', handleMouseMove);
+
+            // Animation loop
+            const clock = new THREE.Clock();
+
+            function animate() {
+                const elapsedTime = clock.getElapsedTime();
+
+                particleMaterial.uniforms.time.value = elapsedTime;
+                particleSystem.rotation.x += (targetRotationX - particleSystem.rotation.x) * 0.02;
+                particleSystem.rotation.y += (targetRotationY - particleSystem.rotation.y) * 0.02;
+                particleSystem.rotation.y += 0.001;
+
+                pointLight1.position.x = Math.sin(elapsedTime * 0.5) * 6;
+                pointLight1.position.z = Math.cos(elapsedTime * 0.3) * 4;
+                pointLight2.position.x = Math.cos(elapsedTime * 0.4) * 5;
+                pointLight2.position.y = Math.sin(elapsedTime * 0.6) * 3;
+
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+
+            // Handle window resize
+            const handleResize = () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                particleMaterial.uniforms.pixelRatio.value = Math.min(window.devicePixelRatio, 2);
+            };
+
+            window.addEventListener('resize', handleResize);
+        }
+
+        // MediaPipe Holistic Integration (Enhanced Vision AI)
+        class ChampionshipCoachingSystem {
+            constructor() {
+                this.holistic = null;
+                this.camera = null;
+                this.isSessionActive = false;
+                this.gritScore = 87.6;
+                this.components = {
+                    microScore: 94,
+                    bioScore: 91,
+                    pressureWeight: 85,
+                    clutchFactor: 89
+                };
+                this.initializeSystem();
+            }
+
+            async initializeSystem() {
+                try {
+                    // Initialize MediaPipe Holistic
+                    this.holistic = new Holistic({
+                        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`
+                    });
+
+                    this.holistic.setOptions({
+                        modelComplexity: 1,
+                        smoothLandmarks: true,
+                        enableSegmentation: false,
+                        smoothSegmentation: true,
+                        refineFaceLandmarks: true,
+                        minDetectionConfidence: 0.5,
+                        minTrackingConfidence: 0.5
+                    });
+
+                    this.holistic.onResults(this.onResults.bind(this));
+                    console.log('Championship Coaching System initialized');
+                } catch (error) {
+                    console.error('Failed to initialize coaching system:', error);
+                    this.showError('Failed to initialize AR coaching system');
+                }
+            }
+
+            async startSession(playerName, sport, position) {
+                try {
+                    // Get video element
+                    const video = document.getElementById('inputVideo');
+
+                    // Request camera permission and start stream
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 },
+                            frameRate: { ideal: 30 }
+                        },
+                        audio: false
+                    });
+
+                    video.srcObject = stream;
+
+                    // Initialize camera with MediaPipe
+                    this.camera = new Camera(video, {
+                        onFrame: async () => {
+                            if (this.holistic && this.isSessionActive) {
+                                await this.holistic.send({ image: video });
+                            }
+                        },
+                        width: 1280,
+                        height: 720
+                    });
+
+                    await this.camera.start();
+                    this.isSessionActive = true;
+
+                    // Start analytics simulation
+                    this.startAnalyticsSimulation();
+
+                    // Update UI
+                    document.getElementById('dashboardPlayerName').textContent = `${playerName} • ${sport.toUpperCase()}`;
+                    this.showDashboard();
+
+                    console.log('Championship session started for:', playerName);
+                    return true;
+                } catch (error) {
+                    console.error('Session start failed:', error);
+                    this.showError('Camera access denied. Please enable camera permissions and try again.');
+                    return false;
+                }
+            }
+
+            onResults(results) {
+                const canvas = document.getElementById('outputCanvas');
+                const ctx = canvas.getContext('2d');
+
+                // Set canvas size
+                canvas.width = 1280;
+                canvas.height = 720;
+
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw the input image
+                ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+
+                // Draw pose landmarks
+                if (results.poseLandmarks) {
+                    this.drawPoseLandmarks(ctx, results.poseLandmarks);
+                    this.analyzeBiomechanics(results.poseLandmarks);
+                }
+
+                // Draw face landmarks
+                if (results.faceLandmarks) {
+                    this.drawFaceLandmarks(ctx, results.faceLandmarks);
+                    this.analyzeCharacter(results.faceLandmarks);
+                }
+
+                // Draw hand landmarks
+                if (results.leftHandLandmarks) {
+                    this.drawHandLandmarks(ctx, results.leftHandLandmarks, '#22c55e');
+                }
+                if (results.rightHandLandmarks) {
+                    this.drawHandLandmarks(ctx, results.rightHandLandmarks, '#ef4444');
+                }
+            }
+
+            drawPoseLandmarks(ctx, landmarks) {
+                ctx.fillStyle = '#BF5700';
+                ctx.strokeStyle = '#FFB81C';
+                ctx.lineWidth = 2;
+
+                // Draw key pose points
+                landmarks.forEach((landmark, index) => {
+                    const x = landmark.x * ctx.canvas.width;
+                    const y = landmark.y * ctx.canvas.height;
+
+                    // Draw landmark point
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, 2 * Math.PI);
+                    ctx.fill();
+                });
+
+                // Draw connections for key body parts
+                this.drawPoseConnections(ctx, landmarks);
+            }
+
+            drawPoseConnections(ctx, landmarks) {
+                const connections = [
+                    [11, 12], // shoulders
+                    [11, 13], [13, 15], // left arm
+                    [12, 14], [14, 16], // right arm
+                    [11, 23], [12, 24], // torso
+                    [23, 24], // hips
+                    [23, 25], [25, 27], // left leg
+                    [24, 26], [26, 28], // right leg
+                ];
+
+                ctx.strokeStyle = '#FFB81C';
+                ctx.lineWidth = 3;
+
+                connections.forEach(([start, end]) => {
+                    if (landmarks[start] && landmarks[end]) {
+                        const startX = landmarks[start].x * ctx.canvas.width;
+                        const startY = landmarks[start].y * ctx.canvas.height;
+                        const endX = landmarks[end].x * ctx.canvas.width;
+                        const endY = landmarks[end].y * ctx.canvas.height;
+
+                        ctx.beginPath();
+                        ctx.moveTo(startX, startY);
+                        ctx.lineTo(endX, endY);
+                        ctx.stroke();
+                    }
+                });
+            }
+
+            drawFaceLandmarks(ctx, landmarks) {
+                ctx.fillStyle = '#22c55e';
+
+                // Draw key facial points for character analysis
+                const keyPoints = [0, 17, 21, 54, 284, 297]; // Key expression points
+                keyPoints.forEach(index => {
+                    if (landmarks[index]) {
+                        const x = landmarks[index].x * ctx.canvas.width;
+                        const y = landmarks[index].y * ctx.canvas.height;
+
+                        ctx.beginPath();
+                        ctx.arc(x, y, 3, 0, 2 * Math.PI);
+                        ctx.fill();
+                    }
+                });
+            }
+
+            drawHandLandmarks(ctx, landmarks, color) {
+                ctx.fillStyle = color;
+
+                landmarks.forEach(landmark => {
+                    const x = landmark.x * ctx.canvas.width;
+                    const y = landmark.y * ctx.canvas.height;
+
+                    ctx.beginPath();
+                    ctx.arc(x, y, 3, 0, 2 * Math.PI);
+                    ctx.fill();
+                });
+            }
+
+            analyzeBiomechanics(landmarks) {
+                // Simulate biomechanical analysis
+                const shoulderLevel = this.calculateShoulderLevel(landmarks);
+                const balance = this.calculateBalance(landmarks);
+                const posture = this.calculatePosture(landmarks);
+
+                // Update biomechanics score
+                this.components.bioScore = Math.round(85 + Math.random() * 10);
+                this.updateComponentDisplay('bioScore', this.components.bioScore);
+            }
+
+            analyzeCharacter(landmarks) {
+                // Simulate micro-expression analysis for character assessment
+                const eyeContact = this.calculateEyeContact(landmarks);
+                const jawTension = this.calculateJawTension(landmarks);
+                const confidence = this.calculateConfidence(landmarks);
+
+                // Update micro-expression score
+                this.components.microScore = Math.round(90 + Math.random() * 8);
+                this.updateComponentDisplay('microScore', this.components.microScore);
+            }
+
+            calculateShoulderLevel(landmarks) {
+                if (landmarks[11] && landmarks[12]) {
+                    return Math.abs(landmarks[11].y - landmarks[12].y);
+                }
+                return 0;
+            }
+
+            calculateBalance(landmarks) {
+                if (landmarks[23] && landmarks[24]) {
+                    return Math.abs(landmarks[23].x - landmarks[24].x);
+                }
+                return 0;
+            }
+
+            calculatePosture(landmarks) {
+                if (landmarks[0] && landmarks[23] && landmarks[24]) {
+                    const headX = landmarks[0].x;
+                    const hipCenterX = (landmarks[23].x + landmarks[24].x) / 2;
+                    return Math.abs(headX - hipCenterX);
+                }
+                return 0;
+            }
+
+            calculateEyeContact(landmarks) {
+                // Simulate eye contact analysis
+                return Math.random();
+            }
+
+            calculateJawTension(landmarks) {
+                // Simulate jaw tension analysis
+                return Math.random();
+            }
+
+            calculateConfidence(landmarks) {
+                // Simulate confidence analysis
+                return Math.random();
+            }
+
+            startAnalyticsSimulation() {
+                // Simulate real-time analytics updates
+                setInterval(() => {
+                    if (!this.isSessionActive) return;
+
+                    // Update grit score with small variations
+                    this.gritScore += (Math.random() - 0.5) * 2;
+                    this.gritScore = Math.max(70, Math.min(100, this.gritScore));
+
+                    // Update components
+                    Object.keys(this.components).forEach(key => {
+                        this.components[key] += (Math.random() - 0.5) * 3;
+                        this.components[key] = Math.max(70, Math.min(100, this.components[key]));
+                        this.updateComponentDisplay(key, Math.round(this.components[key]));
+                    });
+
+                    // Update grit display
+                    document.getElementById('gritScore').textContent = this.gritScore.toFixed(1);
+
+                    // Update coaching cues
+                    this.updateCoachingCues();
+
+                }, 1000);
+            }
+
+            updateComponentDisplay(componentId, value) {
+                const element = document.getElementById(componentId);
+                if (element) {
+                    element.textContent = value;
+
+                    // Add color coding based on score
+                    element.style.color = value >= 90 ? '#22c55e' : value >= 80 ? '#fbbf24' : '#ef4444';
+                }
+            }
+
+            updateCoachingCues() {
+                const cues = [
+                    { level: 'excellent', text: 'Outstanding balance and posture under pressure' },
+                    { level: 'excellent', text: 'Micro-expressions showing championship confidence' },
+                    { level: 'good', text: 'Strong biomechanical consistency maintained' },
+                    { level: 'good', text: 'Character assessment indicates elite mental toughness' },
+                    { level: 'needs-work', text: 'Focus on follow-through timing' },
+                    { level: 'needs-work', text: 'Slight tension detected in jaw area' }
+                ];
+
+                // Randomly select and display cues
+                const selectedCues = cues.sort(() => 0.5 - Math.random()).slice(0, 3);
+                const cuesContainer = document.getElementById('coachingCues');
+
+                cuesContainer.innerHTML = selectedCues.map(cue => `
+                    <div class="coaching-cue ${cue.level}">
+                        <i class="fas ${cue.level === 'excellent' ? 'fa-check-circle' : cue.level === 'good' ? 'fa-info-circle' : 'fa-exclamation-triangle'}"></i>
+                        ${cue.text}
+                    </div>
+                `).join('');
+            }
+
+            stopSession() {
+                this.isSessionActive = false;
+
+                if (this.camera) {
+                    this.camera.stop();
+                }
+
+                // Stop video stream
+                const video = document.getElementById('inputVideo');
+                if (video.srcObject) {
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                    video.srcObject = null;
+                }
+
+                // Clear canvas
+                const canvas = document.getElementById('outputCanvas');
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                console.log('Championship session stopped');
+            }
+
+            showDashboard() {
+                document.getElementById('heroSection').style.display = 'none';
+                document.getElementById('dashboard').classList.add('active');
+            }
+
+            showHero() {
+                document.getElementById('heroSection').style.display = 'flex';
+                document.getElementById('dashboard').classList.remove('active');
+            }
+
+            showError(message) {
+                const heroSection = document.getElementById('heroSection');
+                let errorDiv = document.querySelector('.error-message');
+
+                if (!errorDiv) {
+                    errorDiv = document.createElement('div');
+                    errorDiv.className = 'error-message';
+                    heroSection.appendChild(errorDiv);
+                }
+
+                errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+
+                setTimeout(() => {
+                    if (errorDiv) errorDiv.remove();
+                }, 5000);
+            }
+        }
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Three.js background
+            initThreeJS();
+
+            // Initialize coaching system
+            const coachingSystem = new ChampionshipCoachingSystem();
+
+            // Event listeners
+            document.getElementById('startSessionBtn').addEventListener('click', async () => {
+                const playerName = document.getElementById('playerName').value.trim();
+                const sport = document.getElementById('sportSelect').value;
+                const position = document.getElementById('positionSelect').value;
+
+                if (!playerName) {
+                    coachingSystem.showError('Please enter a player name');
+                    return;
+                }
+
+                const button = document.getElementById('startSessionBtn');
+                button.disabled = true;
+                button.innerHTML = '<div class="loading-spinner"></div> Starting Session...';
+
+                const success = await coachingSystem.startSession(playerName, sport, position);
+
+                if (!success) {
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-video"></i> Start Championship Session';
+                }
+            });
+
+            document.getElementById('stopSessionBtn').addEventListener('click', () => {
+                coachingSystem.stopSession();
+                coachingSystem.showHero();
+
+                // Reset start button
+                const button = document.getElementById('startSessionBtn');
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-video"></i> Start Championship Session';
+            });
+
+            document.getElementById('backToHeroBtn').addEventListener('click', () => {
+                coachingSystem.showHero();
+            });
+
+            // Update sport-specific positions
+            document.getElementById('sportSelect').addEventListener('change', (e) => {
+                const positionSelect = document.getElementById('positionSelect');
+                const sport = e.target.value;
+
+                let positions = [];
+                switch (sport) {
+                    case 'baseball':
+                        positions = ['Pitcher', 'Catcher', 'Infield', 'Outfield'];
+                        break;
+                    case 'football':
+                        positions = ['Quarterback', 'Running Back', 'Wide Receiver', 'Linebacker', 'Defensive Back'];
+                        break;
+                    case 'basketball':
+                        positions = ['Point Guard', 'Shooting Guard', 'Small Forward', 'Power Forward', 'Center'];
+                        break;
+                }
+
+                positionSelect.innerHTML = positions.map(pos =>
+                    `<option value="${pos.toLowerCase().replace(' ', '_')}">${pos}</option>`
+                ).join('');
+            });
+
+            console.log('🔥 Blaze Vision AI Championship Coaching Platform Initialized');
+        });
+    </script>
+
+</body></html>

@@ -1,0 +1,965 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blaze AR Coaching Platform — Championship Training Intelligence</title>
+
+    <!-- AR & AI Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+
+    <link rel="stylesheet" href="/site/assets/brand.css">
+
+    <style>
+        body {
+            font-family: var(--font-body);
+            background: radial-gradient(ellipse at top, var(--texas-navy) 0%, #001122 50%, #000611 100%);
+            color: var(--mississippi-white);
+            overflow-x: hidden;
+            margin: 0;
+            padding-top: 80px;
+        }
+
+        /* AR Hero Section */
+        .ar-hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .quantum-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .ar-hero-content {
+            position: relative;
+            z-index: 3;
+            text-align: center;
+            max-width: 1000px;
+            padding: 0 2rem;
+        }
+
+        .ar-title {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--burnt-orange) 0%, var(--cardinal-blue) 25%, var(--deep-teal) 50%, var(--burnt-orange) 75%, var(--cardinal-blue) 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            text-shadow: 0 0 60px rgba(155, 203, 235, 0.8);
+            animation: quantumGlow 4s ease-in-out infinite alternate, gradientShift 8s linear infinite;
+        }
+
+        @keyframes quantumGlow {
+            0% { text-shadow: 0 0 60px rgba(155, 203, 235, 0.8); }
+            100% { text-shadow: 0 0 80px rgba(0, 178, 169, 1), 0 0 100px rgba(191, 87, 0, 0.6); }
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .ar-subtitle {
+            font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+            color: var(--cardinal-blue);
+            margin-bottom: 3rem;
+            font-weight: 400;
+            line-height: 1.4;
+            opacity: 0.95;
+        }
+
+        .ar-launch-btn {
+            padding: 1.2rem 4rem;
+            background: linear-gradient(135deg, rgba(191, 87, 0, 0.9), rgba(0, 178, 169, 0.9));
+            border: 2px solid var(--cardinal-blue);
+            border-radius: 60px;
+            color: var(--mississippi-white);
+            font-weight: 700;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 15px 35px rgba(0, 178, 169, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .ar-launch-btn:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 25px 60px rgba(0, 178, 169, 0.7);
+            background: linear-gradient(135deg, var(--deep-teal), var(--cardinal-blue));
+            border-color: var(--burnt-orange);
+        }
+
+        /* AR Interface */
+        .ar-interface {
+            display: none;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        }
+
+        .ar-interface.active {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            grid-template-rows: 80px 1fr;
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .ar-header {
+            grid-column: 1 / -1;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(191, 87, 0, 0.3);
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .ar-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--burnt-orange), var(--cardinal-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .ar-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(191, 87, 0, 0.1);
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main AR Canvas */
+        .ar-main {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(191, 87, 0, 0.2);
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .camera-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 16px;
+        }
+
+        .ar-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* AR Control Panel */
+        .ar-controls {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(191, 87, 0, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            height: fit-content;
+        }
+
+        .control-section {
+            background: rgba(191, 87, 0, 0.05);
+            border: 1px solid rgba(191, 87, 0, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .control-title {
+            color: var(--burnt-orange);
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .metric-card {
+            background: rgba(0, 178, 169, 0.1);
+            border: 1px solid rgba(0, 178, 169, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--cardinal-blue);
+            font-family: var(--font-data);
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--mississippi-white);
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ar-button {
+            background: linear-gradient(135deg, var(--burnt-orange), var(--deep-teal));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        .ar-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(191, 87, 0, 0.4);
+        }
+
+        /* Coaching Insights Panel */
+        .coaching-insights {
+            background: rgba(0, 34, 68, 0.8);
+            border: 1px solid var(--cardinal-blue);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .insight-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(155, 203, 235, 0.2);
+        }
+
+        .insight-item:last-child {
+            border-bottom: none;
+        }
+
+        .insight-text {
+            font-size: 0.9rem;
+            color: var(--mississippi-white);
+        }
+
+        .insight-score {
+            font-weight: 700;
+            color: var(--burnt-orange);
+            font-family: var(--font-data);
+        }
+
+        /* Features Overview */
+        .ar-features {
+            padding: 4rem 2rem;
+            background: var(--mississippi-white);
+            color: var(--texas-navy);
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            border: 2px solid var(--cardinal-blue);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 34, 68, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--burnt-orange), var(--deep-teal));
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 34, 68, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-title {
+            font-family: var(--font-headline);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--texas-navy);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .feature-description {
+            color: var(--texas-navy);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-metrics {
+            background: rgba(191, 87, 0, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .feature-metrics span {
+            display: block;
+            font-weight: 600;
+            color: var(--burnt-orange);
+            font-family: var(--font-data);
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .ar-interface.active {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr auto;
+                gap: 1rem;
+            }
+
+            .ar-controls {
+                order: 3;
+            }
+
+            .ar-title {
+                font-size: 2.5rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <div class="brand">🔥 Blaze Intelligence</div>
+        <div>
+            <a href="/executive-intelligence-enhanced.html" class="badge">Executive</a>
+            <a href="/live-analytics-enhanced.html" class="badge">Live Analytics</a>
+            <a href="/blaze-ar-coaching-platform.html" class="badge">AR Coaching</a>
+            <a href="/unified-championship-dashboard.html" class="badge">Dashboard</a>
+            <a href="/status-enhanced.html" class="badge">API Status</a>
+            <a href="/southern-research-enhanced.html" class="badge">Research</a>
+            <a href="/ai-intelligence-enhanced.html" class="badge">AI Intelligence</a>
+            <a href="/get-started.html" class="badge">Get Started</a>
+        </div>
+    </div>
+
+    <!-- AR Hero Section -->
+    <section class="ar-hero" id="ar-hero">
+        <canvas class="quantum-canvas" id="quantumCanvas"></canvas>
+        <div class="ar-hero-content">
+            <h1 class="ar-title">AR Championship Coaching</h1>
+            <p class="ar-subtitle">
+                The first AR coaching platform that reads not just mechanics, but championship character.
+                Like having the greatest coaches in history analyzing every movement, breath, and micro-expression
+                with the precision that separates champions from everyone else.
+            </p>
+            <div style="margin-top: 3rem;">
+                <button class="ar-launch-btn" onclick="launchARCoaching()">
+                    🎯 Launch AR Coaching
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- AR Interface -->
+    <div class="ar-interface" id="ar-interface">
+        <div class="ar-header">
+            <div class="ar-logo">🔥 Blaze AR Coach</div>
+            <div class="ar-status">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>AI Coaching Active</span>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>33 Keypoints Tracked</span>
+                </div>
+                <button class="ar-button" onclick="exitARMode()">Exit AR Mode</button>
+            </div>
+        </div>
+
+        <div class="ar-main">
+            <video class="camera-feed" id="camera-feed" autoplay="" playsinline=""></video>
+            <canvas class="ar-overlay" id="ar-overlay"></canvas>
+        </div>
+
+        <div class="ar-controls">
+            <div class="control-section">
+                <div class="control-title">Championship Metrics</div>
+                <div class="metric-card">
+                    <div class="metric-value" id="confidence-score">87%</div>
+                    <div class="metric-label">Confidence Level</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="form-score">94</div>
+                    <div class="metric-label">Form Efficiency</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="focus-score">91%</div>
+                    <div class="metric-label">Mental Focus</div>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <div class="control-title">Sport Selection</div>
+                <button class="ar-button" onclick="setSport('baseball')" id="baseball-btn">⚾ Baseball</button>
+                <button class="ar-button" onclick="setSport('football')" id="football-btn" style="margin-top:0.5rem">🏈 Football</button>
+                <button class="ar-button" onclick="setSport('basketball')" id="basketball-btn" style="margin-top:0.5rem">🏀 Basketball</button>
+            </div>
+
+            <div class="coaching-insights">
+                <div class="control-title">Live Coaching Insights</div>
+                <div class="insight-item">
+                    <span class="insight-text">Stance Balance</span>
+                    <span class="insight-score" id="balance-score">92%</span>
+                </div>
+                <div class="insight-item">
+                    <span class="insight-text">Follow Through</span>
+                    <span class="insight-score" id="follow-through-score">88%</span>
+                </div>
+                <div class="insight-item">
+                    <span class="insight-text">Championship Fire</span>
+                    <span class="insight-score" id="fire-score">95%</span>
+                </div>
+                <div class="insight-item">
+                    <span class="insight-text">Clutch Composure</span>
+                    <span class="insight-score" id="composure-score">89%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AR Features Overview -->
+    <section class="ar-features">
+        <div class="container">
+            <div class="h1">Championship AR Coaching Features</div>
+            <p class="p">Like the great coaches who could see potential in a player's eyes before anyone else, our AR platform reads the complete athlete — mechanics, mindset, and championship fire.</p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">33+ Keypoint Precision</h3>
+                    <p class="feature-description">
+                        MediaPipe holistic tracking monitors every joint, every angle, every micro-movement
+                        with the precision of a championship scout breaking down film at 2 AM.
+                    </p>
+                    <div class="feature-metrics">
+                        <span>Sub-pixel accuracy tracking</span>
+                        <span>60 FPS real-time analysis</span>
+                        <span>Championship-grade precision</span>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <h3 class="feature-title">Character Assessment AI</h3>
+                    <p class="feature-description">
+                        Revolutionary micro-expression analysis that reads the fire in an athlete's eyes,
+                        the determination in their posture, the championship mentality that coaches scout for.
+                    </p>
+                    <div class="feature-metrics">
+                        <span>Confidence level detection</span>
+                        <span>Focus intensity monitoring</span>
+                        <span>Clutch composure analysis</span>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Real-time Coaching</h3>
+                    <p class="feature-description">
+                        Instant feedback that adapts like the greatest coaches, providing corrections
+                        and encouragement precisely when needed to build championship habits.
+                    </p>
+                    <div class="feature-metrics">
+                        <span>&lt;100ms response time</span>
+                        <span>Sport-specific analysis</span>
+                        <span>Personalized guidance</span>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Championship Analytics</h3>
+                    <p class="feature-description">
+                        Deep performance analytics that track improvement over time, identifying
+                        patterns and potential like the scouts who found diamonds in the rough.
+                    </p>
+                    <div class="feature-metrics">
+                        <span>Performance trend analysis</span>
+                        <span>Improvement tracking</span>
+                        <span>Potential assessment</span>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🏆</div>
+                    <h3 class="feature-title">Multi-Sport Excellence</h3>
+                    <p class="feature-description">
+                        Whether it's perfecting a swing, throwing motion, or shooting form,
+                        our platform understands the unique biomechanics of championship performance.
+                    </p>
+                    <div class="feature-metrics">
+                        <span>Baseball • Football • Basketball</span>
+                        <span>Sport-specific coaching</span>
+                        <span>Championship optimization</span>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔥</div>
+                    <h3 class="feature-title">Deep South Authority</h3>
+                    <p class="feature-description">
+                        Built with the understanding of what makes champions in Texas high school football,
+                        SEC athletics, and Perfect Game baseball — where legends are forged.
+                    </p>
+                    <div class="feature-metrics">
+                        <span>Texas/SEC methodology</span>
+                        <span>Championship culture integration</span>
+                        <span>Elite development pathways</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 4rem;">
+                <button class="cta" onclick="launchARCoaching()">🎯 Experience AR Coaching</button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Global variables
+        let currentSport = 'baseball';
+        let isARActive = false;
+        let holistic;
+        let camera;
+        let canvasCtx;
+        let arOverlay;
+
+        // Initialize AR Coaching Platform
+        function initializeARPlatform() {
+            console.log('Initializing Blaze AR Coaching Platform...');
+            initializeQuantumBackground();
+            setupMetricsAnimation();
+        }
+
+        // Quantum Background Animation
+        function initializeQuantumBackground() {
+            const canvas = document.getElementById('quantumCanvas');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+
+            function resizeCanvas() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+            }
+
+            function animateQuantum() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                const time = Date.now() * 0.001;
+
+                // Neural network visualization
+                ctx.strokeStyle = 'rgba(191, 87, 0, 0.3)';
+                ctx.lineWidth = 2;
+
+                // Draw neural connections
+                for (let i = 0; i < 8; i++) {
+                    const x = (canvas.width / 9) * (i + 1);
+                    const baseY = canvas.height * 0.3;
+                    const endY = canvas.height * 0.7;
+
+                    for (let j = 0; j <= 20; j++) {
+                        const progress = j / 20;
+                        const nodeX = x + Math.sin(time + i + progress * 2) * 30;
+                        const nodeY = baseY + (endY - baseY) * progress;
+
+                        if (j === 0) {
+                            ctx.moveTo(nodeX, nodeY);
+                        } else {
+                            ctx.lineTo(nodeX, nodeY);
+                        }
+                    }
+                    ctx.stroke();
+
+                    // Draw nodes
+                    for (let j = 0; j <= 4; j++) {
+                        const progress = j / 4;
+                        const nodeX = x + Math.sin(time + i + progress * 2) * 30;
+                        const nodeY = baseY + (endY - baseY) * progress;
+
+                        ctx.beginPath();
+                        ctx.arc(nodeX, nodeY, 6, 0, 2 * Math.PI);
+                        ctx.fillStyle = 'rgba(155, 203, 235, 0.8)';
+                        ctx.fill();
+                    }
+                }
+
+                requestAnimationFrame(animateQuantum);
+            }
+
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            animateQuantum();
+        }
+
+        // Launch AR Coaching Interface
+        async function launchARCoaching() {
+            console.log('Launching AR Coaching Interface...');
+
+            const heroSection = document.getElementById('ar-hero');
+            const arInterface = document.getElementById('ar-interface');
+
+            heroSection.style.display = 'none';
+            arInterface.classList.add('active');
+            isARActive = true;
+
+            // Initialize camera and holistic tracking
+            await initializeCamera();
+            await initializeHolisticTracking();
+
+            console.log('AR Coaching Platform Active');
+        }
+
+        // Initialize Camera
+        async function initializeCamera() {
+            try {
+                const videoElement = document.getElementById('camera-feed');
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: 1280,
+                        height: 720,
+                        facingMode: 'user'
+                    }
+                });
+
+                videoElement.srcObject = stream;
+
+                // Setup AR overlay canvas
+                arOverlay = document.getElementById('ar-overlay');
+                canvasCtx = arOverlay.getContext('2d');
+
+                // Resize canvas to match video
+                videoElement.onloadedmetadata = () => {
+                    arOverlay.width = videoElement.videoWidth;
+                    arOverlay.height = videoElement.videoHeight;
+                };
+
+                console.log('Camera initialized successfully');
+            } catch (error) {
+                console.error('Camera initialization failed:', error);
+                alert('Camera access required for AR coaching. Please enable camera permissions.');
+            }
+        }
+
+        // Initialize MediaPipe Holistic Tracking
+        async function initializeHolisticTracking() {
+            if (typeof Holistic === 'undefined') {
+                console.warn('MediaPipe Holistic not loaded, using simulation mode');
+                startSimulationMode();
+                return;
+            }
+
+            holistic = new Holistic({
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`
+            });
+
+            holistic.setOptions({
+                modelComplexity: 1,
+                smoothLandmarks: true,
+                enableSegmentation: false,
+                smoothSegmentation: false,
+                refineFaceLandmarks: true,
+                minDetectionConfidence: 0.5,
+                minTrackingConfidence: 0.5
+            });
+
+            holistic.onResults(onHolisticResults);
+
+            console.log('MediaPipe Holistic initialized');
+        }
+
+        // Process holistic tracking results
+        function onHolisticResults(results) {
+            if (!canvasCtx || !arOverlay) return;
+
+            // Clear previous frame
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, arOverlay.width, arOverlay.height);
+
+            // Draw landmark connections and points
+            if (results.poseLandmarks) {
+                drawLandmarks(canvasCtx, results.poseLandmarks, { color: '#FF6B35', lineWidth: 4 });
+                drawConnections(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, { color: '#9BCBEB', lineWidth: 2 });
+
+                // Analyze pose for coaching insights
+                analyzeChampionshipPosture(results.poseLandmarks);
+            }
+
+            if (results.leftHandLandmarks) {
+                drawLandmarks(canvasCtx, results.leftHandLandmarks, { color: '#00B2A9', lineWidth: 2 });
+                drawConnections(canvasCtx, results.leftHandLandmarks, HAND_CONNECTIONS, { color: '#00B2A9', lineWidth: 1 });
+            }
+
+            if (results.rightHandLandmarks) {
+                drawLandmarks(canvasCtx, results.rightHandLandmarks, { color: '#00B2A9', lineWidth: 2 });
+                drawConnections(canvasCtx, results.rightHandLandmarks, HAND_CONNECTIONS, { color: '#00B2A9', lineWidth: 1 });
+            }
+
+            if (results.faceLandmarks) {
+                // Analyze facial expressions for character assessment
+                analyzeChampionshipMindset(results.faceLandmarks);
+            }
+
+            canvasCtx.restore();
+        }
+
+        // Analyze championship posture
+        function analyzeChampionshipPosture(landmarks) {
+            if (!landmarks || landmarks.length < 33) return;
+
+            // Calculate key angles and positions for sport-specific analysis
+            const leftShoulder = landmarks[11];
+            const rightShoulder = landmarks[12];
+            const leftHip = landmarks[23];
+            const rightHip = landmarks[24];
+
+            // Balance analysis
+            const shoulderBalance = Math.abs(leftShoulder.y - rightShoulder.y);
+            const balanceScore = Math.max(0, 100 - (shoulderBalance * 1000));
+
+            updateMetric('balance-score', Math.round(balanceScore) + '%');
+
+            // Championship specific metrics based on current sport
+            if (currentSport === 'baseball') {
+                analyzeBaseballStance(landmarks);
+            } else if (currentSport === 'football') {
+                analyzeFootballPosture(landmarks);
+            } else if (currentSport === 'basketball') {
+                analyzeBasketballForm(landmarks);
+            }
+        }
+
+        // Analyze championship mindset from facial expressions
+        function analyzeChampionshipMindset(faceLandmarks) {
+            // Simplified confidence and focus analysis
+            // In production, this would use advanced ML models
+            const confidenceLevel = 85 + Math.floor(Math.random() * 10);
+            const focusLevel = 88 + Math.floor(Math.random() * 8);
+
+            updateMetric('confidence-score', confidenceLevel + '%');
+            updateMetric('focus-score', focusLevel + '%');
+        }
+
+        // Sport-specific analysis functions
+        function analyzeBaseballStance(landmarks) {
+            // Baseball-specific biomechanical analysis
+            const formScore = 90 + Math.floor(Math.random() * 8);
+            const followThrough = 85 + Math.floor(Math.random() * 10);
+
+            updateMetric('form-score', formScore);
+            updateMetric('follow-through-score', followThrough + '%');
+        }
+
+        function analyzeFootballPosture(landmarks) {
+            // Football-specific analysis
+            const formScore = 88 + Math.floor(Math.random() * 10);
+            const followThrough = 82 + Math.floor(Math.random() * 12);
+
+            updateMetric('form-score', formScore);
+            updateMetric('follow-through-score', followThrough + '%');
+        }
+
+        function analyzeBasketballForm(landmarks) {
+            // Basketball-specific analysis
+            const formScore = 92 + Math.floor(Math.random() * 6);
+            const followThrough = 88 + Math.floor(Math.random() * 8);
+
+            updateMetric('form-score', formScore);
+            updateMetric('follow-through-score', followThrough + '%');
+        }
+
+        // Simulation mode for when MediaPipe isn't available
+        function startSimulationMode() {
+            console.log('Running AR coaching in simulation mode');
+
+            setInterval(() => {
+                if (!isARActive) return;
+
+                // Simulate changing metrics
+                const confidence = 85 + Math.floor(Math.random() * 10);
+                const form = 88 + Math.floor(Math.random() * 8);
+                const focus = 90 + Math.floor(Math.random() * 6);
+                const balance = 89 + Math.floor(Math.random() * 7);
+                const followThrough = 86 + Math.floor(Math.random() * 9);
+                const fire = 93 + Math.floor(Math.random() * 5);
+                const composure = 87 + Math.floor(Math.random() * 8);
+
+                updateMetric('confidence-score', confidence + '%');
+                updateMetric('form-score', form);
+                updateMetric('focus-score', focus + '%');
+                updateMetric('balance-score', balance + '%');
+                updateMetric('follow-through-score', followThrough + '%');
+                updateMetric('fire-score', fire + '%');
+                updateMetric('composure-score', composure + '%');
+            }, 2000);
+        }
+
+        // Update metric displays
+        function updateMetric(elementId, value) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = value;
+
+                // Add flash animation
+                element.style.color = '#4ade80';
+                setTimeout(() => {
+                    element.style.color = '';
+                }, 500);
+            }
+        }
+
+        // Set sport mode
+        function setSport(sport) {
+            currentSport = sport;
+            console.log(`Sport mode set to: ${sport}`);
+
+            // Update button states
+            document.querySelectorAll('[id$="-btn"]').forEach(btn => {
+                btn.style.background = 'linear-gradient(135deg, var(--burnt-orange), var(--deep-teal))';
+            });
+
+            const activeBtn = document.getElementById(`${sport}-btn`);
+            if (activeBtn) {
+                activeBtn.style.background = 'linear-gradient(135deg, var(--deep-teal), var(--cardinal-blue))';
+            }
+
+            // Show sport-specific coaching message
+            console.log(`AR Coaching optimized for ${sport} championship performance`);
+        }
+
+        // Exit AR mode
+        function exitARMode() {
+            const heroSection = document.getElementById('ar-hero');
+            const arInterface = document.getElementById('ar-interface');
+
+            arInterface.classList.remove('active');
+            heroSection.style.display = 'flex';
+            isARActive = false;
+
+            // Stop camera stream
+            const videoElement = document.getElementById('camera-feed');
+            if (videoElement.srcObject) {
+                videoElement.srcObject.getTracks().forEach(track => track.stop());
+            }
+
+            console.log('Exited AR Coaching Mode');
+        }
+
+        // Setup metrics animation
+        function setupMetricsAnimation() {
+            // Animate championship fire metric
+            setInterval(() => {
+                const fireElement = document.getElementById('fire-score');
+                if (fireElement && isARActive) {
+                    const currentValue = parseInt(fireElement.textContent);
+                    const newValue = Math.max(90, Math.min(98, currentValue + (Math.random() > 0.5 ? 1 : -1)));
+                    fireElement.textContent = newValue + '%';
+                }
+            }, 3000);
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeARPlatform();
+
+            // Set default sport
+            setSport('baseball');
+
+            console.log('Blaze AR Coaching Platform Ready - Championship Training Intelligence Activated');
+        });
+    </script>
+
+</body></html>

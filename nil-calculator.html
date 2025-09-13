@@ -1,0 +1,157 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIL Engine - Blaze Intelligence</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0A0A0B; color: #FFFFFF; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .header { text-align: center; margin-bottom: 3rem; }
+        .header h1 { font-size: 2.5rem; color: #BF5700; margin-bottom: 1rem; }
+        .nil-calculator { background: #1A1A1B; padding: 2rem; border-radius: 12px; border: 1px solid #333; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; color: #9BCBEB; font-weight: 500; }
+        .form-group input, .form-group select { width: 100%; padding: 0.75rem; background: #2A2A2B; border: 1px solid #444; border-radius: 8px; color: #FFFFFF; font-size: 1rem; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #BF5700; }
+        .calculate-btn { background: linear-gradient(135deg, #BF5700, #FF6B35); color: white; padding: 1rem 2rem; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; width: 100%; margin-top: 1rem; }
+        .calculate-btn:hover { opacity: 0.9; }
+        .results { margin-top: 2rem; padding: 1.5rem; background: #0F2027; border-radius: 12px; border-left: 4px solid #9BCBEB; }
+        .results h3 { color: #9BCBEB; margin-bottom: 1rem; }
+        .result-item { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+        .result-value { color: #BF5700; font-weight: 600; }
+        .back-link { display: inline-block; margin-top: 2rem; color: #9BCBEB; text-decoration: none; }
+        .back-link:hover { color: #BF5700; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>NIL Engine</h1>
+            <p>Calculate Name, Image, and Likeness valuations for college athletes</p>
+        </div>
+
+        <div class="nil-calculator">
+            <form id="nilForm">
+                <div class="form-group">
+                    <label for="athleteName">Athlete Name</label>
+                    <input type="text" id="athleteName" name="athleteName" placeholder="Enter athlete name" required="">
+                </div>
+
+                <div class="form-group">
+                    <label for="sport">Sport</label>
+                    <select id="sport" name="sport" required="">
+                        <option value="">Select Sport</option>
+                        <option value="football">Football</option>
+                        <option value="basketball">Basketball</option>
+                        <option value="baseball">Baseball</option>
+                        <option value="track">Track &amp; Field</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="position">Position</label>
+                    <input type="text" id="position" name="position" placeholder="e.g., Quarterback, Point Guard">
+                </div>
+
+                <div class="form-group">
+                    <label for="socialFollowers">Social Media Followers</label>
+                    <input type="number" id="socialFollowers" name="socialFollowers" placeholder="Total followers across platforms">
+                </div>
+
+                <div class="form-group">
+                    <label for="performanceLevel">Performance Level (1-10)</label>
+                    <input type="number" id="performanceLevel" name="performanceLevel" min="1" max="10" placeholder="Rate athletic performance">
+                </div>
+
+                <div class="form-group">
+                    <label for="marketSize">Market Size</label>
+                    <select id="marketSize" name="marketSize" required="">
+                        <option value="">Select Market Size</option>
+                        <option value="large">Large Market (Major City)</option>
+                        <option value="medium">Medium Market</option>
+                        <option value="small">Small Market</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="calculate-btn">Calculate NIL Value</button>
+            </form>
+
+            <div id="results" class="results" style="display: none;">
+                <h3>NIL Valuation Results</h3>
+                <div class="result-item">
+                    <span>Estimated Annual NIL Value:</span>
+                    <span class="result-value" id="nilValue">$0</span>
+                </div>
+                <div class="result-item">
+                    <span>Per-Post Value:</span>
+                    <span class="result-value" id="postValue">$0</span>
+                </div>
+                <div class="result-item">
+                    <span>Brand Deal Potential:</span>
+                    <span class="result-value" id="brandValue">$0</span>
+                </div>
+                <div class="result-item">
+                    <span>Market Tier:</span>
+                    <span class="result-value" id="marketTier">-</span>
+                </div>
+            </div>
+        </div>
+
+        <a href="/" class="back-link">← Back to Home</a>
+    </div>
+
+    <script>
+        document.getElementById('nilForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const followers = parseInt(formData.get('socialFollowers')) || 0;
+            const performance = parseInt(formData.get('performanceLevel')) || 5;
+            const sport = formData.get('sport');
+            const marketSize = formData.get('marketSize');
+            
+            // Simple NIL calculation algorithm
+            let baseValue = followers * 0.05; // Base per follower value
+            
+            // Sport multipliers
+            const sportMultipliers = {
+                'football': 2.5,
+                'basketball': 2.0,
+                'baseball': 1.5,
+                'track': 1.2,
+                'other': 1.0
+            };
+            
+            // Market multipliers
+            const marketMultipliers = {
+                'large': 1.5,
+                'medium': 1.2,
+                'small': 1.0
+            };
+            
+            // Performance multiplier (1-3x based on performance level)
+            const performanceMultiplier = 0.5 + (performance / 10) * 2.5;
+            
+            const sportMult = sportMultipliers[sport] || 1.0;
+            const marketMult = marketMultipliers[marketSize] || 1.0;
+            
+            const annualValue = Math.round(baseValue * sportMult * marketMult * performanceMultiplier);
+            const postValue = Math.round(annualValue / 100); // Roughly 100 posts per year
+            const brandValue = Math.round(annualValue * 0.3); // 30% for brand deals
+            
+            let tier = 'Emerging';
+            if (annualValue > 100000) tier = 'Elite';
+            else if (annualValue > 50000) tier = 'High Value';
+            else if (annualValue > 10000) tier = 'Developing';
+            
+            // Display results
+            document.getElementById('nilValue').textContent = '$' + annualValue.toLocaleString();
+            document.getElementById('postValue').textContent = '$' + postValue.toLocaleString();
+            document.getElementById('brandValue').textContent = '$' + brandValue.toLocaleString();
+            document.getElementById('marketTier').textContent = tier;
+            document.getElementById('results').style.display = 'block';
+        });
+    </script>
+
+</body></html>

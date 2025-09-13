@@ -1,0 +1,497 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Texas Teams | Deep South Perfect Game Authority</title>
+    <meta name="description" content="Championship intelligence on Texas elite baseball organizations: South Texas Sliders, Houston Banditos, Dulins Dodgers, Austin Wings. The authority on Deep South youth baseball pipelines.">
+    
+    <style>
+        :root {
+            --burnt-orange: #BF5700;
+            --sec-crimson: #9B2222;
+            --cardinal-blue: #9BCBEB;
+            --perfect-game-gold: #FFD700;
+            --texas-navy: #002244;
+            --deep-teal: #00B2A9;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #0A192F 0%, #1E3A8A 50%, #0F172A 100%);
+            color: #E6F1FF;
+            line-height: 1.6;
+        }
+
+        .hero-section {
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 25% 25%, rgba(191, 87, 0, 0.15), transparent 50%),
+                       radial-gradient(circle at 75% 75%, rgba(255, 215, 0, 0.1), transparent 50%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            background: linear-gradient(135deg, var(--perfect-game-gold), var(--burnt-orange));
+            color: var(--texas-navy);
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin-bottom: 2rem;
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--perfect-game-gold), var(--burnt-orange), var(--sec-crimson));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--cardinal-blue);
+            margin-bottom: 3rem;
+        }
+
+        .teams-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            max-width: 1400px;
+            margin: 6rem auto;
+            padding: 0 2rem;
+        }
+
+        .team-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-radius: 24px;
+            padding: 3rem;
+            text-align: left;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--perfect-game-gold), var(--burnt-orange));
+        }
+
+        .team-card:hover {
+            transform: translateY(-12px);
+            border-color: var(--perfect-game-gold);
+            background: rgba(255, 215, 0, 0.05);
+            box-shadow: 0 20px 60px rgba(255, 215, 0, 0.2);
+        }
+
+        .team-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--perfect-game-gold), var(--burnt-orange));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--texas-navy);
+            margin-bottom: 2rem;
+        }
+
+        .team-name {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--perfect-game-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .team-location {
+            color: var(--cardinal-blue);
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .team-description {
+            color: #94A9C9;
+            margin-bottom: 2rem;
+            line-height: 1.7;
+        }
+
+        .team-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(0, 34, 68, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--perfect-game-gold);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .team-tournaments {
+            margin-top: 1.5rem;
+        }
+
+        .tournament-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--burnt-orange);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+        }
+
+        .tournament-list {
+            list-style: none;
+        }
+
+        .tournament-list li {
+            padding: 0.5rem 0;
+            color: #94A9C9;
+            font-size: 0.875rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .tournament-list li:last-child {
+            border-bottom: none;
+        }
+
+        .championship-section {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 6rem 2rem;
+            text-align: center;
+        }
+
+        .championship-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--perfect-game-gold), var(--burnt-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .championship-subtitle {
+            font-size: 1.25rem;
+            color: var(--cardinal-blue);
+            margin-bottom: 3rem;
+        }
+
+        .world-series-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .world-series-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--perfect-game-gold);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .world-series-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 40px rgba(255, 215, 0, 0.25);
+        }
+
+        .ws-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--perfect-game-gold);
+            margin-bottom: 0.75rem;
+        }
+
+        .ws-details {
+            color: #94A9C9;
+            margin-bottom: 1rem;
+        }
+
+        .ws-date {
+            background: rgba(191, 87, 0, 0.2);
+            color: var(--burnt-orange);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .teams-grid { grid-template-columns: 1fr; }
+            .world-series-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <div class="hero-badge">🏆 Elite Texas Perfect Game Organizations</div>
+            <h1 class="hero-title">Championship Pedigree</h1>
+            <p class="hero-subtitle">The definitive intelligence on Texas youth baseball powerhouses</p>
+        </div>
+    </section>
+
+    <!-- Elite Teams Grid -->
+    <section class="teams-grid">
+        <!-- South Texas Sliders -->
+        <div class="team-card">
+            <div class="team-logo">STS</div>
+            <h2 class="team-name">South Texas Sliders</h2>
+            <p class="team-location">San Antonio/Boerne Region</p>
+            <p class="team-description">Elite select organization with multiple age divisions competing at the highest levels of Perfect Game competition. Known for developing championship talent across South Texas.</p>
+            
+            <div class="team-stats">
+                <div class="stat-item">
+                    <span class="stat-value">5+</span>
+                    <span class="stat-label">Age Divisions</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">17U</span>
+                    <span class="stat-label">World Series</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">2025</span>
+                    <span class="stat-label">Active Teams</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">PG</span>
+                    <span class="stat-label">Affiliated</span>
+                </div>
+            </div>
+
+            <div class="team-tournaments">
+                <div class="tournament-title">2025 Perfect Game Events</div>
+                <ul class="tournament-list">
+                    <li>17U South World Series (Tomball) - July 28-Aug 1</li>
+                    <li>Central Texas Super Regional NIT (Austin) - April 5-6</li>
+                    <li>Corpus Christi Area Tournament - March 15-16</li>
+                    <li>Beaumont Area Tournament - April 12-13</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Houston Banditos -->
+        <div class="team-card">
+            <div class="team-logo">HB</div>
+            <h2 class="team-name">Houston Banditos</h2>
+            <p class="team-location">Houston Metro</p>
+            <p class="team-description">Championship dynasty with unmatched pedigree. Guaranteed participation in all Perfect Game events including Florida and Georgia showcases. Recent 14U Elite Back to School Bash champions.</p>
+            
+            <div class="team-stats">
+                <div class="stat-item">
+                    <span class="stat-value">146</span>
+                    <span class="stat-label">National Titles</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">219</span>
+                    <span class="stat-label">State Titles</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">2025</span>
+                    <span class="stat-label">Champions</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">Elite</span>
+                    <span class="stat-label">Status</span>
+                </div>
+            </div>
+
+            <div class="team-tournaments">
+                <div class="tournament-title">Championship Pedigree</div>
+                <ul class="tournament-list">
+                    <li>2025 14U PG Back to School Bash - CHAMPIONS</li>
+                    <li>Perfect Game Florida/Georgia Events - Guaranteed</li>
+                    <li>Multiple Perfect Game Baseball Association teams</li>
+                    <li>National showcase circuit participation</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Dulins Dodgers -->
+        <div class="team-card">
+            <div class="team-logo">DD</div>
+            <h2 class="team-name">Dulins Dodgers</h2>
+            <p class="team-location">Plano/DFW Metro</p>
+            <p class="team-description">Elite DFW organization focused on advancing youth baseball skills and showcase opportunities. Official Perfect Game Baseball Association affiliate with comprehensive development programs.</p>
+            
+            <div class="team-stats">
+                <div class="stat-item">
+                    <span class="stat-value">2025</span>
+                    <span class="stat-label">Active Season</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">PG</span>
+                    <span class="stat-label">Association</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">DFW</span>
+                    <span class="stat-label">Metro Hub</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">Elite</span>
+                    <span class="stat-label">Development</span>
+                </div>
+            </div>
+
+            <div class="team-tournaments">
+                <div class="tournament-title">Perfect Game Integration</div>
+                <ul class="tournament-list">
+                    <li>Perfect Game Baseball Association Member</li>
+                    <li>2025 Fall Season Registration Active</li>
+                    <li>Private Tryout System for Elite Selection</li>
+                    <li>National showcase exposure opportunities</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Austin Wings -->
+        <div class="team-card">
+            <div class="team-logo">AW</div>
+            <h2 class="team-name">Austin Wings</h2>
+            <p class="team-location">Central Texas/Austin</p>
+            <p class="team-description">Central Texas select baseball organization with access to Perfect Game tournaments in the Austin market. Multiple age divisions with 2025 tryout system for elite player selection.</p>
+            
+            <div class="team-stats">
+                <div class="stat-item">
+                    <span class="stat-value">2025</span>
+                    <span class="stat-label">Tryouts</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">ATX</span>
+                    <span class="stat-label">Market</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">PG</span>
+                    <span class="stat-label">Access</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">Elite</span>
+                    <span class="stat-label">Selection</span>
+                </div>
+            </div>
+
+            <div class="team-tournaments">
+                <div class="tournament-title">2025 Central Texas Circuit</div>
+                <ul class="tournament-list">
+                    <li>10U-12U Tryouts - July 28, 2025</li>
+                    <li>13U-14U Tryouts - July 29, 2025</li>
+                    <li>Central Texas Super Regional NIT access</li>
+                    <li>Perfect Game tournament participation</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Championship World Series Section -->
+    <section class="championship-section">
+        <h2 class="championship-title">Perfect Game World Series</h2>
+        <p class="championship-subtitle">Texas leads the nation with elite championship tournaments</p>
+        
+        <div class="world-series-grid">
+            <div class="world-series-card">
+                <h3 class="ws-title">Central Texas World Series</h3>
+                <p class="ws-details">12U &amp; 10U divisions in the heart of Texas baseball country</p>
+                <div class="ws-date">July 9-13, 2025 | Austin, TX</div>
+            </div>
+            
+            <div class="world-series-card">
+                <h3 class="ws-title">PG South World Series</h3>
+                <p class="ws-details">17U elite championship featuring top Texas organizations</p>
+                <div class="ws-date">July 28-Aug 1, 2025 | Tomball, TX</div>
+            </div>
+            
+            <div class="world-series-card">
+                <h3 class="ws-title">"The Natty" Texas Style</h3>
+                <p class="ws-details">12U Perfect Game World Series powered by KC&amp;BO</p>
+                <div class="ws-date">June 21-25, 2025 | Flower Mound, TX</div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Add smooth scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all team cards
+        document.querySelectorAll('.team-card, .world-series-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'all 0.6s ease';
+            observer.observe(card);
+        });
+
+        // Add stagger effect
+        document.querySelectorAll('.team-card').forEach((card, index) => {
+            card.style.transitionDelay = `${index * 0.15}s`;
+        });
+    </script>
+
+</body></html>

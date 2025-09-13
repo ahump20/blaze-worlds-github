@@ -1,0 +1,158 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Status · Blaze Intelligence</title>
+  <style>
+    body { 
+      font: 16px/1.5 system-ui, -apple-system, 'Segoe UI', Roboto; 
+      color: #e6e6e6; 
+      background: #0b1326; 
+      margin: 2rem; 
+      max-width: 1200px; 
+      margin: 2rem auto; 
+    }
+    .status-block { 
+      border: 1px solid #233; 
+      background: #111a31; 
+      border-radius: 14px; 
+      padding: 20px; 
+      margin: 16px 0;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .status-header {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #BF5700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .status-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    .operational { background-color: #10b981; }
+    .degraded { background-color: #f59e0b; }
+    .outage { background-color: #ef4444; }
+    pre {
+      background: #0a0a0f;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.9rem;
+      color: #94a3b8;
+    }
+    .loading {
+      text-align: center;
+      color: #64748b;
+      font-style: italic;
+      padding: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="status-header">
+    <span class="status-indicator operational"></span>
+    Blaze Intelligence System Status
+  </div>
+  
+  <div id="status-content" class="loading">Loading system status...</div>
+  
+  <script>
+    (async () => {
+      const content = document.getElementById('status-content');
+      const blocks = [];
+      
+      // Try to fetch health data
+      try {
+        const healthRes = await fetch('/api/health');
+        if (healthRes.ok) {
+          const healthData = await healthRes.json();
+          blocks.push({
+            title: '🏥 System Health',
+            status: healthData.status === 'healthy' ? 'operational' : 'degraded',
+            data: healthData
+          });
+        }
+      } catch (e) {
+        console.log('Health endpoint not available:', e.message);
+      }
+      
+      // Try to fetch status data
+      try {
+        const statusRes = await fetch('/api/status');
+        if (statusRes.ok) {
+          const statusData = await statusRes.json();
+          blocks.push({
+            title: '📊 Platform Metrics',
+            status: statusData.status?.indicator === 'operational' ? 'operational' : 'degraded',
+            data: statusData
+          });
+        }
+      } catch (e) {
+        console.log('Status endpoint not available:', e.message);
+      }
+      
+      // Try to fetch Cardinals data
+      try {
+        const cardinalsRes = await fetch('/data/dashboard-config.json');
+        if (cardinalsRes.ok) {
+          const cardinalsData = await cardinalsRes.json();
+          blocks.push({
+            title: '⚾ Cardinals Intelligence',
+            status: 'operational',
+            data: {
+              readiness_score: `${cardinalsData.cardinals_readiness?.overall_score.toFixed(1)}%`,
+              trend: cardinalsData.cardinals_readiness?.trend,
+              last_update: cardinalsData.timestamp,
+              leverage_factor: cardinalsData.cardinals_readiness?.key_metrics?.leverage_factor
+            }
+          });
+        }
+      } catch (e) {
+        console.log('Cardinals data not available:', e.message);
+      }
+      
+      // Clear loading and render blocks
+      content.innerHTML = '';
+      
+      if (blocks.length === 0) {
+        content.innerHTML = '<div class="status-block"><div style="text-align: center; color: #64748b;">📡 No API endpoints available<br><small>System may be initializing or in maintenance mode</small></div></div>';
+        return;
+      }
+      
+      // Update main indicator
+      const mainIndicator = document.querySelector('.status-indicator');
+      const hasIssues = blocks.some(b => b.status !== 'operational');
+      mainIndicator.className = `status-indicator ${hasIssues ? 'degraded' : 'operational'}`;
+      
+      // Render each block
+      for (const block of blocks) {
+        const blockEl = document.createElement('div');
+        blockEl.className = 'status-block';
+        blockEl.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+            <span class="status-indicator ${block.status}"></span>
+            <strong>${block.title}</strong>
+          </div>
+          <pre>${JSON.stringify(block.data, null, 2)}</pre>
+        `;
+        content.appendChild(blockEl);
+      }
+      
+      // Add last updated timestamp
+      const timestamp = document.createElement('div');
+      timestamp.style.cssText = 'text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 2rem;';
+      timestamp.textContent = `Last updated: ${new Date().toLocaleString()}`;
+      content.appendChild(timestamp);
+      
+      // Auto-refresh every 30 seconds
+      setTimeout(() => location.reload(), 30000);
+    })();
+  </script>
+
+</body></html>

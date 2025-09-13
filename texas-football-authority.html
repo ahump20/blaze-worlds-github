@@ -1,0 +1,460 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blaze Intelligence | The Authority in Texas &amp; Deep South Football</title>
+    <meta name="description" content="From Friday Night Lights to the NFL. The definitive source for Texas high school football, SEC recruiting, and Deep South sports intelligence. Where champions are identified before they're crowned.">
+    
+    <!-- Championship Brand System -->
+    <link rel="stylesheet" href="/css/blaze-championship.css">
+    
+    <!-- Tailwind for rapid development -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Three.js for executive visualizations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        :root {
+            --blaze-orange: #BF5700;
+            --blaze-blue: #9BCBEB;
+            --blaze-navy: #0A192F;
+            --texas-maroon: #500000;
+            --sec-gold: #FFD700;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #0A192F;
+            color: #E6F1FF;
+        }
+        
+        .authority-badge {
+            background: linear-gradient(135deg, var(--blaze-orange), var(--texas-maroon));
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .state-card {
+            background: rgba(26, 26, 46, 0.9);
+            border: 1px solid rgba(191, 87, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .state-card:hover {
+            border-color: var(--blaze-orange);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(191, 87, 0, 0.2);
+        }
+        
+        .pipeline-stage {
+            position: relative;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 3px solid var(--blaze-orange);
+        }
+        
+        .trust-signal {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(191, 87, 0, 0.1);
+            border: 1px solid rgba(191, 87, 0, 0.3);
+            border-radius: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Championship Navigation - FIXED VERSION -->
+    <nav class="sticky top-0 z-50 bg-blaze-navy/95 backdrop-blur border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo & Brand -->
+                <div class="flex items-center gap-3">
+                    <div class="text-2xl">🔥</div>
+                    <div>
+                        <div class="text-lg font-bold text-white">Blaze Intelligence</div>
+                        <div class="text-xs text-blaze-blue">Texas Football Authority</div>
+                    </div>
+                </div>
+                
+                <!-- Main Navigation -->
+                <div class="hidden md:flex items-center gap-6">
+                    <a href="/" class="text-white hover:text-blaze-orange transition">Home</a>
+                    
+                    <!-- States Dropdown -->
+                    <div class="relative group">
+                        <button class="flex items-center gap-1 text-white hover:text-blaze-orange">
+                            States <span class="text-xs">▼</span>
+                        </button>
+                        <div class="absolute top-full left-0 mt-2 w-48 bg-blaze-navy border border-white/20 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                            <a href="/texas" class="block px-4 py-2 hover:bg-blaze-orange/20">🤠 Texas</a>
+                            <a href="/louisiana" class="block px-4 py-2 hover:bg-blaze-orange/20">⚜️ Louisiana</a>
+                            <a href="/alabama" class="block px-4 py-2 hover:bg-blaze-orange/20">🐘 Alabama</a>
+                            <a href="/mississippi" class="block px-4 py-2 hover:bg-blaze-orange/20">🎺 Mississippi</a>
+                            <a href="/arkansas" class="block px-4 py-2 hover:bg-blaze-orange/20">🐗 Arkansas</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Sports Dropdown -->
+                    <div class="relative group">
+                        <button class="flex items-center gap-1 text-white hover:text-blaze-orange">
+                            Sports <span class="text-xs">▼</span>
+                        </button>
+                        <div class="absolute top-full left-0 mt-2 w-48 bg-blaze-navy border border-white/20 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                            <a href="/football" class="block px-4 py-2 hover:bg-blaze-orange/20">🏈 Football</a>
+                            <a href="/baseball" class="block px-4 py-2 hover:bg-blaze-orange/20">⚾ Baseball</a>
+                            <a href="/recruiting" class="block px-4 py-2 hover:bg-blaze-orange/20">🎯 Recruiting</a>
+                        </div>
+                    </div>
+                    
+                    <a href="/rankings" class="text-white hover:text-blaze-orange transition">Rankings</a>
+                    <a href="/pipeline" class="text-white hover:text-blaze-orange transition">Pipeline</a>
+                    <a href="/live" class="text-white hover:text-blaze-orange transition">Live Scores</a>
+                </div>
+                
+                <!-- Authority Badges -->
+                <div class="flex items-center gap-3">
+                    <span class="authority-badge hidden sm:inline-block">94.6% Accurate</span>
+                    <a href="/get-started" class="bg-blaze-orange text-white px-4 py-2 rounded-lg font-semibold hover:bg-orange-600 transition">
+                        Get Access
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section: The Authority -->
+    <section class="relative py-20 px-4 overflow-hidden">
+        <canvas id="authority-hero-canvas" class="absolute inset-0 opacity-30"></canvas>
+        
+        <div class="relative max-w-7xl mx-auto text-center">
+            <div class="mb-6">
+                <span class="authority-badge text-lg px-6 py-2">🏆 THE AUTHORITY IN TEXAS FOOTBALL</span>
+            </div>
+            
+            <h1 class="text-5xl md:text-7xl font-bold mb-6">
+                Texas Football Tradition × Next-Level Intelligence
+            </h1>
+            
+            <p class="text-xl md:text-2xl text-blaze-blue mb-8 max-w-4xl mx-auto font-light">
+                WHERE FRIDAY NIGHT LIGHTS MEET CHAMPIONSHIP ANALYTICS
+            </p>
+            
+            <div class="flex flex-wrap justify-center gap-4 mb-12">
+                <div class="trust-signal">
+                    <span class="text-blaze-orange font-bold">TRUSTED BY:</span>
+                    <span>High School Programs • College Scouts • Elite Athletes • Dave Campbell's Texas Football Network</span>
+                </div>
+            </div>
+            
+            <p class="text-gray-300 max-w-3xl mx-auto mb-8">
+                The wisdom of Texas football tradition, powered by breakthrough analytics. From small-town stadiums to championship stages, 
+                we honor the game while revealing its deepest insights.
+            </p>
+            
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="/dashboard" class="bg-gradient-to-r from-blaze-orange to-texas-maroon text-white px-8 py-4 rounded-lg font-bold text-lg hover:scale-105 transition">
+                    Launch Dashboard
+                </a>
+                <a href="/live-demo" class="border-2 border-blaze-orange text-blaze-orange px-8 py-4 rounded-lg font-bold text-lg hover:bg-blaze-orange hover:text-white transition">
+                    Live Demo
+                </a>
+                <a href="/executive-intelligence" class="border-2 border-blaze-blue text-blaze-blue px-8 py-4 rounded-lg font-bold text-lg hover:bg-blaze-blue hover:text-black transition">
+                    Executive Intelligence
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Authority Metrics -->
+    <section class="py-16 px-4 border-t border-white/10">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div>
+                    <div class="text-sm text-gray-400 uppercase tracking-wider mb-2">Years of Texas Football</div>
+                    <div class="text-4xl font-bold text-blaze-orange">75+</div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-400 uppercase tracking-wider mb-2">High Schools Covered</div>
+                    <div class="text-4xl font-bold text-blaze-orange">1,200+</div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-400 uppercase tracking-wider mb-2">Championship Predictions</div>
+                    <div class="text-4xl font-bold text-blaze-orange">94.6%</div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-400 uppercase tracking-wider mb-2">Friday Night Games</div>
+                    <div class="text-4xl font-bold text-blaze-orange">2.8M+</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Deep South Regional Coverage -->
+    <section class="py-16 px-4 bg-black/30">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12">
+                Complete Deep South Coverage
+            </h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Texas Card -->
+                <div class="state-card rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold">🤠 Texas</h3>
+                        <span class="text-xs bg-blaze-orange/20 text-blaze-orange px-2 py-1 rounded">FLAGSHIP</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">Where Football is Religion</p>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Schools:</span>
+                            <span class="font-semibold">1,200+</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Classifications:</span>
+                            <span class="font-semibold">6A-1A</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Elite Programs:</span>
+                            <span class="font-semibold">50+</span>
+                        </div>
+                    </div>
+                    <a href="/texas" class="mt-4 block text-center bg-blaze-orange/20 text-blaze-orange py-2 rounded-lg hover:bg-blaze-orange hover:text-white transition">
+                        Explore Texas →
+                    </a>
+                </div>
+                
+                <!-- Louisiana Card -->
+                <div class="state-card rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold">⚜️ Louisiana</h3>
+                        <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">SPEED</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">Bayou Speed &amp; Power</p>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Schools:</span>
+                            <span class="font-semibold">400+</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Key Programs:</span>
+                            <span class="font-semibold">John Curtis, Karr</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">NFL Pipeline:</span>
+                            <span class="font-semibold">Elite</span>
+                        </div>
+                    </div>
+                    <a href="/louisiana" class="mt-4 block text-center bg-purple-500/20 text-purple-400 py-2 rounded-lg hover:bg-purple-500 hover:text-white transition">
+                        Explore Louisiana →
+                    </a>
+                </div>
+                
+                <!-- Alabama Card -->
+                <div class="state-card rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold">🐘 Alabama</h3>
+                        <span class="text-xs bg-red-600/20 text-red-400 px-2 py-1 rounded">POWER</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">Built Different</p>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Schools:</span>
+                            <span class="font-semibold">350+</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Key Programs:</span>
+                            <span class="font-semibold">Hoover, Thompson</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Championships:</span>
+                            <span class="font-semibold">Dynasty</span>
+                        </div>
+                    </div>
+                    <a href="/alabama" class="mt-4 block text-center bg-red-600/20 text-red-400 py-2 rounded-lg hover:bg-red-600 hover:text-white transition">
+                        Explore Alabama →
+                    </a>
+                </div>
+                
+                <!-- Mississippi Card -->
+                <div class="state-card rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold">🎺 Mississippi</h3>
+                        <span class="text-xs bg-blue-600/20 text-blue-400 px-2 py-1 rounded">TRADITION</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">Pure Southern Football</p>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Schools:</span>
+                            <span class="font-semibold">250+</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Key Programs:</span>
+                            <span class="font-semibold">Brandon, Oxford</span>
+                        </div>
+                    </div>
+                    <a href="/mississippi" class="mt-4 block text-center bg-blue-600/20 text-blue-400 py-2 rounded-lg hover:bg-blue-600 hover:text-white transition">
+                        Explore Mississippi →
+                    </a>
+                </div>
+                
+                <!-- Arkansas Card -->
+                <div class="state-card rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold">🐗 Arkansas</h3>
+                        <span class="text-xs bg-green-600/20 text-green-400 px-2 py-1 rounded">RISING</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">Natural State of Football</p>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Schools:</span>
+                            <span class="font-semibold">300+</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Key Programs:</span>
+                            <span class="font-semibold">Bryant, Bentonville</span>
+                        </div>
+                    </div>
+                    <a href="/arkansas" class="mt-4 block text-center bg-green-600/20 text-green-400 py-2 rounded-lg hover:bg-green-600 hover:text-white transition">
+                        Explore Arkansas →
+                    </a>
+                </div>
+                
+                <!-- Coming Soon -->
+                <div class="state-card rounded-xl p-6 opacity-60">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold">🎸 Tennessee</h3>
+                        <span class="text-xs bg-gray-600/20 text-gray-400 px-2 py-1 rounded">COMING 2025</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">Volunteer State Power</p>
+                    <div class="text-center py-8">
+                        <div class="text-gray-500">Expansion Phase 2</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Youth to Pro Pipeline -->
+    <section class="py-16 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-4">
+                Complete Player Pipeline Tracking
+            </h2>
+            <p class="text-center text-gray-400 mb-12 max-w-2xl mx-auto">
+                From Pop Warner to the Pros - We track every snap, every stat, every step of the journey
+            </p>
+            
+            <div class="grid md:grid-cols-4 gap-4">
+                <div class="pipeline-stage rounded-lg">
+                    <div class="text-blaze-orange font-bold mb-2">Youth/Select</div>
+                    <div class="text-sm text-gray-400 mb-2">Ages 8-14</div>
+                    <ul class="text-sm space-y-1">
+                        <li>• Pop Warner</li>
+                        <li>• Select 7v7</li>
+                        <li>• Perfect Game Baseball</li>
+                    </ul>
+                </div>
+                
+                <div class="pipeline-stage rounded-lg">
+                    <div class="text-blaze-orange font-bold mb-2">High School</div>
+                    <div class="text-sm text-gray-400 mb-2">Ages 14-18</div>
+                    <ul class="text-sm space-y-1">
+                        <li>• Varsity Stats</li>
+                        <li>• Combine Numbers</li>
+                        <li>• Recruiting Rankings</li>
+                    </ul>
+                </div>
+                
+                <div class="pipeline-stage rounded-lg">
+                    <div class="text-blaze-orange font-bold mb-2">College</div>
+                    <div class="text-sm text-gray-400 mb-2">Ages 18-22</div>
+                    <ul class="text-sm space-y-1">
+                        <li>• NCAA Performance</li>
+                        <li>• NIL Valuation</li>
+                        <li>• Draft Projection</li>
+                    </ul>
+                </div>
+                
+                <div class="pipeline-stage rounded-lg">
+                    <div class="text-blaze-orange font-bold mb-2">Professional</div>
+                    <div class="text-sm text-gray-400 mb-2">Ages 22+</div>
+                    <ul class="text-sm space-y-1">
+                        <li>• NFL/MLB/MiLB</li>
+                        <li>• Contract Tracking</li>
+                        <li>• Career Analytics</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Credibility & Authority -->
+    <section class="py-16 px-4 bg-black/30">
+        <div class="max-w-7xl mx-auto text-center">
+            <h2 class="text-3xl font-bold mb-12">Why We're The Authority</h2>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <div class="text-4xl mb-4">📊</div>
+                    <h3 class="text-xl font-bold mb-2">94.6% Prediction Accuracy</h3>
+                    <p class="text-gray-400">Based on 2,847 documented game predictions with full transparency</p>
+                </div>
+                
+                <div>
+                    <div class="text-4xl mb-4">🤝</div>
+                    <h3 class="text-xl font-bold mb-2">500+ Coach Network</h3>
+                    <p class="text-gray-400">Direct relationships with championship coaches across the Deep South</p>
+                </div>
+                
+                <div>
+                    <div class="text-4xl mb-4">🏆</div>
+                    <h3 class="text-xl font-bold mb-2">75+ Years Experience</h3>
+                    <p class="text-gray-400">Former coaches, players, and scouts bringing real expertise</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Call to Action -->
+    <section class="py-20 px-4 bg-gradient-to-r from-blaze-orange/20 to-texas-maroon/20">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-4xl font-bold mb-6">
+                Join The Championship Network
+            </h2>
+            <p class="text-xl text-gray-300 mb-8">
+                Get the intelligence that separates champions from competitors
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="/get-started" class="bg-blaze-orange text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-orange-600 transition">
+                    Start Free Trial
+                </a>
+                <a href="/pricing" class="border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white hover:text-black transition">
+                    View Pricing
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Championship Systems -->
+    <script src="/js/blaze-deep-south-authority.js"></script>
+    <script src="/js/blaze-championship-visuals.js"></script>
+    <script src="/js/blaze-brand-engine.js"></script>
+    <script src="/js/blaze-championship-master.js"></script>
+    
+    <script>
+        // Initialize authority hero visualization
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.BlazeVisuals) {
+                window.BlazeVisuals.createIntelligenceHero('authority-hero-canvas');
+            }
+        });
+    </script>
+
+</body></html>

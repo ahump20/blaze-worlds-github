@@ -1,0 +1,714 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 Blaze Intelligence — Championship Platform Unification</title>
+    <meta name="description" content="Deep South Sports Authority unified platform connecting Netlify, Replit, and championship features with real-time sync">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .hero-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(191, 87, 0, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(155, 203, 235, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(0, 178, 169, 0.08) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        .neural-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(191, 87, 0, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(191, 87, 0, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: grid-pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes grid-pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #BF5700 0%, #9BCBEB 50%, #00B2A9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .header h2 {
+            font-size: 1.5rem;
+            color: #9BCBEB;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .championship-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #BF5700, #00B2A9);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .platform-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(191, 87, 0, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .platform-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #BF5700, #9BCBEB, #00B2A9);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .platform-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(191, 87, 0, 0.6);
+            box-shadow: 0 20px 40px rgba(191, 87, 0, 0.2);
+        }
+
+        .platform-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .platform-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .platform-icon.main { background: linear-gradient(135deg, #BF5700, #FF7A00); }
+        .platform-icon.replit { background: linear-gradient(135deg, #9BCBEB, #5DADE2); }
+        .platform-icon.dev { background: linear-gradient(135deg, #00B2A9, #48C9B0); }
+
+        .platform-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .platform-description {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .status-indicator.active {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .status-indicator.checking {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .status-indicator.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .feature-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-badge {
+            background: rgba(155, 203, 235, 0.2);
+            color: #9BCBEB;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid rgba(155, 203, 235, 0.3);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #BF5700, #FF7A00);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #FF7A00, #BF5700);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(191, 87, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(155, 203, 235, 0.2);
+            color: #9BCBEB;
+            border: 1px solid rgba(155, 203, 235, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(155, 203, 235, 0.3);
+            border-color: rgba(155, 203, 235, 0.5);
+        }
+
+        .sync-controls {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 178, 169, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .sync-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #00B2A9;
+            margin-bottom: 1rem;
+        }
+
+        .sync-description {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+        }
+
+        .sync-status {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: rgba(0, 178, 169, 0.1);
+            border: 1px solid rgba(0, 178, 169, 0.3);
+            border-radius: 50px;
+            color: #00B2A9;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #BF5700;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 3rem;
+        }
+
+        .footer p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .platform-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #BF5700;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-background"></div>
+    <div class="neural-grid"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🔥 Blaze Intelligence</h1>
+            <h2>Deep South Sports Authority — Championship Platform Unification</h2>
+            <p>Single entry-point that merges your Netlify &amp; Replit experiences into one cohesive championship interface. Real-time sync, performance monitoring, and unified navigation across all platforms.</p>
+            <div class="championship-badge">🏆 Championship Merger Complete</div>
+        </div>
+
+        <div class="sync-controls">
+            <div class="sync-title">🚀 Championship Platform Sync</div>
+            <div class="sync-description">
+                Real-time synchronization across all championship platforms with feature detection and performance monitoring
+            </div>
+            <div class="sync-status" id="syncStatus">
+                <span class="loading-spinner"></span> Initializing championship sync...
+            </div>
+            <button class="btn btn-primary" onclick="syncAllPlatforms()">
+                🔄 Sync All Platforms
+            </button>
+        </div>
+
+        <div class="platform-grid" id="platformGrid">
+            <!-- Platform cards will be dynamically generated -->
+        </div>
+
+        <div class="performance-metrics">
+            <div class="metric-card">
+                <div class="metric-value" id="totalPlatforms">6</div>
+                <div class="metric-label">Total Platforms</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="activePlatforms">-</div>
+                <div class="metric-label">Active Platforms</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="avgResponseTime">-</div>
+                <div class="metric-label">Avg Response (ms)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="championshipFeatures">-</div>
+                <div class="metric-label">Championship Features</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 Blaze Intelligence — Championship Platform Unification System</p>
+        </div>
+    </div>
+
+    <script>
+        // Championship Platform Configuration
+        const PLATFORMS = [
+            {
+                slug: "main-platform",
+                url: "https://blaze-intelligence.netlify.app",
+                title: "Main Blaze Intelligence Platform",
+                description: "Championship-level sports intelligence with AI consciousness and AR coaching",
+                icon: "🏆",
+                iconClass: "main",
+                expectedFeatures: ["Three.js", "Neural AI", "Analytics", "AR Coaching"]
+            },
+            {
+                slug: "unified-championship",
+                url: "https://blaze-intelligence.netlify.app/blaze-unified-championship.html",
+                title: "Unified Championship Platform",
+                description: "All Replit features merged with neural visualization and real-time analytics",
+                icon: "🔥",
+                iconClass: "main",
+                expectedFeatures: ["Three.js", "Neural AI", "Championship Merger"]
+            },
+            {
+                slug: "ar-coaching",
+                url: "https://blaze-intelligence.netlify.app/blaze-ar-coaching-enhanced.html",
+                title: "AR Coaching Platform",
+                description: "MediaPipe-powered biomechanical analysis with championship character assessment",
+                icon: "👁️",
+                iconClass: "main",
+                expectedFeatures: ["MediaPipe", "AR Coaching", "Vision AI"]
+            },
+            {
+                slug: "replit-main",
+                url: "https://35179f3c-00f3-409f-95da-bed1c6ba912c-00-3tftlc85yrdac.spock.replit.dev:8000",
+                title: "Replit Development Platform",
+                description: "Live development environment for Blaze Intelligence features",
+                icon: "⚡",
+                iconClass: "dev",
+                expectedFeatures: ["Development", "Live Code", "Real-time"]
+            },
+            {
+                slug: "replit-netlify",
+                url: "https://blaze-intelligence-replit.netlify.app",
+                title: "Replit Netlify Deployment",
+                description: "Replit platform deployed on Netlify infrastructure",
+                icon: "🌐",
+                iconClass: "replit",
+                expectedFeatures: ["Netlify", "Deployment", "Production"]
+            },
+            {
+                slug: "nil-calculator",
+                url: "https://blaze-intelligence.netlify.app/nil-calculator.html",
+                title: "NIL Valuation Calculator",
+                description: "Championship-level Name, Image, Likeness calculator for college athletes",
+                icon: "💰",
+                iconClass: "main",
+                expectedFeatures: ["NIL", "Calculator", "Analytics"]
+            }
+        ];
+
+        let platformStatuses = {};
+        let syncInProgress = false;
+
+        // Platform Status Checker using Championship Sync API
+        async function checkPlatformStatus(platform) {
+            try {
+                const response = await fetch('/api/championship-sync', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ platform: platform.slug })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.platform) {
+                        const p = data.platform;
+                        return {
+                            status: p.status,
+                            responseTime: p.responseTime || p.health?.responseTime,
+                            features: p.metadata?.features || [],
+                            hasChampionshipFeatures: p.metadata?.hasChampionshipFeatures || false,
+                            lastChecked: p.lastSync,
+                            health: p.health
+                        };
+                    }
+                }
+
+                throw new Error('Sync API failed');
+            } catch (error) {
+                return {
+                    status: 'error',
+                    error: error.message,
+                    features: [],
+                    hasChampionshipFeatures: false,
+                    lastChecked: new Date().toISOString()
+                };
+            }
+        }
+
+        // Create Platform Card
+        function createPlatformCard(platform, status) {
+            const statusClass = status ? status.status : 'checking';
+            const features = status ? status.features : [];
+
+            return `
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-icon ${platform.iconClass}">
+                            ${platform.icon}
+                        </div>
+                        <div>
+                            <div class="platform-title">${platform.title}</div>
+                        </div>
+                    </div>
+
+                    <div class="status-indicator ${statusClass}">
+                        <div class="status-dot"></div>
+                        ${statusClass === 'active' ? 'Championship Active' :
+                          statusClass === 'error' ? 'Connection Error' : 'Checking Status...'}
+                        ${status && status.responseTime ? ` (${status.responseTime}ms)` : ''}
+                    </div>
+
+                    <div class="platform-description">
+                        ${platform.description}
+                    </div>
+
+                    <div class="feature-badges">
+                        ${features.map(feature => `<span class="feature-badge">${feature}</span>`).join('')}
+                        ${features.length === 0 ? '<span class="feature-badge">Standard</span>' : ''}
+                    </div>
+
+                    <div class="action-buttons">
+                        <a href="${platform.url}" target="_blank" class="btn btn-primary">
+                            🚀 Launch Platform
+                        </a>
+                        <button onclick="checkSinglePlatform('${platform.slug}')" class="btn btn-secondary">
+                            🔄 Check Status
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render Platform Grid
+        function renderPlatformGrid() {
+            const grid = document.getElementById('platformGrid');
+            grid.innerHTML = PLATFORMS.map(platform =>
+                createPlatformCard(platform, platformStatuses[platform.slug])
+            ).join('');
+        }
+
+        // Check Single Platform
+        async function checkSinglePlatform(slug) {
+            const platform = PLATFORMS.find(p => p.slug === slug);
+            if (!platform) return;
+
+            platformStatuses[slug] = { status: 'checking' };
+            renderPlatformGrid();
+
+            const status = await checkPlatformStatus(platform);
+            platformStatuses[slug] = status;
+
+            renderPlatformGrid();
+            updateMetrics();
+        }
+
+        // Sync All Platforms using Championship Sync API
+        async function syncAllPlatforms() {
+            if (syncInProgress) return;
+
+            syncInProgress = true;
+            document.getElementById('syncStatus').innerHTML = `
+                <span class="loading-spinner"></span> Synchronizing ${PLATFORMS.length} championship platforms...
+            `;
+
+            // Reset all statuses to checking
+            PLATFORMS.forEach(platform => {
+                platformStatuses[platform.slug] = { status: 'checking' };
+            });
+            renderPlatformGrid();
+
+            try {
+                // Call the full sync API
+                const response = await fetch('/api/championship-sync', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    if (data.success && data.sync) {
+                        // Update platform statuses from sync results
+                        data.sync.platforms.forEach(platform => {
+                            platformStatuses[platform.slug] = {
+                                status: platform.status,
+                                responseTime: platform.responseTime || platform.health?.responseTime,
+                                features: platform.metadata?.features || [],
+                                hasChampionshipFeatures: platform.metadata?.hasChampionshipFeatures || false,
+                                lastChecked: platform.lastSync,
+                                health: platform.health
+                            };
+                        });
+
+                        renderPlatformGrid();
+                        updateMetrics();
+
+                        // Update sync status with comprehensive results
+                        const successful = data.sync.activePlatforms;
+                        const withFeatures = data.sync.platformsWithChampionshipFeatures;
+                        const avgTime = data.sync.averageResponseTime;
+
+                        document.getElementById('syncStatus').innerHTML = `
+                            ✅ Championship sync complete: ${successful}/${data.sync.totalPlatforms} platforms active, ${withFeatures} with championship features (${avgTime}ms avg)
+                        `;
+
+                        return;
+                    }
+                }
+
+                throw new Error('Sync API failed');
+
+            } catch (error) {
+                console.error('Sync failed:', error);
+
+                // Fallback to individual platform checks
+                const statusPromises = PLATFORMS.map(async platform => {
+                    const status = await checkPlatformStatus(platform);
+                    platformStatuses[platform.slug] = status;
+                    renderPlatformGrid();
+                    updateMetrics();
+                    return { platform, status };
+                });
+
+                const results = await Promise.all(statusPromises);
+                const successful = results.filter(r => r.status.status === 'active').length;
+                const withFeatures = results.filter(r => r.status.hasChampionshipFeatures).length;
+
+                document.getElementById('syncStatus').innerHTML = `
+                    ⚠️ Fallback sync complete: ${successful}/${PLATFORMS.length} platforms checked, ${withFeatures} with championship features
+                `;
+            }
+
+            syncInProgress = false;
+        }
+
+        // Update Performance Metrics
+        function updateMetrics() {
+            const statuses = Object.values(platformStatuses);
+            const activeCount = statuses.filter(s => s.status === 'active').length;
+            const avgResponseTime = statuses
+                .filter(s => s.responseTime)
+                .reduce((acc, s, _, arr) => acc + s.responseTime / arr.length, 0);
+            const championshipFeaturesCount = statuses
+                .filter(s => s.hasChampionshipFeatures).length;
+
+            document.getElementById('activePlatforms').textContent = activeCount;
+            document.getElementById('avgResponseTime').textContent =
+                avgResponseTime > 0 ? Math.round(avgResponseTime) : '-';
+            document.getElementById('championshipFeatures').textContent = championshipFeaturesCount;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPlatformGrid();
+
+            // Auto-sync on load
+            setTimeout(() => {
+                syncAllPlatforms();
+            }, 1000);
+
+            // Auto-refresh every 5 minutes
+            setInterval(() => {
+                if (!syncInProgress) {
+                    syncAllPlatforms();
+                }
+            }, 5 * 60 * 1000);
+        });
+    </script>
+
+</body></html>

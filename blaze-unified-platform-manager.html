@@ -1,0 +1,487 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 Blaze Intelligence — Unified Platform Manager</title>
+    <meta name="description" content="Championship platform manager that unifies Netlify and Replit deployments into one cohesive interface">
+
+    <!-- Championship Styling -->
+    <style>
+        :root {
+            --blaze-primary: #BF5700;
+            --blaze-dark: #8B3A00;
+            --blaze-light: #FF7A00;
+            --blaze-accent: #FFB81C;
+            --bg-dark: #0b0b0f;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+            background: radial-gradient(1200px 600px at 20% -10%, rgba(249,115,22,0.25), transparent 60%),
+                        radial-gradient(1200px 600px at 120% -20%, rgba(234,88,12,0.20), transparent 60%),
+                        #0b0b0f;
+            color: #e9edf1;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--blaze-primary), var(--blaze-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .platform-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .platform-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--blaze-primary), var(--blaze-light));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .platform-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .platform-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--blaze-primary);
+            box-shadow: 0 20px 40px rgba(191, 87, 0, 0.1);
+        }
+
+        .platform-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .platform-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 8px #4ade80;
+        }
+
+        .platform-status.warning {
+            background: #fbbf24;
+            box-shadow: 0 0 8px #fbbf24;
+        }
+
+        .platform-status.error {
+            background: #ef4444;
+            box-shadow: 0 0 8px #ef4444;
+        }
+
+        .platform-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .platform-url {
+            font-size: 0.9rem;
+            color: var(--blaze-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .platform-desc {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+        }
+
+        .platform-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-badge {
+            background: rgba(191, 87, 0, 0.2);
+            color: var(--blaze-light);
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .platform-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--blaze-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--blaze-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(191, 87, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--glass);
+            color: white;
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--blaze-primary);
+        }
+
+        .sync-controls {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .sync-status {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .last-sync {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .metric-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--blaze-primary);
+        }
+
+        .metric-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .platform-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .platform-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🔥 Blaze Intelligence</h1>
+            <p>Unified Platform Manager — Single entry point that merges your Netlify &amp; Replit experiences into one championship-level interface</p>
+        </header>
+
+        <div class="platform-grid" id="platformGrid">
+            <!-- Platforms will be loaded here -->
+        </div>
+
+        <div class="sync-controls">
+            <div class="sync-status">🔄 Platform Sync Status</div>
+            <div class="last-sync" id="lastSync">Last synced: Initializing...</div>
+            <button class="btn btn-primary" onclick="syncPlatforms()">
+                🚀 Sync All Platforms
+            </button>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value" id="totalPlatforms">6</div>
+                <div class="metric-label">Total Platforms</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="activePlatforms">--</div>
+                <div class="metric-label">Active Platforms</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="avgLoadTime">--</div>
+                <div class="metric-label">Avg Load Time</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="championshipScore">--</div>
+                <div class="metric-label">Championship Score</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const platforms = [
+            {
+                id: 'main-netlify',
+                title: 'Main Blaze Intelligence Platform',
+                url: 'https://blaze-intelligence.netlify.app',
+                description: 'Championship-level sports intelligence with AI consciousness and AR coaching',
+                features: ['AI Consciousness', 'AR Coaching', 'Neural AI', 'Analytics'],
+                status: 'active'
+            },
+            {
+                id: 'unified-championship',
+                title: 'Unified Championship Platform',
+                url: 'https://blaze-intelligence.netlify.app/unified',
+                description: 'All Replit features merged with neural visualization and real-time analytics',
+                features: ['Three.js', 'Neural Networks', 'Real-time Data', 'Multi-platform'],
+                status: 'active'
+            },
+            {
+                id: 'ar-coaching',
+                title: 'AR Coaching Platform',
+                url: 'https://blaze-intelligence.netlify.app/ar-coaching',
+                description: 'MediaPipe-powered biomechanical analysis with championship character assessment',
+                features: ['MediaPipe', 'AR Vision', 'Biomechanics', 'Character AI'],
+                status: 'active'
+            },
+            {
+                id: 'nil-calculator',
+                title: 'NIL Valuation Calculator',
+                url: 'https://blaze-intelligence.netlify.app/nil-calculator.html',
+                description: 'Championship-level Name, Image, Likeness calculator for college athletes',
+                features: ['NIL Valuation', 'Market Data', 'Athlete Analytics'],
+                status: 'active'
+            },
+            {
+                id: 'replit-dev',
+                title: 'Replit Development Platform',
+                url: 'https://35179f3c-00f3-409f-95da-bed1c6ba912c-00-3tftlc85yrdac.spock.replit.dev:8000',
+                description: 'Live development environment for Blaze Intelligence features',
+                features: ['Development', 'Live Coding', 'Prototyping'],
+                status: 'warning'
+            },
+            {
+                id: 'replit-netlify',
+                title: 'Replit Netlify Deployment',
+                url: 'https://blaze-intelligence-replit.netlify.app',
+                description: 'Replit platform deployed on Netlify infrastructure',
+                features: ['Hybrid Deployment', 'Backup Platform'],
+                status: 'active'
+            }
+        ];
+
+        function renderPlatforms() {
+            const grid = document.getElementById('platformGrid');
+            grid.innerHTML = platforms.map(platform => `
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-status ${platform.status}"></div>
+                        <div class="platform-title">${platform.title}</div>
+                    </div>
+                    <div class="platform-url">${platform.url}</div>
+                    <div class="platform-desc">${platform.description}</div>
+                    <div class="platform-features">
+                        ${platform.features.map(feature => `<span class="feature-badge">${feature}</span>`).join('')}
+                    </div>
+                    <div class="platform-actions">
+                        <a href="${platform.url}" target="_blank" class="btn btn-primary">
+                            🚀 Open Platform
+                        </a>
+                        <button class="btn btn-secondary" onclick="testPlatform('${platform.id}')">
+                            🔍 Test Status
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function testPlatform(platformId) {
+            const platform = platforms.find(p => p.id === platformId);
+            if (!platform) return;
+
+            console.log(`Testing platform: ${platform.title}`);
+
+            // Update UI to show testing
+            const card = document.querySelector(`[onclick="testPlatform('${platformId}')"]`);
+            const originalText = card.innerHTML;
+            card.innerHTML = '🔄 Testing...';
+            card.disabled = true;
+
+            try {
+                const startTime = Date.now();
+                const response = await fetch(platform.url, {
+                    method: 'HEAD',
+                    mode: 'no-cors'
+                });
+                const responseTime = Date.now() - startTime;
+
+                // Update platform status (simulated since no-cors doesn't give status)
+                console.log(`Platform ${platform.title}: Response time ${responseTime}ms`);
+
+                // Show success feedback
+                card.innerHTML = '✅ Active';
+                setTimeout(() => {
+                    card.innerHTML = originalText;
+                    card.disabled = false;
+                }, 2000);
+
+            } catch (error) {
+                console.error(`Platform ${platform.title} error:`, error);
+
+                // Show error feedback
+                card.innerHTML = '❌ Error';
+                setTimeout(() => {
+                    card.innerHTML = originalText;
+                    card.disabled = false;
+                }, 2000);
+            }
+        }
+
+        async function syncPlatforms() {
+            console.log('🔥 Syncing all championship platforms...');
+
+            const syncButton = document.querySelector('[onclick="syncPlatforms()"]');
+            const originalText = syncButton.innerHTML;
+            syncButton.innerHTML = '🔄 Syncing...';
+            syncButton.disabled = true;
+
+            let activePlatforms = 0;
+            let totalResponseTime = 0;
+            let testedPlatforms = 0;
+
+            // Test each platform
+            for (const platform of platforms) {
+                try {
+                    const startTime = Date.now();
+                    await fetch(platform.url, {
+                        method: 'HEAD',
+                        mode: 'no-cors'
+                    });
+                    const responseTime = Date.now() - startTime;
+
+                    activePlatforms++;
+                    totalResponseTime += responseTime;
+                    testedPlatforms++;
+
+                    console.log(`✅ ${platform.title}: ${responseTime}ms`);
+                } catch (error) {
+                    console.log(`❌ ${platform.title}: Error`);
+                    testedPlatforms++;
+                }
+            }
+
+            // Update metrics
+            document.getElementById('activePlatforms').textContent = activePlatforms;
+            document.getElementById('avgLoadTime').textContent = testedPlatforms > 0 ?
+                Math.round(totalResponseTime / testedPlatforms) + 'ms' : '--';
+
+            const championshipScore = Math.round((activePlatforms / platforms.length) * 100);
+            document.getElementById('championshipScore').textContent = championshipScore + '%';
+
+            // Update last sync time
+            document.getElementById('lastSync').textContent =
+                `Last synced: ${new Date().toLocaleTimeString()}`;
+
+            // Restore button
+            setTimeout(() => {
+                syncButton.innerHTML = '✅ Sync Complete';
+                setTimeout(() => {
+                    syncButton.innerHTML = originalText;
+                    syncButton.disabled = false;
+                }, 2000);
+            }, 1000);
+
+            console.log(`🏆 Sync complete: ${activePlatforms}/${platforms.length} platforms active`);
+        }
+
+        // Initialize platform grid
+        renderPlatforms();
+
+        // Auto-sync on load
+        setTimeout(() => {
+            syncPlatforms();
+        }, 1000);
+
+        console.log('🔥 Blaze Intelligence Unified Platform Manager initialized');
+        console.log('🏆 Championship-level platform management active');
+    </script>
+
+</body></html>

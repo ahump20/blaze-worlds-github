@@ -1,0 +1,1638 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blaze Frontier: Gritty Western Experience</title>
+    <meta name="description" content="Red Dead-inspired western frontier with championship-level graphics and authentic Texas atmosphere">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤠</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Rye:wght@400&amp;family=Cinzel:wght@400;600;800&amp;display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dusty-orange: #CD853F;
+            --leather-brown: #654321;
+            --brass-gold: #B8860B;
+            --weathered-blue: #4F6D7A;
+            --sunset-red: #A0522D;
+            --bone-white: #F5F5DC;
+            --charcoal: #2F2F2F;
+            --dust-tan: #D2B48C;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(180deg, #4A4A4A 0%, #2F2F2F 100%);
+            overflow: hidden;
+            color: var(--bone-white);
+            user-select: none;
+            cursor: crosshair;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #gameCanvas {
+            display: block;
+            filter: sepia(0.1) contrast(1.1) brightness(0.95) saturate(1.2);
+            transition: filter 0.5s ease;
+        }
+
+        .dust-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(210, 180, 140, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(205, 133, 63, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(160, 82, 45, 0.05) 0%, transparent 30%);
+            pointer-events: none;
+            z-index: 10;
+            animation: dustSwirl 20s infinite ease-in-out;
+        }
+
+        @keyframes dustSwirl {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        #ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            font-family: 'Rye', serif;
+        }
+
+        .ui-panel {
+            background: 
+                linear-gradient(135deg, 
+                    rgba(101, 67, 33, 0.95) 0%, 
+                    rgba(47, 47, 47, 0.90) 100%
+                );
+            border: 3px solid var(--brass-gold);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(184, 134, 11, 0.3),
+                0 0 20px rgba(184, 134, 11, 0.2);
+            position: relative;
+        }
+
+        .ui-panel::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--brass-gold), var(--dusty-orange), var(--brass-gold));
+            border-radius: inherit;
+            z-index: -1;
+            animation: goldGlow 3s infinite ease-in-out;
+        }
+
+        @keyframes goldGlow {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.8; }
+        }
+
+        #characterInfo {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            padding: 20px;
+            color: var(--bone-white);
+            font-size: 14px;
+            min-width: 320px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        #statusBars {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            padding: 20px;
+            color: var(--bone-white);
+            font-size: 13px;
+            min-width: 280px;
+        }
+
+        .status-bar {
+            margin: 8px 0;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--brass-gold);
+            border-radius: 4px;
+            height: 16px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+            background: linear-gradient(90deg, var(--sunset-red), var(--dusty-orange));
+            box-shadow: 0 0 8px rgba(160, 82, 45, 0.5);
+        }
+
+        .status-fill.health { background: linear-gradient(90deg, #8B0000, #CD853F); }
+        .status-fill.stamina { background: linear-gradient(90deg, #DAA520, #F4A460); }
+        .status-fill.dead-eye { background: linear-gradient(90deg, #4169E1, #87CEEB); }
+
+        #compass {
+            position: absolute;
+            top: 120px;
+            right: 24px;
+            width: 120px;
+            height: 120px;
+            border: 4px solid var(--brass-gold);
+            border-radius: 50%;
+            background: 
+                radial-gradient(circle at center, 
+                    rgba(101, 67, 33, 0.9) 0%, 
+                    rgba(47, 47, 47, 0.95) 100%
+                );
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.6),
+                inset 0 0 20px rgba(184, 134, 11, 0.2);
+        }
+
+        .compass-needle {
+            width: 4px;
+            height: 40px;
+            background: linear-gradient(180deg, var(--sunset-red), var(--brass-gold));
+            border-radius: 2px;
+            transform-origin: center bottom;
+            position: absolute;
+            bottom: 50%;
+            transition: transform 0.5s ease;
+            box-shadow: 0 0 8px rgba(160, 82, 45, 0.5);
+        }
+
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--bone-white);
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: crosshairBreathe 2s infinite ease-in-out;
+            box-shadow: 
+                0 0 20px rgba(245, 245, 220, 0.6),
+                inset 0 0 10px rgba(245, 245, 220, 0.2);
+        }
+
+        .crosshair-line {
+            position: absolute;
+            background: var(--bone-white);
+            box-shadow: 0 0 4px rgba(245, 245, 220, 0.8);
+        }
+
+        .crosshair-line.horizontal {
+            top: 50%;
+            left: -10px;
+            width: 20px;
+            height: 2px;
+            transform: translateY(-50%);
+        }
+
+        .crosshair-line.vertical {
+            top: -10px;
+            left: 50%;
+            width: 2px;
+            height: 20px;
+            transform: translateX(-50%);
+        }
+
+        @keyframes crosshairBreathe {
+            0%, 100% { 
+                opacity: 0.8; 
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+        }
+
+        #weatherInfo {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            padding: 16px;
+            color: var(--bone-white);
+            font-size: 12px;
+            min-width: 250px;
+        }
+
+        #controls {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            padding: 20px;
+            color: var(--bone-white);
+            font-size: 11px;
+            max-width: 280px;
+            line-height: 1.6;
+        }
+
+        #loadingScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 30% 40%, rgba(160, 82, 45, 0.4) 0%, transparent 60%),
+                radial-gradient(circle at 70% 60%, rgba(101, 67, 33, 0.4) 0%, transparent 60%),
+                linear-gradient(135deg, #2F2F2F 0%, #654321 50%, #2F2F2F 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 2s ease-out;
+        }
+
+        #loadingTitle {
+            font-family: 'Rye', serif;
+            font-size: 6em;
+            color: var(--bone-white);
+            text-shadow: 
+                0 0 40px var(--brass-gold),
+                4px 4px 8px rgba(0, 0, 0, 0.8);
+            margin-bottom: 30px;
+            animation: titleFlicker 4s infinite ease-in-out;
+            font-weight: 400;
+            letter-spacing: 4px;
+        }
+
+        #loadingSubtitle {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8em;
+            color: var(--dusty-orange);
+            margin-bottom: 50px;
+            text-align: center;
+            font-weight: 400;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        #loadingBar {
+            width: 500px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 3px solid var(--brass-gold);
+            box-shadow: 
+                0 0 30px rgba(184, 134, 11, 0.5),
+                inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        #loadingProgress {
+            height: 100%;
+            background: linear-gradient(
+                90deg, 
+                var(--sunset-red) 0%, 
+                var(--dusty-orange) 50%, 
+                var(--brass-gold) 100%
+            );
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 7px;
+            box-shadow: 0 0 20px rgba(205, 133, 63, 0.8);
+            animation: goldShimmer 2s infinite linear;
+        }
+
+        @keyframes titleFlicker {
+            0%, 100% { 
+                text-shadow: 
+                    0 0 40px var(--brass-gold),
+                    4px 4px 8px rgba(0, 0, 0, 0.8);
+            }
+            50% { 
+                text-shadow: 
+                    0 0 60px var(--brass-gold),
+                    0 0 80px var(--dusty-orange),
+                    4px 4px 12px rgba(0, 0, 0, 0.8);
+            }
+        }
+
+        @keyframes goldShimmer {
+            0% { background-position: -200px 0; }
+            100% { background-position: 200px 0; }
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            color: var(--brass-gold);
+            text-shadow: 0 0 8px rgba(184, 134, 11, 0.6);
+        }
+
+        .control-key {
+            background: linear-gradient(145deg, var(--leather-brown), var(--charcoal));
+            color: var(--bone-white);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 10px;
+            box-shadow: 
+                0 2px 4px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(184, 134, 11, 0.3);
+            border: 1px solid var(--brass-gold);
+        }
+
+        #dustParticles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            overflow: hidden;
+        }
+
+        .dust-particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(210, 180, 140, 0.6);
+            border-radius: 50%;
+            animation: dustFloat 15s infinite linear;
+            box-shadow: 0 0 2px rgba(210, 180, 140, 0.8);
+        }
+
+        @keyframes dustFloat {
+            0% { 
+                transform: translate(-10px, 100vh) rotate(0deg); 
+                opacity: 0; 
+            }
+            10% { opacity: 1; }
+            90% { opacity: 0.8; }
+            100% { 
+                transform: translate(10px, -10vh) rotate(360deg); 
+                opacity: 0; 
+            }
+        }
+
+        #characterDisplay {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 300px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+            z-index: 200;
+        }
+
+        #characterDisplay.visible {
+            opacity: 1;
+        }
+
+        .character-silhouette {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, 
+                rgba(101, 67, 33, 0.9) 0%,
+                rgba(160, 82, 45, 0.8) 50%,
+                rgba(47, 47, 47, 0.9) 100%
+            );
+            border: 3px solid var(--brass-gold);
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.8),
+                inset 0 0 20px rgba(184, 134, 11, 0.2);
+        }
+
+        .character-hat {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 20px;
+            background: var(--charcoal);
+            border-radius: 30px;
+            border: 2px solid var(--brass-gold);
+        }
+
+        .character-body {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 80px;
+            background: var(--sunset-red);
+            border-radius: 8px;
+            border: 2px solid var(--leather-brown);
+        }
+
+        .character-legs {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 60px;
+            background: var(--weathered-blue);
+            border-radius: 4px;
+            border: 2px solid var(--charcoal);
+        }
+
+        .vintage-filter {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, transparent 25%, rgba(139, 69, 19, 0.05) 25%),
+                linear-gradient(-45deg, transparent 25%, rgba(160, 82, 45, 0.05) 25%),
+                linear-gradient(90deg, transparent 50%, rgba(210, 180, 140, 0.03) 50%);
+            background-size: 20px 20px, 20px 20px, 40px 40px;
+            pointer-events: none;
+            z-index: 150;
+            opacity: 0.6;
+            animation: vintageShift 30s infinite linear;
+        }
+
+        @keyframes vintageShift {
+            0% { background-position: 0 0, 0 0, 0 0; }
+            100% { background-position: 40px 40px, -40px 40px, 80px 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div class="dust-overlay"></div>
+        <div class="vintage-filter"></div>
+        
+        <div id="dustParticles"></div>
+        
+        <div id="ui">
+            <div id="characterInfo" class="ui-panel">
+                <div style="font-size: 16px; font-weight: 800; margin-bottom: 16px; color: var(--brass-gold);">
+                    🤠 AUSTIN "BLAZE" HUMPHREY
+                </div>
+                <div class="stat-row">
+                    <span>Location:</span>
+                    <span class="stat-value" id="location">Lone Star Territory</span>
+                </div>
+                <div class="stat-row">
+                    <span>Territory:</span>
+                    <span class="stat-value" id="territory">Texas Frontier</span>
+                </div>
+                <div class="stat-row">
+                    <span>Elevation:</span>
+                    <span class="stat-value" id="elevation">1,200ft</span>
+                </div>
+                <div class="stat-row">
+                    <span>Horse Speed:</span>
+                    <span class="stat-value" id="horseSpeed">Steady Trot</span>
+                </div>
+                <div class="stat-row">
+                    <span>Time:</span>
+                    <span class="stat-value" id="gameTime">High Noon</span>
+                </div>
+            </div>
+
+            <div id="statusBars" class="ui-panel">
+                <div style="font-weight: 800; margin-bottom: 12px; color: var(--brass-gold);">⚡ COWBOY STATUS</div>
+                <div style="margin: 8px 0;">
+                    <span style="font-size: 12px;">Health</span>
+                    <div class="status-bar">
+                        <div class="status-fill health" style="width: 85%;"></div>
+                    </div>
+                </div>
+                <div style="margin: 8px 0;">
+                    <span style="font-size: 12px;">Stamina</span>
+                    <div class="status-bar">
+                        <div class="status-fill stamina" style="width: 70%;"></div>
+                    </div>
+                </div>
+                <div style="margin: 8px 0;">
+                    <span style="font-size: 12px;">Dead Eye</span>
+                    <div class="status-bar">
+                        <div class="status-fill dead-eye" style="width: 90%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="compass" class="ui-panel">
+                <div class="compass-needle" id="compassNeedle"></div>
+                <div style="font-size: 10px; position: absolute; top: 10px; color: var(--bone-white);">N</div>
+                <div style="font-size: 10px; position: absolute; bottom: 10px; color: var(--brass-gold);">S</div>
+                <div style="font-size: 10px; position: absolute; left: 10px; color: var(--dusty-orange);">W</div>
+                <div style="font-size: 10px; position: absolute; right: 10px; color: var(--dusty-orange);">E</div>
+            </div>
+
+            <div id="crosshair">
+                <div class="crosshair-line horizontal"></div>
+                <div class="crosshair-line vertical"></div>
+            </div>
+
+            <div id="weatherInfo" class="ui-panel">
+                <div style="font-weight: 800; margin-bottom: 8px; color: var(--brass-gold);">🌵 FRONTIER CONDITIONS</div>
+                <div class="stat-row">
+                    <span>Weather:</span>
+                    <span class="stat-value" id="currentWeather">Clear Skies</span>
+                </div>
+                <div class="stat-row">
+                    <span>Wind:</span>
+                    <span class="stat-value" id="windSpeed">Light Breeze</span>
+                </div>
+                <div class="stat-row">
+                    <span>Temperature:</span>
+                    <span class="stat-value" id="temperature">85°F</span>
+                </div>
+                <div class="stat-row">
+                    <span>Visibility:</span>
+                    <span class="stat-value" id="visibility">Excellent</span>
+                </div>
+            </div>
+
+            <div id="controls" class="ui-panel">
+                <h3 style="color: var(--brass-gold); margin-bottom: 12px; font-weight: 800;">🎮 FRONTIER CONTROLS</h3>
+                <div><span class="control-key">WASD</span> Ride the range</div>
+                <div><span class="control-key">SPACE</span> Spur horse / Jump</div>
+                <div><span class="control-key">SHIFT</span> Dismount / Crouch</div>
+                <div><span class="control-key">MOUSE</span> Look around territory</div>
+                <div><span class="control-key">SCROLL</span> Adjust riding speed</div>
+                <div><span class="control-key">R</span> Scout new territory</div>
+                <div><span class="control-key">F</span> Study the land</div>
+                <div><span class="control-key">V</span> Change viewpoint</div>
+                <div><span class="control-key">T</span> Check pocket watch</div>
+                <div><span class="control-key">G</span> Weather tracker</div>
+                <div><span class="control-key">C</span> Show character</div>
+                <br>
+                <div style="color: var(--dusty-orange); font-style: italic; font-size: 10px; line-height: 1.4;">
+                    🔥 Experience the authentic Texas frontier with championship-level western graphics and Red Dead visual fidelity!
+                </div>
+            </div>
+
+            <div id="characterDisplay">
+                <div class="character-silhouette">
+                    <div class="character-hat"></div>
+                    <div class="character-body"></div>
+                    <div class="character-legs"></div>
+                    <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); color: var(--bone-white); font-size: 10px; text-align: center;">
+                        Austin "Blaze" Humphrey<br>
+                        <span style="color: var(--brass-gold);">Intelligence Rider</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="loadingScreen">
+            <div id="loadingTitle">BLAZE FRONTIER</div>
+            <div id="loadingSubtitle">Loading the Authentic Texas Experience...</div>
+            <div id="loadingBar">
+                <div id="loadingProgress"></div>
+            </div>
+            <div style="margin-top: 30px; color: var(--dusty-orange); font-size: 14px; text-align: center;">
+                Powered by Frontier Innovation • Built with Championship Grit
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        class BlazeFrontierWestern {
+            constructor() {
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+                this.clock = new THREE.Clock();
+                
+                // Western atmosphere settings
+                this.atmosphere = {
+                    dustIntensity: 0.6,
+                    heatShimmer: true,
+                    sunIntensity: 1.8,
+                    ambientDust: true,
+                    windEffect: true
+                };
+                
+                this.controls = {
+                    moveForward: false,
+                    moveBackward: false,
+                    moveLeft: false,
+                    moveRight: false,
+                    moveUp: false,
+                    moveDown: false,
+                    sprint: false
+                };
+                
+                this.velocity = new THREE.Vector3();
+                this.direction = new THREE.Vector3();
+                this.playerPosition = new THREE.Vector3(0, 120, 0);
+                this.mouseX = 0;
+                this.mouseY = 0;
+                this.speed = 60;
+                this.maxSpeed = 250;
+                this.wireframe = false;
+                this.viewMode = 0;
+                this.showCharacter = false;
+                
+                this.chunks = new Map();
+                this.chunkSize = 400;
+                this.renderDistance = 6;
+                this.seed = Math.floor(Math.random() * 10000);
+                
+                // Western time system
+                this.timeOfDay = 12.0; // High noon by default
+                this.weatherCondition = 'clear';
+                this.temperature = 85;
+                this.windSpeed = 5;
+                
+                // Performance tracking
+                this.fps = 60;
+                this.frameCount = 0;
+                this.lastFPSUpdate = 0;
+                
+                // Western color palette
+                this.colors = {
+                    dustyOrange: 0xCD853F,
+                    leatherBrown: 0x654321,
+                    brassGold: 0xB8860B,
+                    weatheredBlue: 0x4F6D7A,
+                    sunsetRed: 0xA0522D,
+                    boneWhite: 0xF5F5DC,
+                    charcoal: 0x2F2F2F,
+                    dustTan: 0xD2B48C
+                };
+
+                this.materials = {};
+                this.dustParticles = [];
+                
+                this.init();
+            }
+
+            async init() {
+                this.setupRenderer();
+                this.setupScene();
+                this.setupCamera();
+                this.setupWesternLighting();
+                this.setupWesternMaterials();
+                this.setupEventListeners();
+                this.createDustParticles();
+                this.generateWesternTerrain();
+                this.animate();
+                this.hideLoadingScreen();
+            }
+
+            setupRenderer() {
+                const canvas = document.getElementById('gameCanvas');
+                this.renderer = new THREE.WebGLRenderer({ 
+                    canvas: canvas, 
+                    antialias: true,
+                    powerPreference: "high-performance"
+                });
+                
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                this.renderer.outputEncoding = THREE.sRGBEncoding;
+                this.renderer.toneMapping = THREE.ReinhardToneMapping;
+                this.renderer.toneMappingExposure = 1.4;
+                
+                // Western atmospheric rendering
+                this.renderer.setClearColor(0x8B7355, 1);
+            }
+
+            setupScene() {
+                this.scene = new THREE.Scene();
+                
+                // Western atmospheric fog with dust
+                this.scene.fog = new THREE.Fog(0x8B7355, 800, 3000);
+                
+                // Create western sky with dust and heat shimmer
+                this.setupWesternSky();
+            }
+
+            setupWesternSky() {
+                const skyGeometry = new THREE.SphereGeometry(4000, 64, 64);
+                const skyMaterial = new THREE.ShaderMaterial({
+                    uniforms: {
+                        time: { value: 0 },
+                        sunPosition: { value: new THREE.Vector3(0, 0.8, 0.2) },
+                        dustIntensity: { value: this.atmosphere.dustIntensity },
+                        heatShimmer: { value: this.atmosphere.heatShimmer ? 1.0 : 0.0 }
+                    },
+                    vertexShader: `
+                        varying vec3 vWorldPosition;
+                        void main() {
+                            vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+                            vWorldPosition = worldPosition.xyz;
+                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform float time;
+                        uniform vec3 sunPosition;
+                        uniform float dustIntensity;
+                        uniform float heatShimmer;
+                        
+                        varying vec3 vWorldPosition;
+                        
+                        vec3 getWesternSkyColor(vec3 direction) {
+                            float sunDot = dot(direction, sunPosition);
+                            float elevation = direction.y;
+                            
+                            // Base desert sky colors
+                            vec3 horizonColor = vec3(0.8, 0.6, 0.4);
+                            vec3 zenithColor = vec3(0.4, 0.5, 0.7);
+                            vec3 sunColor = vec3(1.0, 0.9, 0.7);
+                            
+                            // Sky gradient
+                            float skyMix = pow(max(elevation, 0.0), 0.8);
+                            vec3 skyColor = mix(horizonColor, zenithColor, skyMix);
+                            
+                            // Sun disc and halo
+                            float sunDisc = smoothstep(0.996, 0.998, sunDot);
+                            float sunHalo = pow(max(sunDot, 0.0), 8.0);
+                            
+                            skyColor = mix(skyColor, sunColor, sunDisc);
+                            skyColor += sunColor * sunHalo * 0.3;
+                            
+                            // Dust atmosphere effect
+                            float dustEffect = dustIntensity * (1.0 - elevation) * 0.4;
+                            vec3 dustColor = vec3(0.6, 0.4, 0.3);
+                            skyColor = mix(skyColor, dustColor, dustEffect);
+                            
+                            // Heat shimmer (subtle animation)
+                            if (heatShimmer > 0.0 && elevation < 0.2) {
+                                float shimmer = sin(time * 0.001 + direction.x * 20.0) * 0.02;
+                                skyColor.r += shimmer * heatShimmer;
+                                skyColor.b -= shimmer * heatShimmer * 0.5;
+                            }
+                            
+                            return skyColor;
+                        }
+                        
+                        void main() {
+                            vec3 direction = normalize(vWorldPosition);
+                            vec3 color = getWesternSkyColor(direction);
+                            
+                            gl_FragColor = vec4(color, 1.0);
+                        }
+                    `,
+                    side: THREE.BackSide
+                });
+                
+                const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+                this.sky = sky;
+                this.skyMaterial = skyMaterial;
+                this.scene.add(sky);
+            }
+
+            setupCamera() {
+                this.camera = new THREE.PerspectiveCamera(
+                    75, 
+                    window.innerWidth / window.innerHeight, 
+                    0.1, 
+                    8000
+                );
+                this.camera.position.copy(this.playerPosition);
+            }
+
+            setupWesternLighting() {
+                // Harsh desert sun
+                const ambientLight = new THREE.AmbientLight(0x8B6914, 0.4);
+                this.scene.add(ambientLight);
+
+                // Main sun light (harsh and bright)
+                this.sunLight = new THREE.DirectionalLight(0xFFE4B5, 2.2);
+                this.sunLight.position.set(1000, 1200, 400);
+                this.sunLight.castShadow = true;
+                this.sunLight.shadow.mapSize.width = 4096;
+                this.sunLight.shadow.mapSize.height = 4096;
+                this.sunLight.shadow.camera.near = 1;
+                this.sunLight.shadow.camera.far = 3000;
+                this.sunLight.shadow.camera.left = -1500;
+                this.sunLight.shadow.camera.right = 1500;
+                this.sunLight.shadow.camera.top = 1500;
+                this.sunLight.shadow.camera.bottom = -1500;
+                this.sunLight.shadow.bias = -0.0002;
+                this.scene.add(this.sunLight);
+
+                // Warm fill light for western atmosphere
+                this.fillLight = new THREE.DirectionalLight(this.colors.dustyOrange, 0.8);
+                this.fillLight.position.set(-500, 300, -800);
+                this.scene.add(this.fillLight);
+
+                // Atmospheric dust lights
+                this.dustLights = [];
+                for (let i = 0; i < 8; i++) {
+                    const light = new THREE.PointLight(
+                        [this.colors.dustyOrange, this.colors.sunsetRed, this.colors.brassGold][i % 3],
+                        0.6,
+                        600,
+                        1.5
+                    );
+                    light.position.set(
+                        (Math.random() - 0.5) * 4000,
+                        150 + Math.random() * 200,
+                        (Math.random() - 0.5) * 4000
+                    );
+                    this.scene.add(light);
+                    this.dustLights.push(light);
+                }
+            }
+
+            setupWesternMaterials() {
+                // Western terrain material with weathered textures
+                this.materials.westernTerrain = new THREE.ShaderMaterial({
+                    uniforms: {
+                        time: { value: 0 },
+                        sunPosition: { value: new THREE.Vector3(0, 1, 0.2) },
+                        playerPosition: { value: this.playerPosition },
+                        dustColor: { value: new THREE.Color(this.colors.dustTan) },
+                        rockColor: { value: new THREE.Color(this.colors.leatherBrown) },
+                        dryGrassColor: { value: new THREE.Color(0x8B7355) }
+                    },
+                    vertexShader: `
+                        varying vec3 vWorldPosition;
+                        varying vec3 vNormal;
+                        varying vec2 vUv;
+                        varying vec3 vViewPosition;
+                        
+                        void main() {
+                            vUv = uv;
+                            vNormal = normalize(normalMatrix * normal);
+                            
+                            vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+                            vWorldPosition = worldPosition.xyz;
+                            
+                            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                            vViewPosition = -mvPosition.xyz;
+                            
+                            gl_Position = projectionMatrix * mvPosition;
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform float time;
+                        uniform vec3 sunPosition;
+                        uniform vec3 playerPosition;
+                        uniform vec3 dustColor;
+                        uniform vec3 rockColor;
+                        uniform vec3 dryGrassColor;
+                        
+                        varying vec3 vWorldPosition;
+                        varying vec3 vNormal;
+                        varying vec2 vUv;
+                        varying vec3 vViewPosition;
+                        
+                        // Western noise for terrain texturing
+                        float westernNoise(vec2 p) {
+                            return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453123);
+                        }
+                        
+                        float westernFbm(vec2 p) {
+                            float value = 0.0;
+                            float amplitude = 0.5;
+                            float frequency = 1.0;
+                            
+                            for (int i = 0; i < 6; i++) {
+                                value += amplitude * westernNoise(p * frequency);
+                                amplitude *= 0.6;
+                                frequency *= 2.0;
+                            }
+                            
+                            return value;
+                        }
+                        
+                        vec3 getWesternTerrainColor(vec3 worldPos, vec3 normal) {
+                            float height = worldPos.y;
+                            vec2 texCoords = worldPos.xz * 0.008;
+                            
+                            // Western terrain types
+                            vec3 sandColor = dustColor;
+                            vec3 mesas = rockColor;
+                            vec3 scrubColor = dryGrassColor;
+                            vec3 canyonColor = vec3(0.5, 0.3, 0.2);
+                            
+                            // Height-based terrain distribution
+                            float sandWeight = smoothstep(-50.0, 50.0, height) * smoothstep(200.0, 100.0, height);
+                            float mesaWeight = smoothstep(100.0, 250.0, height) * smoothstep(600.0, 300.0, height);
+                            float canyonWeight = smoothstep(150.0, 300.0, height);
+                            
+                            // Slope-based weathering
+                            float slope = 1.0 - normal.y;
+                            mesaWeight += slope * 1.5;
+                            sandWeight *= (1.0 - slope * 0.5);
+                            
+                            // Weathering patterns
+                            float weathering = westernFbm(texCoords * 8.0);
+                            float erosion = westernFbm(texCoords * 15.0) * 0.3;
+                            
+                            // Blend terrain types
+                            vec3 baseColor = sandColor * sandWeight + mesas * mesaWeight + scrubColor * (1.0 - sandWeight - mesaWeight);
+                            
+                            // Apply weathering
+                            baseColor = mix(baseColor, canyonColor, weathering * 0.2);
+                            baseColor = mix(baseColor, dustColor, erosion);
+                            
+                            // Dust accumulation in sheltered areas
+                            float dustAccum = (1.0 - slope) * weathering * 0.3;
+                            baseColor = mix(baseColor, dustColor * 1.2, dustAccum);
+                            
+                            return baseColor;
+                        }
+                        
+                        void main() {
+                            vec3 normal = normalize(vNormal);
+                            vec3 lightDir = normalize(sunPosition);
+                            vec3 viewDir = normalize(vViewPosition);
+                            
+                            // Get western terrain color
+                            vec3 albedo = getWesternTerrainColor(vWorldPosition, normal);
+                            
+                            // Western lighting (harsh sun)
+                            float NdotL = max(0.0, dot(normal, lightDir));
+                            float shadow = NdotL;
+                            
+                            // Harsh desert lighting
+                            vec3 diffuse = albedo * (0.3 + shadow * 0.7);
+                            
+                            // Heat shimmer effect
+                            float distance = length(vWorldPosition - playerPosition);
+                            float heatEffect = sin(time * 0.002 + distance * 0.01) * 0.02;
+                            diffuse.r += heatEffect;
+                            diffuse.b -= heatEffect * 0.5;
+                            
+                            // Atmospheric dust
+                            float dustFog = 1.0 - exp(-distance * 0.0003);
+                            vec3 dustyAtmosphere = dustColor * 0.8;
+                            
+                            vec3 finalColor = mix(diffuse, dustyAtmosphere, dustFog);
+                            
+                            // Western rim lighting
+                            float fresnel = pow(1.0 - dot(normal, viewDir), 2.0);
+                            finalColor += fresnel * 0.15 * vec3(0.8, 0.6, 0.4);
+                            
+                            gl_FragColor = vec4(finalColor, 1.0);
+                        }
+                    `
+                });
+
+                // Weathered wood material for structures
+                this.materials.weatheredWood = new THREE.MeshLambertMaterial({
+                    color: this.colors.leatherBrown,
+                    roughness: 0.9
+                });
+
+                // Metal material for hardware
+                this.materials.brassHardware = new THREE.MeshLambertMaterial({
+                    color: this.colors.brassGold,
+                    metalness: 0.8,
+                    roughness: 0.4
+                });
+            }
+
+            generateWesternTerrain() {
+                const centerX = Math.floor(this.playerPosition.x / this.chunkSize);
+                const centerZ = Math.floor(this.playerPosition.z / this.chunkSize);
+                
+                for (let x = centerX - this.renderDistance; x <= centerX + this.renderDistance; x++) {
+                    for (let z = centerZ - this.renderDistance; z <= centerZ + this.renderDistance; z++) {
+                        this.loadWesternChunk(x, z);
+                    }
+                }
+            }
+
+            loadWesternChunk(x, z) {
+                const key = `${x},${z}`;
+                if (!this.chunks.has(key)) {
+                    const chunk = this.generateWesternTerrainChunk(x, z);
+                    this.chunks.set(key, chunk);
+                    this.scene.add(chunk);
+                }
+            }
+
+            generateWesternTerrainChunk(chunkX, chunkZ) {
+                const geometry = new THREE.PlaneGeometry(
+                    this.chunkSize, 
+                    this.chunkSize, 
+                    96, 
+                    96
+                );
+                
+                const vertices = geometry.attributes.position.array;
+                
+                // Generate western landscape
+                for (let i = 0; i < vertices.length; i += 3) {
+                    const x = vertices[i] + chunkX * this.chunkSize;
+                    const z = vertices[i + 2] + chunkZ * this.chunkSize;
+                    
+                    let height = this.generateWesternHeight(x, z);
+                    vertices[i + 1] = height;
+                }
+                
+                geometry.attributes.position.needsUpdate = true;
+                geometry.computeVertexNormals();
+                
+                const material = this.materials.westernTerrain.clone();
+                material.uniforms.time.value = this.clock.getElapsedTime();
+                
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.rotation.x = -Math.PI / 2;
+                mesh.position.set(
+                    chunkX * this.chunkSize,
+                    0,
+                    chunkZ * this.chunkSize
+                );
+                mesh.receiveShadow = true;
+                mesh.castShadow = false;
+                
+                // Add western features
+                this.addWesternFeatures(mesh, chunkX, chunkZ);
+                
+                return mesh;
+            }
+
+            generateWesternHeight(x, z) {
+                const scale = 0.0006;
+                let height = 0;
+                
+                // Mesa formations
+                height += Math.max(0, this.ridgedNoise(x * scale * 0.2, z * scale * 0.2)) * 350;
+                
+                // Canyon cuts
+                const canyonNoise = this.noise(x * scale * 0.5, z * scale * 0.5);
+                height -= Math.max(0, -canyonNoise) * 120;
+                
+                // Rolling hills
+                height += this.noise(x * scale * 1.2, z * scale * 1.2) * 80;
+                
+                // Erosion patterns
+                height += this.noise(x * scale * 3, z * scale * 3) * 25;
+                
+                // Fine surface detail
+                height += this.noise(x * scale * 8, z * scale * 8) * 8;
+                
+                return height;
+            }
+
+            ridgedNoise(x, y) {
+                return 1.0 - Math.abs(this.noise(x, y));
+            }
+
+            addWesternFeatures(chunk, chunkX, chunkZ) {
+                // Western vegetation (sparse)
+                const vegetationCount = 15 + Math.random() * 20;
+                for (let i = 0; i < vegetationCount; i++) {
+                    if (Math.random() > 0.6) {
+                        const plant = this.createWesternVegetation();
+                        plant.position.set(
+                            (Math.random() - 0.5) * this.chunkSize,
+                            this.getTerrainHeight(
+                                chunkX * this.chunkSize + (Math.random() - 0.5) * this.chunkSize,
+                                chunkZ * this.chunkSize + (Math.random() - 0.5) * this.chunkSize
+                            ),
+                            (Math.random() - 0.5) * this.chunkSize
+                        );
+                        chunk.add(plant);
+                    }
+                }
+                
+                // Rock formations and boulders
+                const rockCount = 8 + Math.random() * 12;
+                for (let i = 0; i < rockCount; i++) {
+                    if (Math.random() > 0.4) {
+                        const rock = this.createWesternRock();
+                        rock.position.set(
+                            (Math.random() - 0.5) * this.chunkSize,
+                            this.getTerrainHeight(
+                                chunkX * this.chunkSize + (Math.random() - 0.5) * this.chunkSize,
+                                chunkZ * this.chunkSize + (Math.random() - 0.5) * this.chunkSize
+                            ),
+                            (Math.random() - 0.5) * this.chunkSize
+                        );
+                        chunk.add(rock);
+                    }
+                }
+            }
+
+            createWesternVegetation() {
+                const group = new THREE.Group();
+                const type = Math.random();
+                
+                if (type > 0.7) {
+                    // Saguaro cactus
+                    const cactusGeometry = new THREE.CylinderGeometry(2, 3, 25, 8);
+                    const cactusMaterial = new THREE.MeshLambertMaterial({ 
+                        color: new THREE.Color(0.2, 0.4, 0.1) 
+                    });
+                    const cactus = new THREE.Mesh(cactusGeometry, cactusMaterial);
+                    cactus.position.y = 12.5;
+                    cactus.castShadow = true;
+                    group.add(cactus);
+                    
+                } else if (type > 0.4) {
+                    // Tumbleweeds
+                    const tumbleweedGeometry = new THREE.SphereGeometry(3 + Math.random() * 2, 8, 8);
+                    const tumbleweedMaterial = new THREE.MeshLambertMaterial({ 
+                        color: new THREE.Color(0.6, 0.5, 0.3),
+                        transparent: true,
+                        opacity: 0.7
+                    });
+                    const tumbleweed = new THREE.Mesh(tumbleweedGeometry, tumbleweedMaterial);
+                    tumbleweed.position.y = 3;
+                    tumbleweed.castShadow = true;
+                    group.add(tumbleweed);
+                    
+                } else {
+                    // Desert shrubs
+                    const shrubGeometry = new THREE.SphereGeometry(1.5 + Math.random(), 6, 6);
+                    const shrubMaterial = new THREE.MeshLambertMaterial({ 
+                        color: new THREE.Color(0.3, 0.3, 0.1) 
+                    });
+                    const shrub = new THREE.Mesh(shrubGeometry, shrubMaterial);
+                    shrub.position.y = 1.5;
+                    shrub.castShadow = true;
+                    group.add(shrub);
+                }
+                
+                return group;
+            }
+
+            createWesternRock() {
+                const size = 4 + Math.random() * 8;
+                const geometry = new THREE.DodecahedronGeometry(size, 0);
+                
+                // Weather the rock
+                const positions = geometry.attributes.position.array;
+                for (let i = 0; i < positions.length; i += 3) {
+                    positions[i] += (Math.random() - 0.5) * size * 0.4;
+                    positions[i + 1] += (Math.random() - 0.5) * size * 0.3;
+                    positions[i + 2] += (Math.random() - 0.5) * size * 0.4;
+                }
+                geometry.attributes.position.needsUpdate = true;
+                geometry.computeVertexNormals();
+                
+                const material = new THREE.MeshLambertMaterial({ 
+                    color: new THREE.Color().setHex(this.colors.leatherBrown).multiplyScalar(0.8)
+                });
+                const rock = new THREE.Mesh(geometry, material);
+                rock.castShadow = true;
+                rock.receiveShadow = true;
+                rock.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                return rock;
+            }
+
+            createDustParticles() {
+                const particleContainer = document.getElementById('dustParticles');
+                
+                for (let i = 0; i < 40; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'dust-particle';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.animationDelay = Math.random() * 15 + 's';
+                    particle.style.animationDuration = (12 + Math.random() * 8) + 's';
+                    particle.style.opacity = (0.3 + Math.random() * 0.4);
+                    particleContainer.appendChild(particle);
+                }
+            }
+
+            // Enhanced noise functions
+            noise(x, y) {
+                const X = Math.floor(x) & 255;
+                const Y = Math.floor(y) & 255;
+                x -= Math.floor(x);
+                y -= Math.floor(y);
+                const u = this.fade(x);
+                const v = this.fade(y);
+                
+                const A = this.p[X] + Y;
+                const AA = this.p[A];
+                const AB = this.p[A + 1];
+                const B = this.p[X + 1] + Y;
+                const BA = this.p[B];
+                const BB = this.p[B + 1];
+                
+                return this.lerp(v, 
+                    this.lerp(u, this.grad(this.p[AA], x, y), this.grad(this.p[BA], x - 1, y)),
+                    this.lerp(u, this.grad(this.p[AB], x, y - 1), this.grad(this.p[BB], x - 1, y - 1))
+                );
+            }
+
+            fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+            lerp(t, a, b) { return a + t * (b - a); }
+            grad(hash, x, y) {
+                const h = hash & 15;
+                const u = h < 8 ? x : y;
+                const v = h < 4 ? y : h === 12 || h === 14 ? x : 0;
+                return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
+            }
+
+            get p() {
+                if (!this._p) {
+                    this._p = [];
+                    for (let i = 0; i < 256; i++) this._p[i] = i;
+                    for (let i = 0; i < 256; i++) {
+                        const j = Math.floor(Math.random() * 256);
+                        [this._p[i], this._p[j]] = [this._p[j], this._p[i]];
+                    }
+                    this._p = this._p.concat(this._p);
+                }
+                return this._p;
+            }
+
+            getTerrainHeight(x, z) {
+                return this.generateWesternHeight(x, z);
+            }
+
+            updateChunks() {
+                const centerX = Math.floor(this.playerPosition.x / this.chunkSize);
+                const centerZ = Math.floor(this.playerPosition.z / this.chunkSize);
+                
+                // Load new chunks
+                for (let x = centerX - this.renderDistance; x <= centerX + this.renderDistance; x++) {
+                    for (let z = centerZ - this.renderDistance; z <= centerZ + this.renderDistance; z++) {
+                        this.loadWesternChunk(x, z);
+                    }
+                }
+                
+                // Unload distant chunks
+                for (let [key, chunk] of this.chunks) {
+                    const [x, z] = key.split(',').map(Number);
+                    if (Math.abs(x - centerX) > this.renderDistance || 
+                        Math.abs(z - centerZ) > this.renderDistance) {
+                        this.scene.remove(chunk);
+                        this.chunks.delete(key);
+                    }
+                }
+            }
+
+            setupEventListeners() {
+                // Western-themed controls
+                document.addEventListener('keydown', (event) => {
+                    switch (event.code) {
+                        case 'KeyW': this.controls.moveForward = true; break;
+                        case 'KeyS': this.controls.moveBackward = true; break;
+                        case 'KeyA': this.controls.moveLeft = true; break;
+                        case 'KeyD': this.controls.moveRight = true; break;
+                        case 'Space': this.controls.moveUp = true; event.preventDefault(); break;
+                        case 'ShiftLeft': this.controls.moveDown = true; this.controls.sprint = true; break;
+                        case 'KeyR': this.regenerateTerritory(); break;
+                        case 'KeyF': this.toggleWireframe(); break;
+                        case 'KeyV': this.cycleViewMode(); break;
+                        case 'KeyT': this.checkPocketWatch(); break;
+                        case 'KeyG': this.toggleWeather(); break;
+                        case 'KeyC': this.toggleCharacterDisplay(); break;
+                    }
+                });
+                
+                document.addEventListener('keyup', (event) => {
+                    switch (event.code) {
+                        case 'KeyW': this.controls.moveForward = false; break;
+                        case 'KeyS': this.controls.moveBackward = false; break;
+                        case 'KeyA': this.controls.moveLeft = false; break;
+                        case 'KeyD': this.controls.moveRight = false; break;
+                        case 'Space': this.controls.moveUp = false; break;
+                        case 'ShiftLeft': this.controls.moveDown = false; this.controls.sprint = false; break;
+                    }
+                });
+                
+                document.addEventListener('mousemove', (event) => {
+                    if (document.pointerLockElement === document.body) {
+                        this.mouseX += event.movementX * 0.002;
+                        this.mouseY -= event.movementY * 0.002;
+                        this.mouseY = Math.max(-Math.PI/2, Math.min(Math.PI/2, this.mouseY));
+                    }
+                });
+                
+                document.addEventListener('click', () => {
+                    document.body.requestPointerLock();
+                });
+                
+                document.addEventListener('wheel', (event) => {
+                    this.speed = Math.max(20, Math.min(this.maxSpeed, this.speed + event.deltaY * 0.2));
+                });
+                
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            }
+
+            regenerateTerritory() {
+                // Clear existing chunks
+                for (let [key, chunk] of this.chunks) {
+                    this.scene.remove(chunk);
+                }
+                this.chunks.clear();
+                
+                this.seed = Math.floor(Math.random() * 10000);
+                this._p = null;
+                this.generateWesternTerrain();
+                
+                console.log('🤠 New territory scouted!');
+            }
+
+            toggleWireframe() {
+                this.wireframe = !this.wireframe;
+                for (let [key, chunk] of this.chunks) {
+                    if (chunk.material && chunk.material.wireframe !== undefined) {
+                        chunk.material.wireframe = this.wireframe;
+                    }
+                }
+            }
+
+            cycleViewMode() {
+                this.viewMode = (this.viewMode + 1) % 3;
+            }
+
+            checkPocketWatch() {
+                this.timeOfDay = (this.timeOfDay + 3) % 24;
+            }
+
+            toggleWeather() {
+                const conditions = ['clear', 'dusty', 'windy', 'hot'];
+                const currentIndex = conditions.indexOf(this.weatherCondition);
+                this.weatherCondition = conditions[(currentIndex + 1) % conditions.length];
+            }
+
+            toggleCharacterDisplay() {
+                this.showCharacter = !this.showCharacter;
+                const display = document.getElementById('characterDisplay');
+                display.classList.toggle('visible', this.showCharacter);
+            }
+
+            updateMovement(delta) {
+                // Western-style movement
+                this.velocity.x -= this.velocity.x * 8.0 * delta;
+                this.velocity.z -= this.velocity.z * 8.0 * delta;
+                this.velocity.y -= this.velocity.y * 6.0 * delta;
+
+                this.direction.z = Number(this.controls.moveForward) - Number(this.controls.moveBackward);
+                this.direction.x = Number(this.controls.moveRight) - Number(this.controls.moveLeft);
+                this.direction.y = Number(this.controls.moveUp) - Number(this.controls.moveDown);
+                this.direction.normalize();
+
+                const moveSpeed = this.controls.sprint ? this.speed * 2 : this.speed;
+
+                if (this.controls.moveForward || this.controls.moveBackward) {
+                    this.velocity.z -= this.direction.z * moveSpeed * delta;
+                }
+                if (this.controls.moveLeft || this.controls.moveRight) {
+                    this.velocity.x -= this.direction.x * moveSpeed * delta;
+                }
+                if (this.controls.moveUp || this.controls.moveDown) {
+                    this.velocity.y += this.direction.y * moveSpeed * delta;
+                }
+
+                // Apply movement
+                const moveVector = new THREE.Vector3();
+                this.camera.getWorldDirection(moveVector);
+                moveVector.y = 0;
+                moveVector.normalize();
+                moveVector.multiplyScalar(-this.velocity.z * delta);
+
+                const sideVector = new THREE.Vector3();
+                sideVector.crossVectors(this.camera.up, moveVector).normalize();
+                sideVector.multiplyScalar(-this.velocity.x * delta);
+
+                this.playerPosition.add(moveVector);
+                this.playerPosition.add(sideVector);
+                this.playerPosition.y += this.velocity.y * delta;
+
+                // Terrain collision
+                const terrainHeight = this.getTerrainHeight(this.playerPosition.x, this.playerPosition.z);
+                this.playerPosition.y = Math.max(terrainHeight + 12, this.playerPosition.y);
+
+                this.updateCamera();
+            }
+
+            updateCamera() {
+                switch (this.viewMode) {
+                    case 0: // First person
+                        this.camera.position.copy(this.playerPosition);
+                        this.camera.rotation.y = this.mouseX;
+                        this.camera.rotation.x = this.mouseY;
+                        break;
+                    
+                    case 1: // Third person
+                        const offset = new THREE.Vector3(0, 25, 45);
+                        offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), this.mouseX);
+                        this.camera.position.copy(this.playerPosition).add(offset);
+                        this.camera.lookAt(this.playerPosition);
+                        break;
+                    
+                    case 2: // Cinematic
+                        const time = this.clock.getElapsedTime();
+                        const cinematicOffset = new THREE.Vector3(
+                            Math.sin(time * 0.15) * 60,
+                            35 + Math.sin(time * 0.1) * 25,
+                            Math.cos(time * 0.15) * 60
+                        );
+                        this.camera.position.copy(this.playerPosition).add(cinematicOffset);
+                        this.camera.lookAt(this.playerPosition);
+                        break;
+                }
+            }
+
+            updateWesternLighting() {
+                const time = this.clock.getElapsedTime();
+                
+                // Time-based sun movement
+                const dayProgress = (this.timeOfDay % 24) / 24;
+                const sunAngle = dayProgress * Math.PI * 2 - Math.PI;
+                
+                this.sunLight.position.set(
+                    Math.cos(sunAngle) * 1000,
+                    Math.sin(sunAngle) * 1000 + 200,
+                    400
+                );
+                
+                // Western sun color progression
+                const sunColor = new THREE.Color();
+                if (Math.sin(sunAngle) > 0) {
+                    // Desert day
+                    sunColor.setHSL(0.08, 0.3, 1.0);
+                    this.sunLight.intensity = 1.8 + Math.sin(sunAngle) * 0.6;
+                } else {
+                    // Desert night
+                    sunColor.setHSL(0.6, 0.5, 0.2);
+                    this.sunLight.intensity = 0.2;
+                }
+                this.sunLight.color = sunColor;
+                
+                // Update sky shader
+                if (this.skyMaterial.uniforms) {
+                    this.skyMaterial.uniforms.time.value = time * 100;
+                    this.skyMaterial.uniforms.sunPosition.value.copy(this.sunLight.position).normalize();
+                }
+                
+                // Update terrain materials
+                for (let [key, chunk] of this.chunks) {
+                    if (chunk.material && chunk.material.uniforms) {
+                        chunk.material.uniforms.time.value = time;
+                        chunk.material.uniforms.sunPosition.value.copy(this.sunLight.position).normalize();
+                        chunk.material.uniforms.playerPosition.value.copy(this.playerPosition);
+                    }
+                }
+                
+                // Animate dust lights
+                this.dustLights.forEach((light, index) => {
+                    light.intensity = 0.4 + Math.sin(time * 0.3 + index) * 0.2;
+                    light.position.y = 150 + Math.sin(time * 0.2 + index * 1.5) * 40;
+                });
+                
+                // Compass needle
+                const needle = document.getElementById('compassNeedle');
+                if (needle) {
+                    needle.style.transform = `rotate(${this.mouseX * 57.2958}deg)`;
+                }
+            }
+
+            updateWesternUI() {
+                // Location info
+                document.getElementById('location').textContent = 
+                    `${Math.round(this.playerPosition.x)}, ${Math.round(this.playerPosition.z)}`;
+                
+                document.getElementById('elevation').textContent = 
+                    `${Math.round(this.playerPosition.y)} ft`;
+                
+                const velocity = Math.sqrt(this.velocity.x ** 2 + this.velocity.z ** 2) * 2.2;
+                let speedText = 'Standing Still';
+                if (velocity > 50) speedText = 'Full Gallop';
+                else if (velocity > 25) speedText = 'Fast Trot';
+                else if (velocity > 10) speedText = 'Steady Trot';
+                else if (velocity > 2) speedText = 'Walking Pace';
+                
+                document.getElementById('horseSpeed').textContent = speedText;
+                
+                // Time display
+                const hours = Math.floor(this.timeOfDay);
+                const minutes = Math.floor((this.timeOfDay % 1) * 60);
+                let timeText = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                
+                if (hours === 12) timeText = 'High Noon';
+                else if (hours === 0) timeText = 'Midnight';
+                else if (hours < 6) timeText = 'Pre-Dawn';
+                else if (hours < 12) timeText = 'Morning';
+                else if (hours < 18) timeText = 'Afternoon';
+                else timeText = 'Evening';
+                
+                document.getElementById('gameTime').textContent = timeText;
+                
+                // Weather info
+                const weatherMap = {
+                    clear: 'Clear Skies',
+                    dusty: 'Dust Storm',
+                    windy: 'Windy',
+                    hot: 'Scorching Heat'
+                };
+                document.getElementById('currentWeather').textContent = weatherMap[this.weatherCondition];
+                
+                document.getElementById('windSpeed').textContent = 
+                    this.windSpeed > 15 ? 'Strong Wind' : 
+                    this.windSpeed > 8 ? 'Moderate Breeze' : 'Light Breeze';
+                
+                document.getElementById('temperature').textContent = `${this.temperature}°F`;
+                
+                // Territory based on terrain
+                const height = this.playerPosition.y;
+                let territory = 'Desert Plains';
+                if (height > 300) territory = 'Mesa Country';
+                else if (height > 150) territory = 'Canyon Lands';
+                else if (height < 50) territory = 'River Bottom';
+                
+                document.getElementById('territory').textContent = territory;
+            }
+
+            hideLoadingScreen() {
+                let progress = 0;
+                const progressBar = document.getElementById('loadingProgress');
+                const loadingScreen = document.getElementById('loadingScreen');
+                
+                const updateProgress = () => {
+                    progress += Math.random() * 10 + 3;
+                    if (progress >= 100) {
+                        progress = 100;
+                        progressBar.style.width = '100%';
+                        setTimeout(() => {
+                            loadingScreen.classList.add('hidden');
+                        }, 1200);
+                        return;
+                    }
+                    progressBar.style.width = progress + '%';
+                    setTimeout(updateProgress, 150 + Math.random() * 250);
+                };
+                
+                setTimeout(updateProgress, 1000);
+            }
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                
+                const delta = this.clock.getDelta();
+                
+                this.updateMovement(delta);
+                this.updateChunks();
+                this.updateWesternLighting();
+                this.updateWesternUI();
+                
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        // Initialize the western frontier experience
+        let game;
+        window.addEventListener('load', () => {
+            console.log('🤠 Initializing Blaze Frontier Western...');
+            game = new BlazeFrontierWestern();
+            window.game = game;
+        });
+    </script>
+
+</body></html>

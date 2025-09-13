@@ -1,0 +1,84 @@
+# Championship Intelligence Routes - All Teams
+/orioles        /orioles-executive-championship.html    301
+/baltimore      /baltimore-intelligence.html    301
+/moneyball      /baltimore-intelligence.html    301
+/blackbird      /project-blackbird-live-demo.html    301
+/chad-tatum     /chad-tatum-championship-demo.html   301
+/tatum          /chad-tatum-championship-demo.html   301
+/scouting       /chad-tatum-championship-demo.html   301
+/executive      /orioles-executive-intelligence.html  301
+/war-room       /orioles-executive-intelligence.html  301
+/c-suite        /orioles-executive-intelligence.html  301
+/brand          /blaze-brand-showcase.html            301
+/brand-system   /blaze-brand-showcase.html            301
+/cardinals      /cardinals-intelligence.html    301
+/stl            /cardinals-intelligence.html    301
+/titans         /titans-intelligence.html    301
+/nashville      /titans-intelligence.html    301
+/grizzlies      /grizzlies-intelligence.html    301
+/memphis        /grizzlies-intelligence.html    301
+/longhorns      /longhorns-intelligence.html    301
+/texas          /longhorns-intelligence.html    301
+
+# SPA Routing - Championship Navigation System
+/app/*                    /app.html                 200
+/site/*                   /site/:splat              200
+
+# Core championship page routes
+/live-demo                /site/live-demo.html      200
+/nil-calculator           /site/nil-calculator.html 200  
+/quantum-platform         /site/quantum-platform.html 200
+/get-started              /site/get-started.html    200
+
+# Sports-specific routes
+/mlb                      /site/index.html          200
+/nfl                      /site/index.html          200
+/cfb                      /site/index.html          200
+/college-football         /site/index.html          200
+/college-baseball         /site/index.html          200
+
+# Unified Championship Platform Routes
+/championship-dashboard   /unified-championship-dashboard.html 200
+/perfect-game            /perfect-game-intelligence.html      200
+/pg                      /perfect-game-intelligence.html      200
+/sec                     /site/sec-football.html              200
+/sec-football            /site/sec-football-enhanced.html     200
+/deep-south              /site/sec-analytics.html             200
+
+# AI Consciousness & Video Intelligence
+/consciousness           /api/consciousness-stream            200
+/video-analysis          /api/video-intelligence             200
+/narratives              /api/narrative-generator            200
+
+# Unified Championship Platform Routes
+/unified                /blaze-unified-championship.html     200
+/championship           /blaze-unified-championship.html     200
+/replit-unified         /blaze-unified-championship.html     200
+/all-platforms          /blaze-unified-championship.html     200
+/platform-manager       /blaze-unified-championship-platform.html 200
+/unified-platform       /blaze-unified-championship-platform.html 200
+/championship-platform  /blaze-unified-championship-platform.html 200
+
+# AR Coaching Platform Routes (Enhanced Vision AI)
+/ar-coaching            /blaze-ar-coaching-enhanced.html     200
+/ar-coach               /blaze-ar-coaching-enhanced.html     200
+/coaching               /blaze-ar-coaching-enhanced.html     200
+/ar                     /blaze-ar-coaching-enhanced.html     200
+/vision-ai              /blaze-ar-coaching-enhanced.html     200
+/ar-coaching-legacy     /blaze-ar-coaching-platform.html     200
+
+# Real-Time Data Streams
+/stream/cardinals        /api/consciousness-stream           200
+/stream/titans           /api/consciousness-stream           200
+/stream/longhorns        /api/consciousness-stream           200
+/stream/grizzlies        /api/consciousness-stream           200
+
+# API routes to Netlify Functions
+/api/*                    /.netlify/functions/:splat 200
+/health                   /.netlify/functions/health 200
+
+# Legacy Platform Routes
+/os     https://a4dc795e.blaze-intelligence.pages.dev/   302
+/platform  https://9fb73261.blaze-intelligence.pages.dev/ 302
+/videos https://9fb73261.blaze-intelligence.pages.dev/#videos 302
+/dashboard https://9fb73261.blaze-intelligence.pages.dev/#live-analytics-dashboard 302
