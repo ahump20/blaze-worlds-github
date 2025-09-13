@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blaze Worlds Ultimate Enhanced - Championship Gaming Experience</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            user-select: none;
+        }
+        
+        #gameCanvas {
+            display: block;
+            cursor: crosshair;
+        }
+        
+        /* Enhanced HUD Design */
+        .hud {
+            position: absolute;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            font-weight: 600;
+            pointer-events: none;
+        }
+        
+        #stats {
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, rgba(191, 87, 0, 0.9), rgba(191, 87, 0, 0.7));
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #ff6b00;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        #minimap {
+            top: 20px;
+            right: 20px;
+            width: 200px;
+            height: 200px;
+            background: rgba(0, 20, 40, 0.9);
+            border: 3px solid #00b2a9;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        #inventory {
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(0, 34, 68, 0.95), rgba(0, 34, 68, 0.8));
+            border-radius: 15px;
+            border: 2px solid #9bcbeb;
+            pointer-events: all;
+        }
+        
+        .inventory-slot {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .inventory-slot:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+            border-color: #ff6b00;
+        }
+        
+        .inventory-slot.active {
+            background: linear-gradient(135deg, #ff6b00, #ff8c00);
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 107, 0, 0.6);
+        }
+        
+        .inventory-count {
+            position: absolute;
+            bottom: 2px;
+            right: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+        
+        #healthBar {
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #fff;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        #healthFill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ff6b00, #00ff00);
+            width: 100%;
+            transition: width 0.3s ease;
+        }
+        
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            pointer-events: none;
+        }
+        
+        .crosshair-line {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 4px rgba(0,0,0,0.5);
+        }
+        
+        .crosshair-line.horizontal {
+            width: 100%;
+            height: 2px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .crosshair-line.vertical {
+            width: 2px;
+            height: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        #controls {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 30px;
+            border-radius: 10px;
+            border: 2px solid #00b2a9;
+            transition: opacity 0.3s;
+        }
+        
+        #loadingScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .loader {
+            width: 80px;
+            height: 80px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #ff6b00;
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #loadingText {
+            color: white;
+            font-size: 24px;
+            margin-top: 20px;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        /* Mobile Controls */
+        .mobile-controls {
+            display: none;
+            position: absolute;
+            bottom: 20px;
+            pointer-events: all;
+        }
+        
+        #joystick {
+            left: 20px;
+            width: 120px;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        #joystickKnob {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, #ff6b00, #bf5700);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: none;
+        }
+        
+        .action-button {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(191, 87, 0, 0.8);
+            border: 2px solid #ff6b00;
+            border-radius: 50%;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            right: 20px;
+            cursor: pointer;
+        }
+        
+        #jumpButton {
+            bottom: 80px;
+        }
+        
+        #actionButton {
+            bottom: 20px;
+            right: 90px;
+        }
+        
+        /* Tooltip System */
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+        }
+        
+        /* Achievement Notification */
+        .achievement {
+            position: absolute;
+            top: 100px;
+            right: -400px;
+            background: linear-gradient(135deg, #ffd700, #ff6b00);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: right 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-width: 350px;
+        }
+        
+        .achievement.show {
+            right: 20px;
+        }
+        
+        .achievement-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .achievement-desc {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-controls {
+                display: block;
+            }
+            
+            #controls {
+                display: none;
+            }
+            
+            #inventory {
+                bottom: 160px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    
+    <!-- Loading Screen -->
+    <div id="loadingScreen">
+        <div class="loader"></div>
+        <div id="loadingText">Loading Texas Frontiers...</div>
+    </div>
+    
+    <!-- HUD Elements -->
+    <div id="stats" class="hud">
+        <div>FPS: <span id="fps">60</span></div>
+        <div>Position: <span id="position">0, 0, 0</span></div>
+        <div>Biome: <span id="biome">Plains</span></div>
+        <div>Time: <span id="gameTime">12:00</span></div>
+        <div>Resources: <span id="resources">0</span></div>
+    </div>
+    
+    <canvas id="minimap" class="hud"></canvas>
+    
+    <div id="inventory" class="hud">
+        <div class="inventory-slot active" data-slot="0">🪨<span class="inventory-count">0</span></div>
+        <div class="inventory-slot" data-slot="1">🪵<span class="inventory-count">0</span></div>
+        <div class="inventory-slot" data-slot="2">🌾<span class="inventory-count">0</span></div>
+        <div class="inventory-slot" data-slot="3">💎<span class="inventory-count">0</span></div>
+        <div class="inventory-slot" data-slot="4">🔨<span class="inventory-count">1</span></div>
+        <div class="inventory-slot" data-slot="5">⛏️<span class="inventory-count">1</span></div>
+        <div class="inventory-slot" data-slot="6">🗡️<span class="inventory-count">1</span></div>
+        <div class="inventory-slot" data-slot="7">🏹<span class="inventory-count">1</span></div>
+        <div class="inventory-slot" data-slot="8">🍖<span class="inventory-count">5</span></div>
+    </div>
+    
+    <div id="healthBar" class="hud">
+        <div id="healthFill"></div>
+    </div>
+    
+    <div id="crosshair">
+        <div class="crosshair-line horizontal"></div>
+        <div class="crosshair-line vertical"></div>
+    </div>
+    
+    <div id="controls" class="hud">
+        <strong>🎮 Enhanced Controls</strong><br>
+        WASD: Move | Mouse: Look | Space: Jump | Shift: Sprint<br>
+        E: Interact | Q: Drop | Tab: Inventory | C: Crouch<br>
+        1-9: Select Item | Left Click: Use | Right Click: Place
+    </div>
+    
+    <!-- Mobile Controls -->
+    <div id="joystick" class="mobile-controls">
+        <div id="joystickKnob"></div>
+    </div>
+    <div id="jumpButton" class="action-button mobile-controls">JUMP</div>
+    <div id="actionButton" class="action-button mobile-controls">USE</div>
+    
+    <!-- Achievement System -->
+    <div id="achievement" class="achievement">
+        <div class="achievement-title">Achievement Unlocked!</div>
+        <div class="achievement-desc">First Steps in Texas</div>
+    </div>
+    
+    <!-- Tooltip -->
+    <div id="tooltip" class="tooltip"></div>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Simplex Noise -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
+    
+    <script>
+        // Enhanced Blaze Worlds Ultimate Edition
+        class BlazeWorldsUltimate {
+            constructor() {
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                this.renderer = new THREE.WebGLRenderer({ 
+                    canvas: document.getElementById('gameCanvas'),
+                    antialias: true,
+                    powerPreference: "high-performance"
+                });
+                
+                // Enhanced graphics settings
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+                this.renderer.toneMappingExposure = 1.2;
+                
+                // World generation
+                this.noise = new SimplexNoise();
+                this.chunks = new Map();
+                this.chunkSize = 16;
+                this.renderDistance = 8;
+                this.worldHeight = 64;
+                
+                // Enhanced player controller
+                this.player = {
+                    position: new THREE.Vector3(0, 50, 0),
+                    velocity: new THREE.Vector3(0, 0, 0),
+                    rotation: { x: 0, y: 0 },
+                    speed: 0.15,
+                    sprintMultiplier: 2.0,
+                    jumpForce: 0.35,
+                    isSprinting: false,
+                    isCrouching: false,
+                    isGrounded: false,
+                    health: 100,
+                    stamina: 100,
+                    inventory: new Map([
+                        ['stone', 0],
+                        ['wood', 0],
+                        ['wheat', 0],
+                        ['diamond', 0],
+                        ['hammer', 1],
+                        ['pickaxe', 1],
+                        ['sword', 1],
+                        ['bow', 1],
+                        ['food', 5]
+                    ]),
+                    selectedSlot: 0
+                };
+                
+                // Enhanced controls
+                this.keys = {};
+                this.mouse = { x: 0, y: 0, locked: false };
+                this.sensitivity = 0.002;
+                
+                // Game systems
+                this.gameTime = 12; // 24-hour cycle
+                this.dayNightCycle = true;
+                this.weather = { type: 'clear', intensity: 0 };
+                this.entities = [];
+                this.particles = [];
+                
+                // Enhanced biomes with Texas themes
+                this.biomes = {
+                    HILL_COUNTRY: { 
+                        color: 0x8B7355, 
+                        baseHeight: 35, 
+                        variance: 12,
+                        vegetation: 'oak',
+                        fogColor: 0xE6D5B8,
+                        resources: ['limestone', 'oak_wood', 'water']
+                    },
+                    PINEY_WOODS: { 
+                        color: 0x2E5F2E, 
+                        baseHeight: 32, 
+                        variance: 8,
+                        vegetation: 'pine',
+                        fogColor: 0x3A5F3A,
+                        resources: ['pine_wood', 'berries', 'mushrooms']
+                    },
+                    GULF_COAST: { 
+                        color: 0xF4E4BC, 
+                        baseHeight: 28, 
+                        variance: 15,
+                        vegetation: 'palm',
+                        fogColor: 0x87CEEB,
+                        resources: ['sand', 'shells', 'fish']
+                    },
+                    BADLANDS: { 
+                        color: 0xCC6633, 
+                        baseHeight: 40, 
+                        variance: 20,
+                        vegetation: 'cactus',
+                        fogColor: 0xFFD4AA,
+                        resources: ['copper', 'clay', 'fossils']
+                    },
+                    BRUSH_COUNTRY: { 
+                        color: 0x9B8653, 
+                        baseHeight: 30, 
+                        variance: 6,
+                        vegetation: 'mesquite',
+                        fogColor: 0xCDB891,
+                        resources: ['leather', 'thorns', 'herbs']
+                    }
+                };
+                
+                // Performance monitoring
+                this.stats = {
+                    fps: 60,
+                    frameTime: 0,
+                    lastTime: performance.now(),
+                    chunks: 0,
+                    entities: 0,
+                    triangles: 0
+                };
+                
+                // Sound system placeholder
+                this.sounds = {
+                    enabled: true,
+                    volume: 0.5,
+                    ambient: null,
+                    effects: new Map()
+                };
+                
+                // Achievement system
+                this.achievements = new Map([
+                    ['first_steps', { title: 'First Steps', desc: 'Welcome to Texas Frontiers', unlocked: false }],
+                    ['builder', { title: 'Master Builder', desc: 'Place 100 blocks', unlocked: false }],
+                    ['explorer', { title: 'Frontier Explorer', desc: 'Discover all biomes', unlocked: false }],
+                    ['survivor', { title: 'Survivor', desc: 'Survive 7 days', unlocked: false }],
+                    ['wealthy', { title: 'Texas Tycoon', desc: 'Collect 1000 resources', unlocked: false }]
+                ]);
+                
+                this.init();
+            }
+            
+            init() {
+                // Enhanced scene setup
+                this.setupLighting();
+                this.setupSky();
+                this.setupFog();
+                this.setupControls();
+                this.setupMobileControls();
+                this.generateInitialWorld();
+                this.setupParticleSystem();
+                
+                // Camera setup
+                this.camera.position.copy(this.player.position);
+                
+                // Start game loop
+                this.hideLoadingScreen();
+                this.animate();
+                
+                // Unlock first achievement
+                this.unlockAchievement('first_steps');
+                
+                // Hide controls after 5 seconds
+                setTimeout(() => {
+                    document.getElementById('controls').style.opacity = '0.3';
+                }, 5000);
+            }
+            
+            setupLighting() {
+                // Enhanced lighting system
+                // Ambient light
+                this.ambientLight = new THREE.HemisphereLight(0x87CEEB, 0x545454, 0.6);
+                this.scene.add(this.ambientLight);
+                
+                // Directional light (sun)
+                this.sunLight = new THREE.DirectionalLight(0xFFFFED, 1.2);
+                this.sunLight.position.set(100, 200, 50);
+                this.sunLight.castShadow = true;
+                this.sunLight.shadow.mapSize.width = 2048;
+                this.sunLight.shadow.mapSize.height = 2048;
+                this.sunLight.shadow.camera.near = 0.5;
+                this.sunLight.shadow.camera.far = 500;
+                this.sunLight.shadow.camera.left = -100;
+                this.sunLight.shadow.camera.right = 100;
+                this.sunLight.shadow.camera.top = 100;
+                this.sunLight.shadow.camera.bottom = -100;
+                this.scene.add(this.sunLight);
+                
+                // Moon light
+                this.moonLight = new THREE.DirectionalLight(0x6677AA, 0.3);
+                this.moonLight.position.set(-100, 200, -50);
+                this.scene.add(this.moonLight);
+            }
+            
+            setupSky() {
+                // Enhanced sky system with gradient
+                const skyGeometry = new THREE.SphereGeometry(500, 32, 32);
+                const skyMaterial = new THREE.ShaderMaterial({
+                    uniforms: {
+                        topColor: { value: new THREE.Color(0x0077FF) },
+                        bottomColor: { value: new THREE.Color(0xFFFFFF) },
+                        offset: { value: 100 },
+                        exponent: { value: 0.6 }
+                    },
+                    vertexShader: `
+                        varying vec3 vWorldPosition;
+                        void main() {
+                            vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+                            vWorldPosition = worldPosition.xyz;
+                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform vec3 topColor;
+                        uniform vec3 bottomColor;
+                        uniform float offset;
+                        uniform float exponent;
+                        varying vec3 vWorldPosition;
+                        void main() {
+                            float h = normalize(vWorldPosition + offset).y;
+                            gl_FragColor = vec4(mix(bottomColor, topColor, max(pow(max(h, 0.0), exponent), 0.0)), 1.0);
+                        }
+                    `,
+                    side: THREE.BackSide
+                });
+                
+                this.sky = new THREE.Mesh(skyGeometry, skyMaterial);
+                this.scene.add(this.sky);
+                
+                // Add sun sphere
+                const sunGeometry = new THREE.SphereGeometry(10, 16, 16);
+                const sunMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0xFFFF00,
+                    emissive: 0xFFFF00,
+                    emissiveIntensity: 1
+                });
+                this.sun = new THREE.Mesh(sunGeometry, sunMaterial);
+                this.sun.position.copy(this.sunLight.position);
+                this.scene.add(this.sun);
+            }
+            
+            setupFog() {
+                // Dynamic fog based on biome
+                this.scene.fog = new THREE.FogExp2(0xCCCCCC, 0.002);
+            }
+            
+            setupControls() {
+                // Enhanced keyboard controls
+                document.addEventListener('keydown', (e) => {
+                    this.keys[e.key.toLowerCase()] = true;
+                    
+                    // Inventory shortcuts
+                    if (e.key >= '1' && e.key <= '9') {
+                        this.selectInventorySlot(parseInt(e.key) - 1);
+                    }
+                    
+                    // Toggle crouch
+                    if (e.key.toLowerCase() === 'c') {
+                        this.player.isCrouching = !this.player.isCrouching;
+                        this.player.speed = this.player.isCrouching ? 0.05 : 0.15;
+                    }
+                    
+                    // Drop item
+                    if (e.key.toLowerCase() === 'q') {
+                        this.dropCurrentItem();
+                    }
+                });
+                
+                document.addEventListener('keyup', (e) => {
+                    this.keys[e.key.toLowerCase()] = false;
+                    
+                    if (e.key === 'Shift') {
+                        this.player.isSprinting = false;
+                    }
+                });
+                
+                // Enhanced mouse controls
+                document.addEventListener('mousedown', (e) => {
+                    if (!this.mouse.locked) {
+                        document.body.requestPointerLock();
+                    } else {
+                        if (e.button === 0) { // Left click
+                            this.useCurrentItem();
+                        } else if (e.button === 2) { // Right click
+                            this.placeBlock();
+                        }
+                    }
+                });
+                
+                document.addEventListener('mousemove', (e) => {
+                    if (this.mouse.locked) {
+                        this.player.rotation.y -= e.movementX * this.sensitivity;
+                        this.player.rotation.x = Math.max(-Math.PI / 2, 
+                            Math.min(Math.PI / 2, this.player.rotation.x - e.movementY * this.sensitivity));
+                    }
+                });
+                
+                document.addEventListener('pointerlockchange', () => {
+                    this.mouse.locked = document.pointerLockElement === document.body;
+                });
+                
+                // Mouse wheel for inventory
+                document.addEventListener('wheel', (e) => {
+                    if (this.mouse.locked) {
+                        const direction = e.deltaY > 0 ? 1 : -1;
+                        this.player.selectedSlot = (this.player.selectedSlot + direction + 9) % 9;
+                        this.updateInventoryUI();
+                    }
+                });
+                
+                // Window resize
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            }
+            
+            setupMobileControls() {
+                // Mobile touch controls
+                const joystick = document.getElementById('joystick');
+                const joystickKnob = document.getElementById('joystickKnob');
+                let joystickActive = false;
+                
+                const handleJoystickStart = (e) => {
+                    joystickActive = true;
+                    e.preventDefault();
+                };
+                
+                const handleJoystickMove = (e) => {
+                    if (!joystickActive) return;
+                    
+                    const touch = e.touches[0];
+                    const rect = joystick.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    
+                    let deltaX = touch.clientX - centerX;
+                    let deltaY = touch.clientY - centerY;
+                    
+                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                    const maxDistance = rect.width / 2 - 20;
+                    
+                    if (distance > maxDistance) {
+                        deltaX = (deltaX / distance) * maxDistance;
+                        deltaY = (deltaY / distance) * maxDistance;
+                    }
+                    
+                    joystickKnob.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+                    
+                    // Update movement
+                    this.keys['w'] = deltaY < -20;
+                    this.keys['s'] = deltaY > 20;
+                    this.keys['a'] = deltaX < -20;
+                    this.keys['d'] = deltaX > 20;
+                };
+                
+                const handleJoystickEnd = () => {
+                    joystickActive = false;
+                    joystickKnob.style.transform = 'translate(0, 0)';
+                    this.keys['w'] = false;
+                    this.keys['s'] = false;
+                    this.keys['a'] = false;
+                    this.keys['d'] = false;
+                };
+                
+                joystick.addEventListener('touchstart', handleJoystickStart);
+                joystick.addEventListener('touchmove', handleJoystickMove);
+                joystick.addEventListener('touchend', handleJoystickEnd);
+                
+                // Jump button
+                document.getElementById('jumpButton').addEventListener('touchstart', () => {
+                    this.keys[' '] = true;
+                });
+                document.getElementById('jumpButton').addEventListener('touchend', () => {
+                    this.keys[' '] = false;
+                });
+                
+                // Action button
+                document.getElementById('actionButton').addEventListener('touchstart', () => {
+                    this.useCurrentItem();
+                });
+            }
+            
+            setupParticleSystem() {
+                // Particle system for effects
+                const particleGeometry = new THREE.BufferGeometry();
+                const particleCount = 1000;
+                const positions = new Float32Array(particleCount * 3);
+                
+                for (let i = 0; i < particleCount * 3; i += 3) {
+                    positions[i] = (Math.random() - 0.5) * 200;
+                    positions[i + 1] = Math.random() * 100;
+                    positions[i + 2] = (Math.random() - 0.5) * 200;
+                }
+                
+                particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                
+                const particleMaterial = new THREE.PointsMaterial({
+                    color: 0xFFFFFF,
+                    size: 0.5,
+                    transparent: true,
+                    opacity: 0.6
+                });
+                
+                this.particleSystem = new THREE.Points(particleGeometry, particleMaterial);
+                this.scene.add(this.particleSystem);
+            }
+            
+            generateInitialWorld() {
+                const playerChunkX = Math.floor(this.player.position.x / this.chunkSize);
+                const playerChunkZ = Math.floor(this.player.position.z / this.chunkSize);
+                
+                // Generate chunks around player
+                for (let x = -this.renderDistance; x <= this.renderDistance; x++) {
+                    for (let z = -this.renderDistance; z <= this.renderDistance; z++) {
+                        this.generateChunk(playerChunkX + x, playerChunkZ + z);
+                    }
+                }
+            }
+            
+            generateChunk(chunkX, chunkZ) {
+                const chunkKey = `${chunkX},${chunkZ}`;
+                if (this.chunks.has(chunkKey)) return;
+                
+                const geometry = new THREE.BufferGeometry();
+                const vertices = [];
+                const colors = [];
+                const normals = [];
+                const uvs = [];
+                
+                // Determine biome
+                const biomeNoise = this.noise.noise2D(chunkX * 0.05, chunkZ * 0.05);
+                const biomeKeys = Object.keys(this.biomes);
+                const biomeIndex = Math.floor((biomeNoise + 1) * 0.5 * biomeKeys.length);
+                const biome = this.biomes[biomeKeys[biomeIndex % biomeKeys.length]];
+                
+                // Generate terrain with enhanced detail
+                for (let x = 0; x < this.chunkSize; x++) {
+                    for (let z = 0; z < this.chunkSize; z++) {
+                        const worldX = chunkX * this.chunkSize + x;
+                        const worldZ = chunkZ * this.chunkSize + z;
+                        
+                        // Multi-octave noise for realistic terrain
+                        const baseHeight = this.getTerrainHeight(worldX, worldZ, biome);
+                        
+                        // Create block geometry with enhanced detail
+                        this.addBlockToGeometry(vertices, colors, normals, uvs, worldX, baseHeight, worldZ, biome);
+                        
+                        // Add vegetation and features
+                        if (Math.random() < 0.05) {
+                            this.addVegetation(worldX, baseHeight + 1, worldZ, biome);
+                        }
+                        
+                        // Add resources
+                        if (Math.random() < 0.02) {
+                            this.addResource(worldX, baseHeight + 1, worldZ, biome);
+                        }
+                    }
+                }
+                
+                // Create mesh with enhanced materials
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+                geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+                geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+                geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+                geometry.computeBoundingSphere();
+                
+                const material = new THREE.MeshLambertMaterial({ 
+                    vertexColors: true,
+                    side: THREE.DoubleSide
+                });
+                
+                const chunk = new THREE.Mesh(geometry, material);
+                chunk.castShadow = true;
+                chunk.receiveShadow = true;
+                chunk.userData = { chunkX, chunkZ, biome };
+                
+                this.chunks.set(chunkKey, chunk);
+                this.scene.add(chunk);
+            }
+            
+            getTerrainHeight(x, z, biome) {
+                // Enhanced terrain generation with multiple noise octaves
+                const scale1 = 0.01;
+                const scale2 = 0.05;
+                const scale3 = 0.1;
+                
+                const noise1 = this.noise.noise2D(x * scale1, z * scale1) * 0.5;
+                const noise2 = this.noise.noise2D(x * scale2, z * scale2) * 0.25;
+                const noise3 = this.noise.noise2D(x * scale3, z * scale3) * 0.125;
+                
+                const combinedNoise = noise1 + noise2 + noise3;
+                const height = biome.baseHeight + combinedNoise * biome.variance;
+                
+                // Add special terrain features
+                const featureNoise = this.noise.noise2D(x * 0.02, z * 0.02);
+                if (featureNoise > 0.7) {
+                    // Hills or mountains
+                    return height + 10;
+                } else if (featureNoise < -0.7) {
+                    // Valleys or canyons
+                    return Math.max(20, height - 10);
+                }
+                
+                return Math.max(20, Math.floor(height));
+            }
+            
+            addBlockToGeometry(vertices, colors, normals, uvs, x, y, z, biome) {
+                const size = 0.5;
+                
+                // Enhanced block with all 6 faces
+                const positions = [
+                    // Front face
+                    x - size, y - size, z + size,
+                    x + size, y - size, z + size,
+                    x + size, y + size, z + size,
+                    x - size, y + size, z + size,
+                    // Back face
+                    x + size, y - size, z - size,
+                    x - size, y - size, z - size,
+                    x - size, y + size, z - size,
+                    x + size, y + size, z - size,
+                    // Top face
+                    x - size, y + size, z + size,
+                    x + size, y + size, z + size,
+                    x + size, y + size, z - size,
+                    x - size, y + size, z - size,
+                    // Bottom face
+                    x - size, y - size, z - size,
+                    x + size, y - size, z - size,
+                    x + size, y - size, z + size,
+                    x - size, y - size, z + size,
+                    // Right face
+                    x + size, y - size, z + size,
+                    x + size, y - size, z - size,
+                    x + size, y + size, z - size,
+                    x + size, y + size, z + size,
+                    // Left face
+                    x - size, y - size, z - size,
+                    x - size, y - size, z + size,
+                    x - size, y + size, z + size,
+                    x - size, y + size, z - size
+                ];
+                
+                // Add vertices for each face
+                for (let face = 0; face < 6; face++) {
+                    const baseIndex = face * 12;
+                    
+                    // Triangle 1
+                    vertices.push(
+                        positions[baseIndex], positions[baseIndex + 1], positions[baseIndex + 2],
+                        positions[baseIndex + 3], positions[baseIndex + 4], positions[baseIndex + 5],
+                        positions[baseIndex + 6], positions[baseIndex + 7], positions[baseIndex + 8]
+                    );
+                    
+                    // Triangle 2
+                    vertices.push(
+                        positions[baseIndex], positions[baseIndex + 1], positions[baseIndex + 2],
+                        positions[baseIndex + 6], positions[baseIndex + 7], positions[baseIndex + 8],
+                        positions[baseIndex + 9], positions[baseIndex + 10], positions[baseIndex + 11]
+                    );
+                    
+                    // Colors with variation
+                    const color = new THREE.Color(biome.color);
+                    const variation = 0.1;
+                    color.r += (Math.random() - 0.5) * variation;
+                    color.g += (Math.random() - 0.5) * variation;
+                    color.b += (Math.random() - 0.5) * variation;
+                    
+                    for (let i = 0; i < 6; i++) {
+                        colors.push(color.r, color.g, color.b);
+                    }
+                    
+                    // Normals
+                    const faceNormals = [
+                        [0, 0, 1], [0, 0, -1], [0, 1, 0], 
+                        [0, -1, 0], [1, 0, 0], [-1, 0, 0]
+                    ];
+                    
+                    for (let i = 0; i < 6; i++) {
+                        normals.push(...faceNormals[face]);
+                    }
+                    
+                    // UVs
+                    uvs.push(
+                        0, 0, 1, 0, 1, 1,
+                        0, 0, 1, 1, 0, 1
+                    );
+                }
+            }
+            
+            addVegetation(x, y, z, biome) {
+                let geometry, material, mesh;
+                
+                switch (biome.vegetation) {
+                    case 'oak':
+                        // Oak tree
+                        geometry = new THREE.ConeGeometry(2, 5, 8);
+                        material = new THREE.MeshLambertMaterial({ color: 0x2D5016 });
+                        mesh = new THREE.Mesh(geometry, material);
+                        mesh.position.set(x, y + 2.5, z);
+                        break;
+                        
+                    case 'pine':
+                        // Pine tree
+                        geometry = new THREE.ConeGeometry(1.5, 7, 6);
+                        material = new THREE.MeshLambertMaterial({ color: 0x0F4F0F });
+                        mesh = new THREE.Mesh(geometry, material);
+                        mesh.position.set(x, y + 3.5, z);
+                        break;
+                        
+                    case 'palm':
+                        // Palm tree
+                        const trunkGeometry = new THREE.CylinderGeometry(0.3, 0.3, 5, 6);
+                        const trunkMaterial = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
+                        const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+                        trunk.position.set(x, y + 2.5, z);
+                        this.scene.add(trunk);
+                        
+                        const leavesGeometry = new THREE.SphereGeometry(2, 6, 4);
+                        const leavesMaterial = new THREE.MeshLambertMaterial({ color: 0x228B22 });
+                        mesh = new THREE.Mesh(leavesGeometry, leavesMaterial);
+                        mesh.position.set(x, y + 5, z);
+                        mesh.scale.y = 0.5;
+                        break;
+                        
+                    case 'cactus':
+                        // Cactus
+                        geometry = new THREE.CylinderGeometry(0.5, 0.5, 3, 6);
+                        material = new THREE.MeshLambertMaterial({ color: 0x2F5F2F });
+                        mesh = new THREE.Mesh(geometry, material);
+                        mesh.position.set(x, y + 1.5, z);
+                        break;
+                        
+                    case 'mesquite':
+                        // Mesquite bush
+                        geometry = new THREE.SphereGeometry(1.5, 6, 4);
+                        material = new THREE.MeshLambertMaterial({ color: 0x6B6B47 });
+                        mesh = new THREE.Mesh(geometry, material);
+                        mesh.position.set(x, y + 0.75, z);
+                        mesh.scale.y = 0.5;
+                        break;
+                }
+                
+                if (mesh) {
+                    mesh.castShadow = true;
+                    mesh.receiveShadow = true;
+                    this.scene.add(mesh);
+                    this.entities.push(mesh);
+                }
+            }
+            
+            addResource(x, y, z, biome) {
+                // Add collectable resources based on biome
+                const resources = biome.resources;
+                const resource = resources[Math.floor(Math.random() * resources.length)];
+                
+                let geometry, material;
+                
+                switch (resource) {
+                    case 'limestone':
+                    case 'copper':
+                    case 'clay':
+                        geometry = new THREE.BoxGeometry(0.4, 0.4, 0.4);
+                        material = new THREE.MeshLambertMaterial({ 
+                            color: resource === 'limestone' ? 0xE0E0E0 : 
+                                   resource === 'copper' ? 0xB87333 : 0xA67D3D
+                        });
+                        break;
+                        
+                    case 'oak_wood':
+                    case 'pine_wood':
+                        geometry = new THREE.CylinderGeometry(0.2, 0.2, 0.8);
+                        material = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
+                        break;
+                        
+                    default:
+                        geometry = new THREE.SphereGeometry(0.3, 6, 4);
+                        material = new THREE.MeshLambertMaterial({ color: 0xFFD700 });
+                }
+                
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.position.set(x, y, z);
+                mesh.userData = { type: 'resource', resource: resource, collectible: true };
+                
+                // Add floating animation
+                mesh.userData.originalY = y;
+                mesh.userData.floatTime = Math.random() * Math.PI * 2;
+                
+                this.scene.add(mesh);
+                this.entities.push(mesh);
+            }
+            
+            updatePlayerMovement(deltaTime) {
+                // Enhanced movement with physics
+                const moveSpeed = this.player.speed * (this.player.isSprinting ? this.player.sprintMultiplier : 1);
+                const actualSpeed = moveSpeed * deltaTime * 60;
+                
+                // Calculate movement direction
+                let moveX = 0;
+                let moveZ = 0;
+                
+                if (this.keys['w']) moveZ -= 1;
+                if (this.keys['s']) moveZ += 1;
+                if (this.keys['a']) moveX -= 1;
+                if (this.keys['d']) moveX += 1;
+                
+                // Normalize diagonal movement
+                if (moveX !== 0 && moveZ !== 0) {
+                    const factor = 1 / Math.sqrt(2);
+                    moveX *= factor;
+                    moveZ *= factor;
+                }
+                
+                // Apply rotation to movement
+                const sin = Math.sin(this.player.rotation.y);
+                const cos = Math.cos(this.player.rotation.y);
+                
+                const deltaX = moveX * cos - moveZ * sin;
+                const deltaZ = moveX * sin + moveZ * cos;
+                
+                // Update velocity
+                this.player.velocity.x = deltaX * actualSpeed;
+                this.player.velocity.z = deltaZ * actualSpeed;
+                
+                // Sprinting
+                if (this.keys['shift'] && !this.player.isCrouching) {
+                    this.player.isSprinting = true;
+                    this.player.stamina = Math.max(0, this.player.stamina - deltaTime * 10);
+                } else {
+                    this.player.isSprinting = false;
+                    this.player.stamina = Math.min(100, this.player.stamina + deltaTime * 5);
+                }
+                
+                // Jumping
+                if (this.keys[' '] && this.player.isGrounded) {
+                    this.player.velocity.y = this.player.jumpForce;
+                    this.player.isGrounded = false;
+                }
+                
+                // Apply gravity
+                if (!this.player.isGrounded) {
+                    this.player.velocity.y -= 0.02;
+                } else {
+                    this.player.velocity.y = Math.max(0, this.player.velocity.y);
+                }
+                
+                // Update position
+                this.player.position.x += this.player.velocity.x;
+                this.player.position.y += this.player.velocity.y;
+                this.player.position.z += this.player.velocity.z;
+                
+                // Simple ground collision
+                const groundHeight = this.getGroundHeight(this.player.position.x, this.player.position.z);
+                if (this.player.position.y <= groundHeight + 2) {
+                    this.player.position.y = groundHeight + 2;
+                    this.player.isGrounded = true;
+                    this.player.velocity.y = 0;
+                } else {
+                    this.player.isGrounded = false;
+                }
+                
+                // Check resource collection
+                this.checkResourceCollection();
+            }
+            
+            getGroundHeight(x, z) {
+                // Get terrain height at position
+                const chunkX = Math.floor(x / this.chunkSize);
+                const chunkZ = Math.floor(z / this.chunkSize);
+                const biomeNoise = this.noise.noise2D(chunkX * 0.05, chunkZ * 0.05);
+                const biomeKeys = Object.keys(this.biomes);
+                const biomeIndex = Math.floor((biomeNoise + 1) * 0.5 * biomeKeys.length);
+                const biome = this.biomes[biomeKeys[biomeIndex % biomeKeys.length]];
+                
+                return this.getTerrainHeight(Math.floor(x), Math.floor(z), biome);
+            }
+            
+            checkResourceCollection() {
+                // Check if player is near any resources
+                const collectionDistance = 3;
+                
+                for (let i = this.entities.length - 1; i >= 0; i--) {
+                    const entity = this.entities[i];
+                    if (entity.userData.collectible) {
+                        const distance = this.player.position.distanceTo(entity.position);
+                        
+                        if (distance < collectionDistance) {
+                            // Collect resource
+                            this.collectResource(entity.userData.resource);
+                            this.scene.remove(entity);
+                            this.entities.splice(i, 1);
+                            
+                            // Show collection effect
+                            this.showCollectionEffect(entity.position);
+                        }
+                    }
+                }
+            }
+            
+            collectResource(resource) {
+                // Add to inventory
+                const resourceMap = {
+                    'limestone': 'stone',
+                    'oak_wood': 'wood',
+                    'pine_wood': 'wood',
+                    'copper': 'stone',
+                    'clay': 'stone',
+                    'berries': 'food',
+                    'mushrooms': 'food'
+                };
+                
+                const inventoryItem = resourceMap[resource] || 'stone';
+                const currentCount = this.player.inventory.get(inventoryItem) || 0;
+                this.player.inventory.set(inventoryItem, currentCount + 1);
+                
+                // Update UI
+                this.updateInventoryUI();
+                
+                // Check achievements
+                const totalResources = Array.from(this.player.inventory.values()).reduce((a, b) => a + b, 0);
+                if (totalResources >= 1000) {
+                    this.unlockAchievement('wealthy');
+                }
+            }
+            
+            showCollectionEffect(position) {
+                // Create particle effect for collection
+                const particleCount = 20;
+                const particles = [];
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.1, 4, 4),
+                        new THREE.MeshBasicMaterial({ 
+                            color: 0xFFD700,
+                            emissive: 0xFFD700,
+                            emissiveIntensity: 1
+                        })
+                    );
+                    
+                    particle.position.copy(position);
+                    particle.userData = {
+                        velocity: new THREE.Vector3(
+                            (Math.random() - 0.5) * 0.2,
+                            Math.random() * 0.3,
+                            (Math.random() - 0.5) * 0.2
+                        ),
+                        lifetime: 1.0
+                    };
+                    
+                    this.scene.add(particle);
+                    particles.push(particle);
+                }
+                
+                // Animate particles
+                const animateParticles = () => {
+                    for (let i = particles.length - 1; i >= 0; i--) {
+                        const particle = particles[i];
+                        particle.position.add(particle.userData.velocity);
+                        particle.userData.velocity.y -= 0.01;
+                        particle.userData.lifetime -= 0.02;
+                        particle.material.opacity = particle.userData.lifetime;
+                        
+                        if (particle.userData.lifetime <= 0) {
+                            this.scene.remove(particle);
+                            particles.splice(i, 1);
+                        }
+                    }
+                    
+                    if (particles.length > 0) {
+                        requestAnimationFrame(animateParticles);
+                    }
+                };
+                
+                animateParticles();
+            }
+            
+            useCurrentItem() {
+                // Use the currently selected item
+                const slots = document.querySelectorAll('.inventory-slot');
+                const currentSlot = slots[this.player.selectedSlot];
+                const item = currentSlot.textContent[0];
+                
+                switch (item) {
+                    case '🔨': // Hammer - break blocks
+                        this.breakBlock();
+                        break;
+                    case '⛏️': // Pickaxe - mine resources
+                        this.mineResource();
+                        break;
+                    case '🗡️': // Sword - attack
+                        this.attack();
+                        break;
+                    case '🏹': // Bow - shoot arrow
+                        this.shootArrow();
+                        break;
+                    case '🍖': // Food - restore health
+                        this.eatFood();
+                        break;
+                    default:
+                        // Place block
+                        this.placeBlock();
+                }
+            }
+            
+            breakBlock() {
+                // Raycast to find block to break
+                const raycaster = new THREE.Raycaster();
+                const direction = new THREE.Vector3();
+                
+                this.camera.getWorldDirection(direction);
+                raycaster.set(this.camera.position, direction);
+                
+                const intersects = raycaster.intersectObjects(Array.from(this.chunks.values()));
+                
+                if (intersects.length > 0 && intersects[0].distance < 5) {
+                    // Add break effect
+                    this.showBreakEffect(intersects[0].point);
+                }
+            }
+            
+            showBreakEffect(position) {
+                // Create break particles
+                const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+                const material = new THREE.MeshBasicMaterial({ color: 0x8B4513 });
+                
+                for (let i = 0; i < 10; i++) {
+                    const particle = new THREE.Mesh(geometry, material);
+                    particle.position.copy(position);
+                    particle.position.add(new THREE.Vector3(
+                        (Math.random() - 0.5) * 0.5,
+                        Math.random() * 0.5,
+                        (Math.random() - 0.5) * 0.5
+                    ));
+                    
+                    this.scene.add(particle);
+                    
+                    // Remove after animation
+                    setTimeout(() => this.scene.remove(particle), 1000);
+                }
+            }
+            
+            placeBlock() {
+                // Place a block in front of player
+                const direction = new THREE.Vector3();
+                this.camera.getWorldDirection(direction);
+                
+                const placePosition = this.player.position.clone();
+                placePosition.add(direction.multiplyScalar(3));
+                
+                // Create block
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                const material = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
+                const block = new THREE.Mesh(geometry, material);
+                
+                block.position.set(
+                    Math.floor(placePosition.x),
+                    Math.floor(placePosition.y),
+                    Math.floor(placePosition.z)
+                );
+                
+                block.castShadow = true;
+                block.receiveShadow = true;
+                
+                this.scene.add(block);
+                this.entities.push(block);
+            }
+            
+            eatFood() {
+                const foodCount = this.player.inventory.get('food') || 0;
+                if (foodCount > 0) {
+                    this.player.health = Math.min(100, this.player.health + 20);
+                    this.player.inventory.set('food', foodCount - 1);
+                    this.updateInventoryUI();
+                    this.updateHealthBar();
+                }
+            }
+            
+            selectInventorySlot(slot) {
+                // Update selected inventory slot
+                this.player.selectedSlot = slot;
+                this.updateInventoryUI();
+            }
+            
+            updateInventoryUI() {
+                // Update inventory display
+                const slots = document.querySelectorAll('.inventory-slot');
+                slots.forEach((slot, index) => {
+                    slot.classList.toggle('active', index === this.player.selectedSlot);
+                    
+                    // Update counts
+                    const counts = slot.querySelector('.inventory-count');
+                    const items = ['stone', 'wood', 'wheat', 'diamond', 'hammer', 'pickaxe', 'sword', 'bow', 'food'];
+                    const count = this.player.inventory.get(items[index]) || 0;
+                    counts.textContent = count;
+                });
+                
+                // Update resource counter
+                const totalResources = Array.from(this.player.inventory.values()).reduce((a, b) => a + b, 0);
+                document.getElementById('resources').textContent = totalResources;
+            }
+            
+            updateHealthBar() {
+                const healthFill = document.getElementById('healthFill');
+                healthFill.style.width = `${this.player.health}%`;
+            }
+            
+            dropCurrentItem() {
+                // Drop currently selected item
+                console.log('Dropping item from slot', this.player.selectedSlot);
+            }
+            
+            mineResource() {
+                // Mine resources with pickaxe
+                console.log('Mining with pickaxe');
+            }
+            
+            attack() {
+                // Attack with sword
+                console.log('Attacking with sword');
+            }
+            
+            shootArrow() {
+                // Shoot arrow with bow
+                const arrow = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.05, 0.05, 1),
+                    new THREE.MeshBasicMaterial({ color: 0x8B4513 })
+                );
+                
+                arrow.position.copy(this.camera.position);
+                const direction = new THREE.Vector3();
+                this.camera.getWorldDirection(direction);
+                
+                arrow.userData = {
+                    velocity: direction.multiplyScalar(1),
+                    lifetime: 3
+                };
+                
+                this.scene.add(arrow);
+                this.entities.push(arrow);
+            }
+            
+            updateChunks() {
+                // Dynamic chunk loading/unloading
+                const playerChunkX = Math.floor(this.player.position.x / this.chunkSize);
+                const playerChunkZ = Math.floor(this.player.position.z / this.chunkSize);
+                
+                // Load new chunks
+                for (let x = -this.renderDistance; x <= this.renderDistance; x++) {
+                    for (let z = -this.renderDistance; z <= this.renderDistance; z++) {
+                        this.generateChunk(playerChunkX + x, playerChunkZ + z);
+                    }
+                }
+                
+                // Unload distant chunks
+                for (const [key, chunk] of this.chunks) {
+                    const [chunkX, chunkZ] = key.split(',').map(Number);
+                    const distance = Math.max(
+                        Math.abs(chunkX - playerChunkX),
+                        Math.abs(chunkZ - playerChunkZ)
+                    );
+                    
+                    if (distance > this.renderDistance + 2) {
+                        this.scene.remove(chunk);
+                        this.chunks.delete(key);
+                    }
+                }
+            }
+            
+            updateCamera() {
+                // Enhanced camera with smooth following
+                const targetPosition = this.player.position.clone();
+                targetPosition.y += this.player.isCrouching ? 1 : 1.6;
+                
+                // Smooth camera movement
+                this.camera.position.lerp(targetPosition, 0.1);
+                
+                // Apply rotation
+                this.camera.rotation.order = 'YXZ';
+                this.camera.rotation.y = this.player.rotation.y;
+                this.camera.rotation.x = this.player.rotation.x;
+            }
+            
+            updateDayNightCycle(deltaTime) {
+                // Day/night cycle
+                if (this.dayNightCycle) {
+                    this.gameTime += deltaTime * 0.01; // 1 game hour = 100 seconds
+                    if (this.gameTime >= 24) {
+                        this.gameTime -= 24;
+                    }
+                    
+                    // Update sun position
+                    const sunAngle = (this.gameTime / 24) * Math.PI * 2 - Math.PI / 2;
+                    this.sunLight.position.x = Math.cos(sunAngle) * 100;
+                    this.sunLight.position.y = Math.sin(sunAngle) * 100 + 50;
+                    
+                    this.sun.position.copy(this.sunLight.position);
+                    
+                    // Update light intensity
+                    const intensity = Math.max(0, Math.sin(sunAngle));
+                    this.sunLight.intensity = intensity * 1.2;
+                    this.moonLight.intensity = (1 - intensity) * 0.3;
+                    
+                    // Update sky color
+                    const skyMaterial = this.sky.material;
+                    if (intensity > 0.5) {
+                        // Day
+                        skyMaterial.uniforms.topColor.value.setHex(0x0077FF);
+                        skyMaterial.uniforms.bottomColor.value.setHex(0xFFFFFF);
+                    } else if (intensity > 0) {
+                        // Sunrise/sunset
+                        skyMaterial.uniforms.topColor.value.setHex(0xFF6B00);
+                        skyMaterial.uniforms.bottomColor.value.setHex(0xFFD700);
+                    } else {
+                        // Night
+                        skyMaterial.uniforms.topColor.value.setHex(0x000033);
+                        skyMaterial.uniforms.bottomColor.value.setHex(0x000066);
+                    }
+                    
+                    // Update fog
+                    const currentBiome = this.getCurrentBiome();
+                    const fogColor = new THREE.Color(currentBiome.fogColor);
+                    fogColor.multiplyScalar(intensity * 0.5 + 0.5);
+                    this.scene.fog.color = fogColor;
+                }
+                
+                // Update game time display
+                const hours = Math.floor(this.gameTime);
+                const minutes = Math.floor((this.gameTime - hours) * 60);
+                document.getElementById('gameTime').textContent = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            }
+            
+            getCurrentBiome() {
+                // Get current biome based on player position
+                const chunkX = Math.floor(this.player.position.x / this.chunkSize);
+                const chunkZ = Math.floor(this.player.position.z / this.chunkSize);
+                const biomeNoise = this.noise.noise2D(chunkX * 0.05, chunkZ * 0.05);
+                const biomeKeys = Object.keys(this.biomes);
+                const biomeIndex = Math.floor((biomeNoise + 1) * 0.5 * biomeKeys.length);
+                return this.biomes[biomeKeys[biomeIndex % biomeKeys.length]];
+            }
+            
+            updateEntities(deltaTime) {
+                // Update all entities
+                for (let i = this.entities.length - 1; i >= 0; i--) {
+                    const entity = this.entities[i];
+                    
+                    // Floating animation for resources
+                    if (entity.userData.floatTime !== undefined) {
+                        entity.userData.floatTime += deltaTime * 2;
+                        entity.position.y = entity.userData.originalY + Math.sin(entity.userData.floatTime) * 0.2;
+                        entity.rotation.y += deltaTime;
+                    }
+                    
+                    // Arrow physics
+                    if (entity.userData.velocity) {
+                        entity.position.add(entity.userData.velocity.clone().multiplyScalar(deltaTime * 60));
+                        entity.userData.velocity.y -= 0.01; // Gravity
+                        
+                        entity.userData.lifetime -= deltaTime;
+                        if (entity.userData.lifetime <= 0) {
+                            this.scene.remove(entity);
+                            this.entities.splice(i, 1);
+                        }
+                    }
+                }
+                
+                // Update particle system
+                if (this.particleSystem) {
+                    this.particleSystem.rotation.y += deltaTime * 0.05;
+                    const positions = this.particleSystem.geometry.attributes.position.array;
+                    
+                    for (let i = 1; i < positions.length; i += 3) {
+                        positions[i] -= deltaTime * 10; // Falling particles
+                        if (positions[i] < 0) {
+                            positions[i] = 100; // Reset to top
+                        }
+                    }
+                    
+                    this.particleSystem.geometry.attributes.position.needsUpdate = true;
+                }
+            }
+            
+            updateMinimap() {
+                // Update minimap display
+                const canvas = document.getElementById('minimap');
+                const ctx = canvas.getContext('2d');
+                
+                // Clear canvas
+                ctx.fillStyle = '#001428';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw chunks
+                const playerChunkX = Math.floor(this.player.position.x / this.chunkSize);
+                const playerChunkZ = Math.floor(this.player.position.z / this.chunkSize);
+                
+                const mapRadius = 5;
+                const chunkPixelSize = canvas.width / (mapRadius * 2);
+                
+                for (let x = -mapRadius; x < mapRadius; x++) {
+                    for (let z = -mapRadius; z < mapRadius; z++) {
+                        const chunkKey = `${playerChunkX + x},${playerChunkZ + z}`;
+                        
+                        if (this.chunks.has(chunkKey)) {
+                            const chunk = this.chunks.get(chunkKey);
+                            const biome = chunk.userData.biome;
+                            
+                            ctx.fillStyle = `#${biome.color.toString(16).padStart(6, '0')}`;
+                            ctx.fillRect(
+                                (x + mapRadius) * chunkPixelSize,
+                                (z + mapRadius) * chunkPixelSize,
+                                chunkPixelSize - 1,
+                                chunkPixelSize - 1
+                            );
+                        }
+                    }
+                }
+                
+                // Draw player
+                ctx.fillStyle = '#FF6B00';
+                ctx.beginPath();
+                ctx.arc(canvas.width / 2, canvas.height / 2, 5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Draw player direction
+                ctx.strokeStyle = '#FF6B00';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(canvas.width / 2, canvas.height / 2);
+                ctx.lineTo(
+                    canvas.width / 2 + Math.sin(this.player.rotation.y) * 10,
+                    canvas.height / 2 - Math.cos(this.player.rotation.y) * 10
+                );
+                ctx.stroke();
+            }
+            
+            updateStats() {
+                // Update performance stats
+                const now = performance.now();
+                const deltaTime = now - this.stats.lastTime;
+                this.stats.lastTime = now;
+                
+                this.stats.frameTime = deltaTime;
+                this.stats.fps = Math.round(1000 / deltaTime);
+                
+                // Count active chunks and entities
+                this.stats.chunks = this.chunks.size;
+                this.stats.entities = this.entities.length;
+                this.stats.triangles = this.renderer.info.render.triangles;
+                
+                // Update UI
+                document.getElementById('fps').textContent = this.stats.fps;
+                document.getElementById('position').textContent = 
+                    `${Math.floor(this.player.position.x)}, ${Math.floor(this.player.position.y)}, ${Math.floor(this.player.position.z)}`;
+                
+                const currentBiome = this.getCurrentBiome();
+                const biomeNames = {
+                    HILL_COUNTRY: 'Hill Country',
+                    PINEY_WOODS: 'Piney Woods',
+                    GULF_COAST: 'Gulf Coast',
+                    BADLANDS: 'Badlands',
+                    BRUSH_COUNTRY: 'Brush Country'
+                };
+                
+                for (const [key, biome] of Object.entries(this.biomes)) {
+                    if (biome === currentBiome) {
+                        document.getElementById('biome').textContent = biomeNames[key];
+                        break;
+                    }
+                }
+            }
+            
+            unlockAchievement(id) {
+                const achievement = this.achievements.get(id);
+                if (achievement && !achievement.unlocked) {
+                    achievement.unlocked = true;
+                    
+                    // Show achievement notification
+                    const achievementEl = document.getElementById('achievement');
+                    achievementEl.querySelector('.achievement-title').textContent = achievement.title;
+                    achievementEl.querySelector('.achievement-desc').textContent = achievement.desc;
+                    achievementEl.classList.add('show');
+                    
+                    setTimeout(() => {
+                        achievementEl.classList.remove('show');
+                    }, 5000);
+                }
+            }
+            
+            hideLoadingScreen() {
+                const loadingScreen = document.getElementById('loadingScreen');
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }
+            
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                
+                const deltaTime = 1 / 60; // Target 60 FPS
+                
+                // Update game systems
+                this.updatePlayerMovement(deltaTime);
+                this.updateCamera();
+                this.updateChunks();
+                this.updateDayNightCycle(deltaTime);
+                this.updateEntities(deltaTime);
+                this.updateMinimap();
+                this.updateStats();
+                
+                // Render scene
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+        
+        // Initialize game when page loads
+        window.addEventListener('load', () => {
+            const game = new BlazeWorldsUltimate();
+            window.game = game; // For debugging
+        });
+    </script>
+</body>
+</html>

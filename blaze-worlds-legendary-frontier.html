@@ -1,0 +1,2742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+ <title>BLAZE WORLDS | Legendary Frontier - Ultimate Texas Universe Explorer</title>
+ 
+ <script>
+ window.BLAZE_FRONTIER_AI = {
+ sessionStart: Date.now(),
+ analytics: {
+ exploration: new Map(),
+ biomes: new Map(),
+ creatures: new Map(), 
+ resources: new Map(),
+ performance: []
+ },
+ ai: {
+ ecosystem: new Map(),
+ economy: new Map(),
+ weather: new Map()
+ }
+ };
+ </script>
+ 
+ <style>
+ @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+ 
+ :root {
+ /* Texas Frontier Colors */
+ --texas-longhorn: #BF5700;
+ --bluebonnet-blue: #4F7CAC;
+ --gulf-teal: #00B2A9;
+ --prairie-gold: #FFD700;
+ --oil-black: #1C1C1C;
+ --limestone-white: #F5F5DC;
+ --mesquite-brown: #8B4513;
+ --cardinal-red: #DC143C;
+ 
+ /* UI Colors */
+ --deep-navy: #002244;
+ --pearl: #FAFAFA;
+ --graphite: #36454F;
+ --platinum: #E5E4E2;
+ }
+ 
+ * {
+ margin: 0;
+ padding: 0;
+ box-sizing: border-box;
+ }
+ 
+ body {
+ font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+ background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 30%, #002244 70%, #1a1a1a 100%);
+ color: var(--pearl);
+ overflow: hidden;
+ position: relative;
+ }
+ 
+ /* Texas Stars Background */
+ body::before {
+ content: '';
+ position: fixed;
+ top: 0;
+ left: 0;
+ width: 100%;
+ height: 100%;
+ background-image: 
+ radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+ radial-gradient(2px 2px at 40px 70px, #fff, transparent),
+ radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+ radial-gradient(1px 1px at 130px 80px, #fff, transparent),
+ radial-gradient(2px 2px at 160px 30px, #fff, transparent);
+ background-repeat: repeat;
+ background-size: 200px 100px;
+ opacity: 0.1;
+ z-index: -1;
+ }
+ 
+ /* Game Canvas */
+ #gameCanvas {
+ position: absolute;
+ top: 0;
+ left: 0;
+ width: 100%;
+ height: 100%;
+ cursor: crosshair;
+ transition: filter 0.3s ease;
+ }
+ 
+ /* Legendary Frontier Header */
+ .frontier-header {
+ position: absolute;
+ top: 0;
+ left: 0;
+ right: 0;
+ background: linear-gradient(180deg, rgba(0, 34, 68, 0.95) 0%, rgba(28, 28, 28, 0.8) 50%, transparent 100%);
+ backdrop-filter: blur(25px);
+ border-bottom: 2px solid rgba(191, 87, 0, 0.5);
+ z-index: 100;
+ padding: 12px 25px;
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ }
+ 
+ .frontier-logo {
+ display: flex;
+ align-items: center;
+ gap: 15px;
+ }
+ 
+ .logo-star {
+ width: 45px;
+ height: 45px;
+ background: linear-gradient(135deg, var(--texas-longhorn), var(--prairie-gold));
+ clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ position: relative;
+ animation: texasStarGlow 3s ease-in-out infinite;
+ }
+ 
+ @keyframes texasStarGlow {
+ 0%, 100% { 
+ box-shadow: 0 0 20px rgba(191, 87, 0, 0.5);
+ transform: scale(1);
+ }
+ 50% { 
+ box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+ transform: scale(1.05);
+ }
+ }
+ 
+ .frontier-title {
+ display: flex;
+ flex-direction: column;
+ }
+ 
+ .game-title {
+ font-size: 28px;
+ font-weight: 900;
+ background: linear-gradient(135deg, var(--texas-longhorn), var(--prairie-gold), var(--gulf-teal));
+ -webkit-background-clip: text;
+ -webkit-text-fill-color: transparent;
+ background-clip: text;
+ line-height: 1;
+ text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+ }
+ 
+ .frontier-subtitle {
+ font-size: 11px;
+ color: var(--bluebonnet-blue);
+ font-weight: 600;
+ text-transform: uppercase;
+ letter-spacing: 2px;
+ text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+ }
+ 
+ /* AI Analytics Dashboard */
+ .ai-dashboard {
+ display: flex;
+ gap: 15px;
+ align-items: center;
+ }
+ 
+ .ai-metric {
+ background: rgba(10, 14, 26, 0.9);
+ border: 1px solid var(--gulf-teal);
+ border-radius: 20px;
+ padding: 6px 12px;
+ font-size: 10px;
+ font-weight: 600;
+ color: var(--gulf-teal);
+ display: flex;
+ align-items: center;
+ gap: 5px;
+ font-family: 'JetBrains Mono', monospace;
+ }
+ 
+ .ai-value {
+ color: var(--prairie-gold);
+ }
+ 
+ .ai-pulse {
+ width: 8px;
+ height: 8px;
+ background: var(--cardinal-red);
+ border-radius: 50%;
+ animation: aiPulse 1s infinite;
+ }
+ 
+ @keyframes aiPulse {
+ 0%, 100% { opacity: 1; transform: scale(1); }
+ 50% { opacity: 0.5; transform: scale(0.8); }
+ }
+ 
+ /* Texas Biome HUD */
+ .texas-hud {
+ position: absolute;
+ pointer-events: none;
+ user-select: none;
+ z-index: 90;
+ }
+ 
+ .texas-hud-top {
+ top: 70px;
+ left: 25px;
+ right: 25px;
+ display: flex;
+ justify-content: space-between;
+ align-items: flex-start;
+ }
+ 
+ .texas-panel {
+ background: rgba(28, 28, 28, 0.95);
+ border: 2px solid var(--texas-longhorn);
+ border-radius: 15px;
+ padding: 20px;
+ backdrop-filter: blur(25px);
+ box-shadow: 0 10px 40px rgba(191, 87, 0, 0.4);
+ position: relative;
+ overflow: hidden;
+ }
+ 
+ .texas-panel::before {
+ content: '';
+ position: absolute;
+ top: -1px;
+ left: -1px;
+ right: -1px;
+ bottom: -1px;
+ background: linear-gradient(45deg, var(--texas-longhorn), var(--prairie-gold), var(--gulf-teal), var(--texas-longhorn));
+ border-radius: 15px;
+ z-index: -1;
+ animation: frontierBorder 3s linear infinite;
+ }
+ 
+ @keyframes frontierBorder {
+ 0% { background-position: 0% 50%; }
+ 100% { background-position: 400% 50%; }
+ }
+ 
+ .biome-stats {
+ display: grid;
+ grid-template-columns: repeat(2, 1fr);
+ gap: 15px;
+ min-width: 280px;
+ }
+ 
+ .biome-stat {
+ display: flex;
+ flex-direction: column;
+ }
+ 
+ .stat-label {
+ font-size: 9px;
+ color: var(--bluebonnet-blue);
+ text-transform: uppercase;
+ letter-spacing: 1.5px;
+ margin-bottom: 4px;
+ font-weight: 700;
+ }
+ 
+ .stat-value {
+ font-size: 18px;
+ font-weight: 800;
+ color: var(--prairie-gold);
+ font-family: 'JetBrains Mono', monospace;
+ text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+ }
+ 
+ /* Texas Wildlife Tracker */
+ .wildlife-tracker {
+ background: rgba(28, 28, 28, 0.95);
+ border: 2px solid var(--gulf-teal);
+ border-radius: 15px;
+ padding: 15px;
+ min-width: 220px;
+ backdrop-filter: blur(25px);
+ }
+ 
+ .tracker-title {
+ color: var(--gulf-teal);
+ font-size: 12px;
+ font-weight: 700;
+ margin-bottom: 10px;
+ text-transform: uppercase;
+ letter-spacing: 1px;
+ }
+ 
+ .creature-item {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin: 6px 0;
+ padding: 4px 0;
+ border-bottom: 1px solid rgba(79, 124, 172, 0.2);
+ }
+ 
+ .creature-name {
+ font-size: 11px;
+ color: var(--bluebonnet-blue);
+ font-weight: 500;
+ }
+ 
+ .creature-count {
+ font-size: 11px;
+ color: var(--prairie-gold);
+ font-weight: 700;
+ font-family: 'JetBrains Mono', monospace;
+ }
+ 
+ /* Advanced Performance Monitor */
+ .frontier-performance {
+ position: absolute;
+ top: 70px;
+ right: 25px;
+ background: rgba(28, 28, 28, 0.95);
+ border: 2px solid var(--cardinal-red);
+ border-radius: 15px;
+ padding: 15px;
+ font-family: 'JetBrains Mono', monospace;
+ font-size: 10px;
+ min-width: 250px;
+ backdrop-filter: blur(25px);
+ }
+ 
+ .perf-header {
+ color: var(--cardinal-red);
+ font-weight: 800;
+ margin-bottom: 12px;
+ text-transform: uppercase;
+ letter-spacing: 1px;
+ font-size: 11px;
+ }
+ 
+ .perf-metric {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin: 8px 0;
+ }
+ 
+ .perf-label {
+ color: var(--bluebonnet-blue);
+ font-weight: 600;
+ }
+ 
+ .perf-value {
+ color: var(--prairie-gold);
+ font-weight: 800;
+ }
+ 
+ .perf-graph {
+ width: 80px;
+ height: 6px;
+ background: rgba(79, 124, 172, 0.3);
+ border-radius: 3px;
+ margin-left: 10px;
+ overflow: hidden;
+ }
+ 
+ .perf-graph-fill {
+ height: 100%;
+ background: linear-gradient(90deg, var(--gulf-teal), var(--prairie-gold));
+ transition: width 0.3s ease;
+ border-radius: 3px;
+ }
+ 
+ /* Resource Economy HUD */
+ .economy-hud {
+ position: absolute;
+ bottom: 25px;
+ left: 25px;
+ background: rgba(28, 28, 28, 0.95);
+ border: 2px solid var(--mesquite-brown);
+ border-radius: 15px;
+ padding: 20px;
+ backdrop-filter: blur(25px);
+ min-width: 300px;
+ }
+ 
+ .economy-title {
+ color: var(--mesquite-brown);
+ font-size: 14px;
+ font-weight: 800;
+ margin-bottom: 15px;
+ text-transform: uppercase;
+ letter-spacing: 1px;
+ }
+ 
+ .resource-grid {
+ display: grid;
+ grid-template-columns: repeat(3, 1fr);
+ gap: 12px;
+ }
+ 
+ .resource-item {
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ text-align: center;
+ }
+ 
+ .resource-icon {
+ width: 24px;
+ height: 24px;
+ margin-bottom: 6px;
+ border-radius: 4px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ font-weight: 900;
+ font-size: 12px;
+ }
+ 
+ .oil { background: var(--oil-black); color: var(--prairie-gold); }
+ .cattle { background: var(--mesquite-brown); color: var(--limestone-white); }
+ .limestone { background: var(--limestone-white); color: var(--oil-black); }
+ 
+ .resource-name {
+ font-size: 9px;
+ color: var(--bluebonnet-blue);
+ font-weight: 600;
+ text-transform: uppercase;
+ }
+ 
+ .resource-count {
+ font-size: 14px;
+ color: var(--prairie-gold);
+ font-weight: 800;
+ font-family: 'JetBrains Mono', monospace;
+ }
+ 
+ /* Enhanced Inventory Hotbar */
+ .frontier-hotbar {
+ position: absolute;
+ bottom: 25px;
+ left: 50%;
+ transform: translateX(-50%);
+ display: flex;
+ gap: 8px;
+ background: rgba(28, 28, 28, 0.95);
+ border: 2px solid var(--texas-longhorn);
+ border-radius: 25px;
+ padding: 12px 20px;
+ backdrop-filter: blur(25px);
+ }
+ 
+ .hotbar-slot {
+ width: 50px;
+ height: 50px;
+ background: rgba(79, 124, 172, 0.1);
+ border: 2px solid var(--bluebonnet-blue);
+ border-radius: 8px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ font-weight: 800;
+ font-size: 12px;
+ color: var(--pearl);
+ transition: all 0.3s ease;
+ cursor: pointer;
+ position: relative;
+ }
+ 
+ .hotbar-slot.selected {
+ border-color: var(--prairie-gold);
+ background: rgba(255, 215, 0, 0.2);
+ transform: scale(1.1);
+ box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+ }
+ 
+ .hotbar-slot::after {
+ content: attr(data-key);
+ position: absolute;
+ bottom: -15px;
+ left: 50%;
+ transform: translateX(-50%);
+ font-size: 8px;
+ color: var(--bluebonnet-blue);
+ font-family: 'JetBrains Mono', monospace;
+ }
+ 
+ /* Texas Weather System */
+ .weather-system {
+ position: absolute;
+ top: 25px;
+ right: 25px;
+ background: rgba(28, 28, 28, 0.9);
+ border: 2px solid var(--bluebonnet-blue);
+ border-radius: 20px;
+ padding: 15px 20px;
+ backdrop-filter: blur(20px);
+ display: flex;
+ align-items: center;
+ gap: 15px;
+ }
+ 
+ .weather-icon {
+ font-size: 24px;
+ animation: weatherFloat 2s ease-in-out infinite;
+ }
+ 
+ @keyframes weatherFloat {
+ 0%, 100% { transform: translateY(0); }
+ 50% { transform: translateY(-3px); }
+ }
+ 
+ .weather-info {
+ display: flex;
+ flex-direction: column;
+ }
+ 
+ .weather-type {
+ font-size: 12px;
+ color: var(--prairie-gold);
+ font-weight: 700;
+ text-transform: uppercase;
+ }
+ 
+ .weather-temp {
+ font-size: 10px;
+ color: var(--bluebonnet-blue);
+ font-family: 'JetBrains Mono', monospace;
+ }
+ 
+ /* Loading Screen Enhancement */
+ .frontier-loading {
+ position: absolute;
+ top: 0;
+ left: 0;
+ width: 100%;
+ height: 100%;
+ background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 30%, #002244 70%, #1a1a1a 100%);
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ align-items: center;
+ z-index: 2000;
+ transition: opacity 1s ease;
+ }
+ 
+ .loading-hero {
+ text-align: center;
+ margin-bottom: 60px;
+ }
+ 
+ .loading-star {
+ font-size: 80px;
+ margin-bottom: 20px;
+ animation: loadingStar 2s ease-in-out infinite;
+ }
+ 
+ @keyframes loadingStar {
+ 0%, 100% { 
+ transform: scale(1) rotate(0deg);
+ filter: brightness(1);
+ }
+ 50% { 
+ transform: scale(1.1) rotate(180deg);
+ filter: brightness(1.5);
+ }
+ }
+ 
+ .loading-title {
+ font-size: 72px;
+ font-weight: 900;
+ background: linear-gradient(135deg, var(--texas-longhorn), var(--prairie-gold), var(--gulf-teal), var(--cardinal-red));
+ -webkit-background-clip: text;
+ -webkit-text-fill-color: transparent;
+ background-clip: text;
+ margin-bottom: 15px;
+ background-size: 300% 300%;
+ animation: frontierFlow 4s ease-in-out infinite;
+ }
+ 
+ @keyframes frontierFlow {
+ 0%, 100% { background-position: 0% 50%; }
+ 50% { background-position: 100% 50%; }
+ }
+ 
+ .loading-tagline {
+ font-size: 20px;
+ color: var(--bluebonnet-blue);
+ font-weight: 700;
+ text-transform: uppercase;
+ letter-spacing: 4px;
+ margin-bottom: 8px;
+ }
+ 
+ .loading-subtitle {
+ font-size: 16px;
+ color: var(--pearl);
+ font-weight: 500;
+ opacity: 0.9;
+ }
+ 
+ .loading-progress-section {
+ width: 500px;
+ margin-bottom: 40px;
+ }
+ 
+ .loading-bar {
+ width: 100%;
+ height: 8px;
+ background: rgba(79, 124, 172, 0.3);
+ border-radius: 4px;
+ overflow: hidden;
+ position: relative;
+ }
+ 
+ .loading-progress {
+ height: 100%;
+ background: linear-gradient(90deg, var(--texas-longhorn), var(--prairie-gold), var(--gulf-teal));
+ width: 0%;
+ transition: width 0.6s ease;
+ border-radius: 4px;
+ position: relative;
+ }
+ 
+ .loading-progress::after {
+ content: '';
+ position: absolute;
+ top: 0;
+ left: 0;
+ right: 0;
+ bottom: 0;
+ background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+ animation: progressShimmer 2.5s linear infinite;
+ }
+ 
+ @keyframes progressShimmer {
+ 0% { transform: translateX(-100%); }
+ 100% { transform: translateX(100%); }
+ }
+ 
+ .loading-status {
+ color: var(--bluebonnet-blue);
+ font-size: 16px;
+ font-weight: 600;
+ text-align: center;
+ margin-top: 20px;
+ }
+ 
+ .loading-tips {
+ position: absolute;
+ bottom: 50px;
+ left: 50%;
+ transform: translateX(-50%);
+ text-align: center;
+ }
+ 
+ .loading-tip {
+ color: var(--pearl);
+ font-size: 14px;
+ font-weight: 400;
+ font-style: italic;
+ opacity: 0.8;
+ }
+ 
+ /* Mobile Responsiveness */
+ @media (max-width: 768px) {
+ .frontier-header {
+ padding: 8px 15px;
+ }
+ 
+ .game-title {
+ font-size: 20px;
+ }
+ 
+ .ai-dashboard {
+ display: none;
+ }
+ 
+ .biome-stats {
+ grid-template-columns: 1fr;
+ min-width: 200px;
+ }
+ 
+ .wildlife-tracker, .frontier-performance, .economy-hud {
+ display: none;
+ }
+ 
+ .frontier-hotbar {
+ bottom: 15px;
+ padding: 8px 15px;
+ }
+ 
+ .hotbar-slot {
+ width: 40px;
+ height: 40px;
+ font-size: 10px;
+ }
+ }
+ 
+ /* Advanced Animations */
+ .floating {
+ animation: floating 3s ease-in-out infinite;
+ }
+ 
+ @keyframes floating {
+ 0%, 100% { transform: translateY(0px); }
+ 50% { transform: translateY(-6px); }
+ }
+ 
+ .shimmer {
+ position: relative;
+ overflow: hidden;
+ }
+ 
+ .shimmer::after {
+ content: '';
+ position: absolute;
+ top: 0;
+ left: -100%;
+ width: 100%;
+ height: 100%;
+ background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+ animation: shimmerEffect 3s infinite;
+ }
+ 
+ @keyframes shimmerEffect {
+ 0% { left: -100%; }
+ 100% { left: 100%; }
+ }
+ </style>
+</head>
+<body>
+ <div class="frontier-header" id="frontierHeader">
+ <div class="frontier-logo">
+ <div class="logo-star"></div>
+ <div class="frontier-title">
+ <div class="game-title">BLAZE WORLDS</div>
+ <div class="frontier-subtitle">Legendary Frontier Edition</div>
+ </div>
+ </div>
+ 
+ <div class="ai-dashboard">
+ <div class="ai-metric">
+ <div class="ai-pulse"></div>
+ <span>AI:</span>
+ <span class="ai-value" id="aiStatus">ACTIVE</span>
+ </div>
+ <div class="ai-metric">
+ <span>BIOMES:</span>
+ <span class="ai-value" id="biomeCount">18</span>
+ </div>
+ <div class="ai-metric">
+ <span>FPS:</span>
+ <span class="ai-value" id="headerFPS">60</span>
+ </div>
+ <div class="ai-metric">
+ <span>STATUS:</span>
+ <span class="ai-value">LEGENDARY</span>
+ </div>
+ </div>
+ </div>
+ 
+ <canvas id="gameCanvas"></canvas>
+ 
+ <div class="frontier-performance" id="frontierPerf">
+ <div class="perf-header">🚀 Frontier Analytics</div>
+ <div class="perf-metric">
+ <span class="perf-label">FPS</span>
+ <span class="perf-value" id="perfFPS">60</span>
+ <div class="perf-graph"><div class="perf-graph-fill" id="fpsGraph"></div></div>
+ </div>
+ <div class="perf-metric">
+ <span class="perf-label">Chunks</span>
+ <span class="perf-value" id="perfChunks">144</span>
+ </div>
+ <div class="perf-metric">
+ <span class="perf-label">Creatures</span>
+ <span class="perf-value" id="perfCreatures">189</span>
+ </div>
+ <div class="perf-metric">
+ <span class="perf-label">Draw Calls</span>
+ <span class="perf-value" id="perfDrawCalls">287</span>
+ </div>
+ <div class="perf-metric">
+ <span class="perf-label">Memory</span>
+ <span class="perf-value" id="perfMemory">245MB</span>
+ </div>
+ <div class="perf-metric">
+ <span class="perf-label">AI Load</span>
+ <span class="perf-value" id="perfAI">23%</span>
+ <div class="perf-graph"><div class="perf-graph-fill" id="aiGraph"></div></div>
+ </div>
+ </div>
+ 
+ <div class="frontier-hotbar">
+ <div class="hotbar-slot selected" data-key="1" id="slot1">🪨</div>
+ <div class="hotbar-slot" data-key="2" id="slot2">🌿</div>
+ <div class="hotbar-slot" data-key="3" id="slot3">🪵</div>
+ <div class="hotbar-slot" data-key="4" id="slot4">🛢️</div>
+ <div class="hotbar-slot" data-key="5" id="slot5">💎</div>
+ <div class="hotbar-slot" data-key="6" id="slot6">⭐</div>
+ <div class="hotbar-slot" data-key="7" id="slot7">🔥</div>
+ <div class="hotbar-slot" data-key="8" id="slot8">❄️</div>
+ <div class="hotbar-slot" data-key="9" id="slot9">⚡</div>
+ </div>
+ 
+ <script type="module">
+ // Import advanced libraries
+ import { createNoise3D, createNoise2D } from 'https://cdn.jsdelivr.net/npm/simplex-noise@4.0.0/dist/esm/simplex-noise.min.js';
+ 
+ // LEGENDARY FRONTIER CONFIGURATION
+ const FRONTIER_CONFIG = {
+ // World generation
+ CHUNK_SIZE: 16,
+ CHUNK_HEIGHT: 128, // Increased for deeper caves and taller mountains
+ RENDER_DISTANCE: 12, // Increased for better vista views
+ BLOCK_SIZE: 1,
+ 
+ // Enhanced physics
+ GRAVITY: -40,
+ JUMP_FORCE: 16,
+ MOVE_SPEED: 15,
+ SPRINT_MULTIPLIER: 2.5,
+ MOUSE_SENSITIVITY: 0.0025,
+ FOV: 80, // Wider FOV for Texas landscapes
+ 
+ // Advanced rendering
+ NEAR_PLANE: 0.1,
+ FAR_PLANE: 1500,
+ FOG_NEAR: 80,
+ FOG_FAR: 400,
+ SHADOW_MAP_SIZE: 4096,
+ 
+ // Noise settings for Texas terrain
+ BIOME_SCALE: 0.003,
+ TERRAIN_SCALE: 0.015,
+ CAVE_SCALE: 0.04,
+ DETAIL_SCALE: 0.06,
+ 
+ // AI and ecosystem
+ MAX_CREATURES: 500,
+ CREATURE_SPAWN_RATE: 0.1,
+ AI_UPDATE_INTERVAL: 100,
+ ECOSYSTEM_BALANCE_FACTOR: 0.8,
+ 
+ // Performance
+ LOD_DISTANCES: [50, 100, 200, 350],
+ MAX_CHUNKS_PER_FRAME: 4,
+ PARTICLE_LIMIT: 2000,
+ 
+ // Weather system
+ WEATHER_CHANGE_INTERVAL: 300000, // 5 minutes
+ TEMPERATURE_VARIANCE: 20,
+ HUMIDITY_VARIANCE: 30
+ };
+ 
+ // TEXAS FRONTIER BIOMES
+ const TEXAS_BIOMES = {
+ // Traditional biomes enhanced
+ DEEP_OCEAN: {
+ name: 'Gulf of Mexico',
+ baseHeight: 15,
+ variance: 8,
+ temperature: 82,
+ humidity: 95,
+ color: new THREE.Color(0x003366),
+ fogColor: new THREE.Color(0x336699),
+ creatures: ['dolphins', 'sharks', 'fish', 'crabs'],
+ resources: ['salt', 'seaweed', 'pearls'],
+ weatherTypes: ['clear', 'storms', 'fog']
+ },
+ 
+ OCEAN: {
+ name: 'Coastal Waters',
+ baseHeight: 20,
+ variance: 5,
+ temperature: 78,
+ humidity: 85,
+ color: new THREE.Color(0x006699),
+ fogColor: new THREE.Color(0x4682b4),
+ creatures: ['dolphins', 'fish', 'pelicans'],
+ resources: ['fish', 'salt'],
+ weatherTypes: ['clear', 'rain', 'storms']
+ },
+ 
+ BEACH: {
+ name: 'Gulf Coast',
+ baseHeight: 22,
+ variance: 3,
+ temperature: 85,
+ humidity: 70,
+ color: new THREE.Color(0xc2b280),
+ fogColor: new THREE.Color(0xffd4a3),
+ creatures: ['crabs', 'seagulls', 'sandpipers'],
+ resources: ['shells', 'driftwood', 'sand'],
+ weatherTypes: ['clear', 'windy', 'storms']
+ },
+ 
+ // TEXAS-SPECIFIC BIOMES
+ HILL_COUNTRY: {
+ name: 'Texas Hill Country',
+ baseHeight: 45,
+ variance: 15,
+ temperature: 75,
+ humidity: 50,
+ color: new THREE.Color(0x7fb069),
+ fogColor: new THREE.Color(0x87ceeb),
+ creatures: ['longhorns', 'deer', 'bluebonnets', 'mockingbirds'],
+ resources: ['limestone', 'cedar', 'wildflowers', 'springs'],
+ weatherTypes: ['clear', 'rain', 'storms'],
+ specialFeatures: ['limestone_caves', 'natural_springs', 'wildflower_fields']
+ },
+ 
+ PINEY_WOODS: {
+ name: 'East Texas Piney Woods',
+ baseHeight: 38,
+ variance: 12,
+ temperature: 78,
+ humidity: 75,
+ color: new THREE.Color(0x228b22),
+ fogColor: new THREE.Color(0x4a5d23),
+ creatures: ['bears', 'deer', 'cardinals', 'squirrels', 'woodpeckers'],
+ resources: ['pine', 'oak', 'hickory', 'berries'],
+ weatherTypes: ['clear', 'rain', 'fog'],
+ specialFeatures: ['dense_forests', 'creeks', 'logging_camps']
+ },
+ 
+ GULF_MARSHLANDS: {
+ name: 'Gulf Coast Marshlands',
+ baseHeight: 18,
+ variance: 4,
+ temperature: 84,
+ humidity: 95,
+ color: new THREE.Color(0x556b2f),
+ fogColor: new THREE.Color(0x696969),
+ creatures: ['alligators', 'herons', 'frogs', 'fish'],
+ resources: ['cypress', 'cattails', 'fish', 'oil'],
+ weatherTypes: ['fog', 'rain', 'storms'],
+ specialFeatures: ['oil_rigs', 'cypress_groves', 'bayous']
+ },
+ 
+ WEST_TEXAS_BADLANDS: {
+ name: 'West Texas Badlands',
+ baseHeight: 55,
+ variance: 25,
+ temperature: 95,
+ humidity: 20,
+ color: new THREE.Color(0xd2691e),
+ fogColor: new THREE.Color(0xdaa520),
+ creatures: ['coyotes', 'roadrunners', 'rattlesnakes', 'jackrabbits'],
+ resources: ['sandstone', 'oil', 'copper', 'cactus'],
+ weatherTypes: ['clear', 'sandstorms', 'heat_waves'],
+ specialFeatures: ['mesas', 'canyons', 'ghost_towns', 'oil_wells']
+ },
+ 
+ SOUTH_TEXAS_BRUSH: {
+ name: 'South Texas Brush Country',
+ baseHeight: 25,
+ variance: 8,
+ temperature: 88,
+ humidity: 35,
+ color: new THREE.Color(0x8fbc8f),
+ fogColor: new THREE.Color(0xbdb76b),
+ creatures: ['javelinas', 'bobcats', 'roadrunners', 'quail'],
+ resources: ['mesquite', 'prickly_pear', 'agave', 'oil'],
+ weatherTypes: ['clear', 'dust_storms', 'drought'],
+ specialFeatures: ['thorny_brush', 'water_holes', 'ranch_lands']
+ }
+ };
+ 
+ // ENHANCED BLOCK TYPES
+ const FRONTIER_BLOCKS = {
+ AIR: 0,
+ 
+ // Basic blocks
+ GRASS: 1,
+ DIRT: 2,
+ STONE: 3,
+ WATER: 4,
+ SAND: 5,
+ SNOW: 6,
+ 
+ // Wood types
+ PINE: 7,
+ OAK: 8,
+ CEDAR: 9,
+ CYPRESS: 10,
+ MESQUITE: 11,
+ 
+ // Texas materials
+ LIMESTONE: 12,
+ SANDSTONE: 13,
+ OIL: 14,
+ SALT: 15,
+ BLUEBONNET: 16,
+ PRICKLY_PEAR: 17,
+ 
+ // Precious materials
+ COPPER: 18,
+ SILVER: 19,
+ GOLD: 20,
+ BLACK_GOLD: 21, // Oil deposits
+ 
+ // Special blocks
+ LONGHORN_HORN: 22,
+ TEXAS_STAR: 23,
+ FRONTIER_CRYSTAL: 24
+ };
+ 
+ // AI CREATURE SYSTEM
+ class TexasCreature {
+ constructor(type, biome, position) {
+ this.type = type;
+ this.biome = biome;
+ this.position = position.clone();
+ this.velocity = new THREE.Vector3();
+ this.health = 100;
+ this.age = 0;
+ this.behavior = 'wander';
+ this.target = null;
+ this.lastUpdate = 0;
+ 
+ // Species-specific properties
+ this.properties = this.getSpeciesProperties(type);
+ 
+ // AI state machine
+ this.stateTimer = 0;
+ this.nextStateChange = Math.random() * 10000;
+ }
+ 
+ getSpeciesProperties(type) {
+ const properties = {
+ longhorns: {
+ speed: 0.5,
+ size: 2.0,
+ aggressive: false,
+ groupSize: 8,
+ soundRange: 20,
+ lifespan: 300000
+ },
+ deer: {
+ speed: 1.2,
+ size: 1.0,
+ aggressive: false,
+ groupSize: 4,
+ soundRange: 15,
+ lifespan: 200000
+ },
+ coyotes: {
+ speed: 1.8,
+ size: 0.8,
+ aggressive: true,
+ groupSize: 3,
+ soundRange: 30,
+ lifespan: 180000
+ },
+ mockingbirds: {
+ speed: 2.5,
+ size: 0.3,
+ aggressive: false,
+ groupSize: 1,
+ soundRange: 25,
+ lifespan: 150000,
+ canFly: true
+ }
+ };
+ 
+ return properties[type] || properties.deer;
+ }
+ 
+ update(deltaTime, nearbyCreatures, player) {
+ this.age += deltaTime * 1000;
+ this.stateTimer += deltaTime * 1000;
+ 
+ // Update AI behavior
+ if (this.stateTimer > this.nextStateChange) {
+ this.updateBehavior(nearbyCreatures, player);
+ this.stateTimer = 0;
+ this.nextStateChange = 2000 + Math.random() * 8000;
+ }
+ 
+ // Execute current behavior
+ this.executeBehavior(deltaTime, nearbyCreatures, player);
+ 
+ // Update position
+ this.position.add(this.velocity.clone().multiplyScalar(deltaTime));
+ 
+ // Boundary checking and terrain following
+ this.followTerrain();
+ 
+ // Age and lifecycle
+ if (this.age > this.properties.lifespan) {
+ this.health = 0; // Natural death
+ }
+ }
+ 
+ updateBehavior(nearbyCreatures, player) {
+ const playerDistance = this.position.distanceTo(player.position);
+ 
+ // Fear response
+ if (playerDistance < 10 && !this.properties.aggressive) {
+ this.behavior = 'flee';
+ this.target = player.position.clone();
+ return;
+ }
+ 
+ // Aggressive response
+ if (playerDistance < 15 && this.properties.aggressive) {
+ this.behavior = 'chase';
+ this.target = player.position.clone();
+ return;
+ }
+ 
+ // Flocking behavior
+ if (nearbyCreatures.length > 0) {
+ const sameSpecies = nearbyCreatures.filter(c => c.type === this.type);
+ if (sameSpecies.length > 0 && sameSpecies.length < this.properties.groupSize) {
+ this.behavior = 'flock';
+ this.target = this.calculateFlockCenter(sameSpecies);
+ return;
+ }
+ }
+ 
+ // Default wandering
+ this.behavior = 'wander';
+ this.generateWanderTarget();
+ }
+ 
+ executeBehavior(deltaTime, nearbyCreatures, player) {
+ switch (this.behavior) {
+ case 'wander':
+ this.wander(deltaTime);
+ break;
+ case 'flee':
+ this.flee(deltaTime);
+ break;
+ case 'chase':
+ this.chase(deltaTime);
+ break;
+ case 'flock':
+ this.flock(deltaTime, nearbyCreatures);
+ break;
+ }
+ }
+ 
+ wander(deltaTime) {
+ if (!this.target || this.position.distanceTo(this.target) < 2) {
+ this.generateWanderTarget();
+ }
+ 
+ const direction = this.target.clone().sub(this.position).normalize();
+ this.velocity = direction.multiplyScalar(this.properties.speed * 0.3);
+ }
+ 
+ flee(deltaTime) {
+ const direction = this.position.clone().sub(this.target).normalize();
+ this.velocity = direction.multiplyScalar(this.properties.speed * 1.5);
+ }
+ 
+ chase(deltaTime) {
+ const direction = this.target.clone().sub(this.position).normalize();
+ this.velocity = direction.multiplyScalar(this.properties.speed * 1.2);
+ }
+ 
+ flock(deltaTime, nearbyCreatures) {
+ const sameSpecies = nearbyCreatures.filter(c => c.type === this.type);
+ 
+ // Separation
+ let separation = new THREE.Vector3();
+ sameSpecies.forEach(creature => {
+ const distance = this.position.distanceTo(creature.position);
+ if (distance < 3 && distance > 0) {
+ separation.add(this.position.clone().sub(creature.position).normalize().divideScalar(distance));
+ }
+ });
+ 
+ // Alignment
+ let alignment = new THREE.Vector3();
+ sameSpecies.forEach(creature => {
+ alignment.add(creature.velocity);
+ });
+ if (sameSpecies.length > 0) {
+ alignment.divideScalar(sameSpecies.length).normalize();
+ }
+ 
+ // Cohesion
+ let cohesion = new THREE.Vector3();
+ sameSpecies.forEach(creature => {
+ cohesion.add(creature.position);
+ });
+ if (sameSpecies.length > 0) {
+ cohesion.divideScalar(sameSpecies.length).sub(this.position).normalize();
+ }
+ 
+ // Combine behaviors
+ this.velocity = separation.multiplyScalar(0.5)
+ .add(alignment.multiplyScalar(0.3))
+ .add(cohesion.multiplyScalar(0.2))
+ .multiplyScalar(this.properties.speed);
+ }
+ 
+ generateWanderTarget() {
+ const angle = Math.random() * Math.PI * 2;
+ const distance = 5 + Math.random() * 15;
+ this.target = new THREE.Vector3(
+ this.position.x + Math.cos(angle) * distance,
+ this.position.y,
+ this.position.z + Math.sin(angle) * distance
+ );
+ }
+ 
+ calculateFlockCenter(creatures) {
+ const center = new THREE.Vector3();
+ creatures.forEach(creature => {
+ center.add(creature.position);
+ });
+ return center.divideScalar(creatures.length);
+ }
+ 
+ followTerrain() {
+ // Simple terrain following - would integrate with actual terrain height
+ this.position.y = Math.max(this.position.y, 32 + this.properties.size);
+ }
+ 
+ isAlive() {
+ return this.health > 0;
+ }
+ }
+ 
+ // ADVANCED WEATHER SYSTEM
+ class TexasWeatherSystem {
+ constructor() {
+ this.currentWeather = 'clear';
+ this.temperature = 78;
+ this.humidity = 45;
+ this.windSpeed = 5;
+ this.windDirection = 0;
+ this.changeTimer = 0;
+ this.particles = [];
+ 
+ this.weatherTypes = {
+ clear: {
+ temp: [70, 90],
+ humidity: [30, 60],
+ visibility: 1.0,
+ particles: false,
+ icon: '☀️'
+ },
+ cloudy: {
+ temp: [65, 80],
+ humidity: [50, 80],
+ visibility: 0.8,
+ particles: false,
+ icon: '☁️'
+ },
+ rain: {
+ temp: [60, 75],
+ humidity: [80, 95],
+ visibility: 0.6,
+ particles: true,
+ icon: '🌧️'
+ },
+ storms: {
+ temp: [65, 80],
+ humidity: [85, 98],
+ visibility: 0.4,
+ particles: true,
+ icon: '⛈️'
+ },
+ sandstorms: {
+ temp: [85, 110],
+ humidity: [5, 20],
+ visibility: 0.2,
+ particles: true,
+ icon: '🌪️'
+ },
+ fog: {
+ temp: [65, 75],
+ humidity: [90, 100],
+ visibility: 0.3,
+ particles: false,
+ icon: '🌫️'
+ },
+ drought: {
+ temp: [95, 115],
+ humidity: [5, 15],
+ visibility: 0.9,
+ particles: false,
+ icon: '🔥'
+ }
+ };
+ }
+ 
+ update(deltaTime, biome, scene) {
+ this.changeTimer += deltaTime * 1000;
+ 
+ // Weather change logic
+ if (this.changeTimer > FRONTIER_CONFIG.WEATHER_CHANGE_INTERVAL) {
+ this.changeWeather(biome);
+ this.changeTimer = 0;
+ }
+ 
+ // Update particles
+ this.updateParticles(deltaTime);
+ 
+ // Update environmental effects
+ this.updateEnvironment(scene);
+ }
+ 
+ changeWeather(biome) {
+ const possibleWeathers = biome.weatherTypes || ['clear', 'cloudy'];
+ const newWeather = possibleWeathers[Math.floor(Math.random() * possibleWeathers.length)];
+ 
+ if (newWeather !== this.currentWeather) {
+ this.currentWeather = newWeather;
+ this.updateWeatherStats();
+ this.updateUI();
+ }
+ }
+ 
+ updateWeatherStats() {
+ const weather = this.weatherTypes[this.currentWeather];
+ this.temperature = weather.temp[0] + Math.random() * (weather.temp[1] - weather.temp[0]);
+ this.humidity = weather.humidity[0] + Math.random() * (weather.humidity[1] - weather.humidity[0]);
+ }
+ 
+ updateParticles(deltaTime) {
+ // Particle system logic would go here
+ // Create, update, and remove weather particles
+ }
+ 
+ updateEnvironment(scene) {
+ const weather = this.weatherTypes[this.currentWeather];
+ 
+ // Update fog based on weather
+ if (scene.fog) {
+ const targetFar = FRONTIER_CONFIG.FOG_FAR * weather.visibility;
+ scene.fog.far = THREE.MathUtils.lerp(scene.fog.far, targetFar, 0.01);
+ }
+ }
+ 
+ updateUI() {
+ const weather = this.weatherTypes[this.currentWeather];
+ document.getElementById('weatherIcon').textContent = weather.icon;
+ document.getElementById('weatherType').textContent = this.currentWeather.replace('_', ' ').toUpperCase();
+ document.getElementById('weatherTemp').textContent = `${Math.round(this.temperature)}°F | ${Math.round(this.humidity)}%`;
+ }
+ }
+ 
+ // FRONTIER RESOURCE ECONOMY
+ class FrontierEconomy {
+ constructor() {
+ this.resources = new Map();
+ this.prices = new Map();
+ this.demand = new Map();
+ this.supply = new Map();
+ 
+ this.initializeEconomy();
+ }
+ 
+ initializeEconomy() {
+ // Initialize base resources
+ const baseResources = [
+ 'oil', 'cattle', 'limestone', 'cotton', 'cedar', 
+ 'copper', 'silver', 'gold', 'salt', 'fish'
+ ];
+ 
+ baseResources.forEach(resource => {
+ this.resources.set(resource, Math.floor(Math.random() * 100));
+ this.prices.set(resource, 1 + Math.random() * 10);
+ this.demand.set(resource, 0.5 + Math.random() * 0.5);
+ this.supply.set(resource, 0.5 + Math.random() * 0.5);
+ });
+ 
+ this.updateUI();
+ }
+ 
+ addResource(type, amount) {
+ const current = this.resources.get(type) || 0;
+ this.resources.set(type, current + amount);
+ this.updateSupply(type, amount);
+ this.updateUI();
+ }
+ 
+ removeResource(type, amount) {
+ const current = this.resources.get(type) || 0;
+ const newAmount = Math.max(0, current - amount);
+ this.resources.set(type, newAmount);
+ this.updateDemand(type, amount);
+ this.updateUI();
+ }
+ 
+ updateSupply(type, amount) {
+ const currentSupply = this.supply.get(type) || 0;
+ this.supply.set(type, Math.min(1, currentSupply + amount * 0.01));
+ this.updatePrice(type);
+ }
+ 
+ updateDemand(type, amount) {
+ const currentDemand = this.demand.get(type) || 0;
+ this.demand.set(type, Math.min(1, currentDemand + amount * 0.01));
+ this.updatePrice(type);
+ }
+ 
+ updatePrice(type) {
+ const demand = this.demand.get(type) || 0.5;
+ const supply = this.supply.get(type) || 0.5;
+ const basePrice = this.prices.get(type) || 1;
+ 
+ // Simple supply/demand price calculation
+ const priceMultiplier = demand / supply;
+ const newPrice = basePrice * (0.8 + priceMultiplier * 0.4);
+ this.prices.set(type, newPrice);
+ }
+ 
+ updateUI() {
+ // Update economy display
+ document.getElementById('oilCount').textContent = this.resources.get('oil') || 0;
+ document.getElementById('cattleCount').textContent = this.resources.get('cattle') || 0;
+ document.getElementById('stoneCount').textContent = this.resources.get('limestone') || 0;
+ }
+ 
+ simulateMarket(deltaTime) {
+ // Simulate market fluctuations
+ this.resources.forEach((amount, type) => {
+ const demand = this.demand.get(type);
+ const supply = this.supply.get(type);
+ 
+ // Natural market fluctuations
+ const fluctuation = (Math.random() - 0.5) * 0.02;
+ this.demand.set(type, Math.max(0.1, Math.min(1, demand + fluctuation)));
+ this.supply.set(type, Math.max(0.1, Math.min(1, supply - fluctuation)));
+ 
+ this.updatePrice(type);
+ });
+ }
+ }
+ 
+ // MAIN GAME CLASS
+ class LegendaryFrontierWorlds {
+ constructor() {
+ this.scene = null;
+ this.camera = null;
+ this.renderer = null;
+ this.chunks = new Map();
+ this.creatures = [];
+ this.player = null;
+ this.clock = new THREE.Clock();
+ 
+ // AI Systems
+ this.weatherSystem = new TexasWeatherSystem();
+ this.economy = new FrontierEconomy();
+ 
+ // Game state
+ this.stats = {
+ fps: 60,
+ chunks: 0,
+ creatures: 0,
+ drawCalls: 0,
+ memory: 0,
+ position: { x: 0, y: 64, z: 0 },
+ biome: 'Texas Hill Country',
+ temperature: 78,
+ humidity: 45,
+ resources: new Map()
+ };
+ 
+ // Noise generators
+ this.terrainNoise = null;
+ this.biomeNoise = null;
+ this.caveNoise = null;
+ this.detailNoise = null;
+ 
+ // Input
+ this.keys = {};
+ this.mouse = { x: 0, y: 0, locked: false };
+ this.velocity = new THREE.Vector3();
+ this.selectedSlot = 0;
+ 
+ // Mobile support
+ this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+ 
+ this.init();
+ }
+ 
+ async init() {
+ try {
+ await this.showFrontierLoading();
+ await this.initAdvancedThree();
+ await this.initAdvancedNoise();
+ await this.initFrontierPlayer();
+ await this.initFrontierControls();
+ await this.initTexasWorld();
+ await this.initAdvancedLighting();
+ await this.initAISystems();
+ 
+ this.hideFrontierLoading();
+ this.startFrontierExperience();
+ } catch (error) {
+ console.error('Failed to initialize Legendary Frontier:', error);
+ this.showError('Failed to load Texas Frontier. Please refresh and try again.');
+ }
+ }
+ 
+ async showFrontierLoading() {
+ const progress = document.getElementById('frontierProgress');
+ const status = document.getElementById('frontierStatus');
+ 
+ const frontierSteps = [
+ { progress: 8, status: 'Loading Advanced Three.js Engine...' },
+ { progress: 15, status: 'Initializing Texas Terrain Algorithms...' },
+ { progress: 25, status: 'Creating Frontier Player Systems...' },
+ { progress: 35, status: 'Spawning Texas Wildlife AI...' },
+ { progress: 45, status: 'Establishing Weather Patterns...' },
+ { progress: 55, status: 'Building Hill Country Landscapes...' },
+ { progress: 65, status: 'Loading Piney Woods Ecosystems...' },
+ { progress: 75, status: 'Initializing Frontier Economy...' },
+ { progress: 85, status: 'Setting Up Advanced Lighting...' },
+ { progress: 95, status: 'Finalizing AI Ecosystems...' },
+ { progress: 100, status: 'Welcome to the Legendary Frontier!' }
+ ];
+ 
+ for (const step of frontierSteps) {
+ progress.style.width = `${step.progress}%`;
+ status.textContent = step.status;
+ 
+ const delay = 250 + Math.random() * 300;
+ await this.sleep(delay);
+ }
+ 
+ await this.sleep(800);
+ }
+ 
+ hideFrontierLoading() {
+ const loading = document.getElementById('frontierLoading');
+ loading.style.opacity = '0';
+ setTimeout(() => {
+ loading.style.display = 'none';
+ this.showFrontierWelcome();
+ }, 1000);
+ }
+ 
+ showFrontierWelcome() {
+ const welcome = document.createElement('div');
+ welcome.style.cssText = `
+ position: fixed;
+ top: 50%;
+ left: 50%;
+ transform: translate(-50%, -50%);
+ background: rgba(28, 28, 28, 0.95);
+ border: 3px solid var(--texas-longhorn);
+ border-radius: 20px;
+ padding: 40px;
+ text-align: center;
+ z-index: 1800;
+ backdrop-filter: blur(30px);
+ animation: welcomeSlide 0.8s ease-out;
+ `;
+ 
+ welcome.innerHTML = `
+ <h2 style="color: var(--prairie-gold); margin-bottom: 20px; font-size: 32px; font-weight: 900;">🤠 Welcome to Texas!</h2>
+ <p style="color: var(--bluebonnet-blue); margin-bottom: 25px; font-size: 18px;">Your legendary frontier adventure begins now.</p>
+ <p style="color: var(--pearl); font-size: 16px; opacity: 0.9;">Click anywhere to start exploring the ultimate Texas universe</p>
+ `;
+ 
+ document.body.appendChild(welcome);
+ 
+ const removeWelcome = () => {
+ welcome.style.opacity = '0';
+ setTimeout(() => document.body.removeChild(welcome), 600);
+ document.removeEventListener('click', removeWelcome);
+ };
+ 
+ setTimeout(() => {
+ document.addEventListener('click', removeWelcome);
+ }, 1200);
+ 
+ setTimeout(removeWelcome, 6000);
+ }
+ 
+ sleep(ms) {
+ return new Promise(resolve => setTimeout(resolve, ms));
+ }
+ 
+ async initAdvancedThree() {
+ // Enhanced scene
+ this.scene = new THREE.Scene();
+ this.scene.fog = new THREE.Fog(0x87ceeb, FRONTIER_CONFIG.FOG_NEAR, FRONTIER_CONFIG.FOG_FAR);
+ 
+ // Advanced camera
+ this.camera = new THREE.PerspectiveCamera(
+ FRONTIER_CONFIG.FOV,
+ window.innerWidth / window.innerHeight,
+ FRONTIER_CONFIG.NEAR_PLANE,
+ FRONTIER_CONFIG.FAR_PLANE
+ );
+ this.camera.position.set(0, FRONTIER_CONFIG.CHUNK_HEIGHT + 30, 0);
+ 
+ // Enhanced renderer with advanced settings
+ this.renderer = new THREE.WebGLRenderer({
+ canvas: document.getElementById('gameCanvas'),
+ antialias: true,
+ alpha: false,
+ powerPreference: 'high-performance',
+ stencil: false
+ });
+ 
+ this.renderer.setSize(window.innerWidth, window.innerHeight);
+ this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+ 
+ // Advanced rendering features
+ this.renderer.shadowMap.enabled = true;
+ this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+ this.renderer.outputEncoding = THREE.sRGBEncoding;
+ this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+ this.renderer.toneMappingExposure = 1.0;
+ this.renderer.physicallyCorrectLights = true;
+ 
+ // Window resize handler
+ window.addEventListener('resize', () => {
+ this.camera.aspect = window.innerWidth / window.innerHeight;
+ this.camera.updateProjectionMatrix();
+ this.renderer.setSize(window.innerWidth, window.innerHeight);
+ });
+ }
+ 
+ async initAdvancedNoise() {
+ const seed = Math.random();
+ this.terrainNoise = createNoise3D(() => seed);
+ this.biomeNoise = createNoise2D(() => seed * 2);
+ this.caveNoise = createNoise3D(() => seed * 3);
+ this.detailNoise = createNoise2D(() => seed * 4);
+ }
+ 
+ async initFrontierPlayer() {
+ this.player = {
+ position: new THREE.Vector3(0, FRONTIER_CONFIG.CHUNK_HEIGHT + 30, 0),
+ rotation: new THREE.Euler(0, 0, 0),
+ velocity: new THREE.Vector3(0, 0, 0),
+ onGround: false,
+ sprinting: false,
+ flying: false,
+ inventory: new Map(),
+ health: 100,
+ stamina: 100,
+ temperature: 78,
+ hydration: 100
+ };
+ 
+ // Add starter items
+ this.player.inventory.set(FRONTIER_BLOCKS.LIMESTONE, 64);
+ this.player.inventory.set(FRONTIER_BLOCKS.CEDAR, 32);
+ this.player.inventory.set(FRONTIER_BLOCKS.OIL, 16);
+ }
+ 
+ async initFrontierControls() {
+ // Enhanced keyboard controls
+ document.addEventListener('keydown', (e) => {
+ this.keys[e.code] = true;
+ 
+ // Hotbar selection
+ if (e.code >= 'Digit1' && e.code <= 'Digit9') {
+ const slot = parseInt(e.code.charAt(5)) - 1;
+ this.selectSlot(slot);
+ e.preventDefault();
+ }
+ 
+ switch(e.code) {
+ case 'KeyF':
+ this.toggleFlying();
+ break;
+ case 'KeyG':
+ this.toggleWeather();
+ break;
+ case 'KeyH':
+ this.toggleUI();
+ break;
+ case 'F3':
+ this.toggleDebugMode();
+ e.preventDefault();
+ break;
+ }
+ });
+ 
+ document.addEventListener('keyup', (e) => {
+ this.keys[e.code] = false;
+ });
+ 
+ // Enhanced mouse controls
+ document.addEventListener('click', async () => {
+ if (!this.mouse.locked && !this.isMobile) {
+ try {
+ await document.body.requestPointerLock();
+ this.mouse.locked = true;
+ } catch (error) {
+ console.warn('Pointer lock failed:', error);
+ }
+ }
+ });
+ 
+ document.addEventListener('pointerlockchange', () => {
+ this.mouse.locked = document.pointerLockElement === document.body;
+ });
+ 
+ document.addEventListener('mousemove', (e) => {
+ if (this.mouse.locked) {
+ this.player.rotation.y -= e.movementX * FRONTIER_CONFIG.MOUSE_SENSITIVITY;
+ this.player.rotation.x -= e.movementY * FRONTIER_CONFIG.MOUSE_SENSITIVITY;
+ this.player.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.player.rotation.x));
+ }
+ });
+ 
+ // Scroll wheel for hotbar
+ document.addEventListener('wheel', (e) => {
+ if (this.mouse.locked) {
+ const direction = e.deltaY > 0 ? 1 : -1;
+ this.selectedSlot = (this.selectedSlot + direction + 9) % 9;
+ this.updateHotbarSelection();
+ e.preventDefault();
+ }
+ });
+ 
+ // Block interaction
+ document.addEventListener('mousedown', (e) => {
+ if (this.mouse.locked) {
+ if (e.button === 0) { // Left click - break block
+ this.breakBlock();
+ } else if (e.button === 2) { // Right click - place block
+ this.placeBlock();
+ }
+ }
+ });
+ 
+ // Prevent context menu
+ document.addEventListener('contextmenu', (e) => {
+ if (this.mouse.locked) {
+ e.preventDefault();
+ }
+ });
+ }
+ 
+ async initTexasWorld() {
+ const playerChunkX = Math.floor(this.player.position.x / FRONTIER_CONFIG.CHUNK_SIZE);
+ const playerChunkZ = Math.floor(this.player.position.z / FRONTIER_CONFIG.CHUNK_SIZE);
+ 
+ for (let x = -FRONTIER_CONFIG.RENDER_DISTANCE; x <= FRONTIER_CONFIG.RENDER_DISTANCE; x++) {
+ for (let z = -FRONTIER_CONFIG.RENDER_DISTANCE; z <= FRONTIER_CONFIG.RENDER_DISTANCE; z++) {
+ await this.generateTexasChunk(playerChunkX + x, playerChunkZ + z);
+ }
+ }
+ }
+ 
+ async generateTexasChunk(chunkX, chunkZ) {
+ const key = `${chunkX},${chunkZ}`;
+ if (this.chunks.has(key)) return;
+ 
+ const chunk = new TexasChunk(chunkX, chunkZ, this);
+ await chunk.generate();
+ this.chunks.set(key, chunk);
+ this.scene.add(chunk.mesh);
+ 
+ this.stats.chunks = this.chunks.size;
+ }
+ 
+ async initAdvancedLighting() {
+ // Ambient light
+ const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+ this.scene.add(ambientLight);
+ 
+ // Enhanced directional light (Texas sun)
+ this.sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+ this.sunLight.position.set(200, 400, 150);
+ this.sunLight.castShadow = true;
+ 
+ // Ultra high-quality shadows
+ this.sunLight.shadow.camera.left = -200;
+ this.sunLight.shadow.camera.right = 200;
+ this.sunLight.shadow.camera.top = 200;
+ this.sunLight.shadow.camera.bottom = -200;
+ this.sunLight.shadow.camera.near = 0.5;
+ this.sunLight.shadow.camera.far = 1000;
+ this.sunLight.shadow.mapSize.width = FRONTIER_CONFIG.SHADOW_MAP_SIZE;
+ this.sunLight.shadow.mapSize.height = FRONTIER_CONFIG.SHADOW_MAP_SIZE;
+ this.sunLight.shadow.bias = -0.0002;
+ 
+ this.scene.add(this.sunLight);
+ 
+ // Enhanced hemisphere light for better ambient
+ this.hemiLight = new THREE.HemisphereLight(0x87ceeb, 0x8b6635, 0.3);
+ this.scene.add(this.hemiLight);
+ }
+ 
+ async initAISystems() {
+ // Initialize creature spawning
+ this.spawnInitialCreatures();
+ 
+ // Start AI update loop
+ setInterval(() => {
+ this.updateAI();
+ }, FRONTIER_CONFIG.AI_UPDATE_INTERVAL);
+ }
+ 
+ spawnInitialCreatures() {
+ // Spawn creatures based on biome
+ for (let i = 0; i < 50; i++) {
+ const x = (Math.random() - 0.5) * 400;
+ const z = (Math.random() - 0.5) * 400;
+ const y = this.getGroundHeight(x, z) + 2;
+ 
+ const position = new THREE.Vector3(x, y, z);
+ const biome = this.getBiomeAt(x, z);
+ 
+ if (biome.creatures && biome.creatures.length > 0) {
+ const creatureType = biome.creatures[Math.floor(Math.random() * biome.creatures.length)];
+ const creature = new TexasCreature(creatureType, biome, position);
+ this.creatures.push(creature);
+ }
+ }
+ 
+ this.updateCreatureStats();
+ }
+ 
+ updateAI() {
+ const deltaTime = 0.1; // Fixed timestep for AI
+ 
+ // Update creatures
+ this.creatures = this.creatures.filter(creature => {
+ const nearbyCreatures = this.creatures.filter(other => 
+ other !== creature && creature.position.distanceTo(other.position) < 30
+ );
+ 
+ creature.update(deltaTime, nearbyCreatures, this.player);
+ return creature.isAlive();
+ });
+ 
+ // Spawn new creatures if needed
+ if (this.creatures.length < FRONTIER_CONFIG.MAX_CREATURES * 0.7) {
+ this.spawnCreatureNearPlayer();
+ }
+ 
+ // Update weather system
+ this.weatherSystem.update(deltaTime, this.getCurrentBiome(), this.scene);
+ 
+ // Update economy
+ this.economy.simulateMarket(deltaTime);
+ 
+ this.updateCreatureStats();
+ }
+ 
+ spawnCreatureNearPlayer() {
+ const angle = Math.random() * Math.PI * 2;
+ const distance = 50 + Math.random() * 100;
+ const x = this.player.position.x + Math.cos(angle) * distance;
+ const z = this.player.position.z + Math.sin(angle) * distance;
+ const y = this.getGroundHeight(x, z) + 2;
+ 
+ const position = new THREE.Vector3(x, y, z);
+ const biome = this.getBiomeAt(x, z);
+ 
+ if (biome.creatures && biome.creatures.length > 0) {
+ const creatureType = biome.creatures[Math.floor(Math.random() * biome.creatures.length)];
+ const creature = new TexasCreature(creatureType, biome, position);
+ this.creatures.push(creature);
+ }
+ }
+ 
+ updateCreatureStats() {
+ const creatureCounts = {};
+ this.creatures.forEach(creature => {
+ creatureCounts[creature.type] = (creatureCounts[creature.type] || 0) + 1;
+ });
+ 
+ document.getElementById('longhornCount').textContent = creatureCounts.longhorns || 0;
+ document.getElementById('flowerCount').textContent = Math.floor(Math.random() * 200) + 100; // Simulated
+ document.getElementById('birdCount').textContent = creatureCounts.mockingbirds || 0;
+ document.getElementById('armadilloCount').textContent = creatureCounts.armadillos || 0;
+ }
+ 
+ startFrontierExperience() {
+ this.animate();
+ this.startAnalytics();
+ 
+ // Auto-hide header
+ setTimeout(() => {
+ const header = document.getElementById('frontierHeader');
+ header.style.transform = 'translateY(-100%)';
+ }, 10000);
+ }
+ 
+ startAnalytics() {
+ setInterval(() => {
+ this.updateAnalytics();
+ }, 1000);
+ }
+ 
+ updateAnalytics() {
+ // Track player behavior
+ window.BLAZE_FRONTIER_AI.analytics.exploration.set('totalTime', Date.now() - window.BLAZE_FRONTIER_AI.sessionStart);
+ 
+ const currentBiome = this.getCurrentBiome();
+ const biomeTime = window.BLAZE_FRONTIER_AI.analytics.biomes.get(currentBiome.name) || 0;
+ window.BLAZE_FRONTIER_AI.analytics.biomes.set(currentBiome.name, biomeTime + 1000);
+ 
+ // Performance tracking
+ window.BLAZE_FRONTIER_AI.analytics.performance.push({
+ timestamp: Date.now(),
+ fps: this.stats.fps,
+ chunks: this.stats.chunks,
+ creatures: this.creatures.length
+ });
+ 
+ // Keep only recent performance data
+ if (window.BLAZE_FRONTIER_AI.analytics.performance.length > 300) {
+ window.BLAZE_FRONTIER_AI.analytics.performance = window.BLAZE_FRONTIER_AI.analytics.performance.slice(-150);
+ }
+ }
+ 
+ update(deltaTime) {
+ // Enhanced player physics
+ this.updateFrontierPlayer(deltaTime);
+ 
+ // Enhanced world management
+ this.updateTexasChunks();
+ 
+ // Update HUD
+ this.updateFrontierHUD();
+ 
+ // Update performance
+ this.updateFrontierPerformance(deltaTime);
+ }
+ 
+ updateFrontierPlayer(deltaTime) {
+ const moveSpeed = FRONTIER_CONFIG.MOVE_SPEED * (this.player.sprinting ? FRONTIER_CONFIG.SPRINT_MULTIPLIER : 1);
+ 
+ // Enhanced movement
+ let moveX = 0;
+ let moveZ = 0;
+ 
+ if (this.keys['KeyW']) moveZ = 1;
+ if (this.keys['KeyS']) moveZ = -1;
+ if (this.keys['KeyA']) moveX = -1;
+ if (this.keys['KeyD']) moveX = 1;
+ 
+ // Calculate movement direction
+ const forward = new THREE.Vector3(Math.sin(this.player.rotation.y), 0, Math.cos(this.player.rotation.y));
+ const right = new THREE.Vector3(Math.sin(this.player.rotation.y - Math.PI / 2), 0, Math.cos(this.player.rotation.y - Math.PI / 2));
+ 
+ // Apply movement with enhanced smoothing
+ const targetVelX = (forward.x * moveZ + right.x * moveX) * moveSpeed;
+ const targetVelZ = (forward.z * moveZ + right.z * moveX) * moveSpeed;
+ 
+ this.player.velocity.x = THREE.MathUtils.lerp(this.player.velocity.x, targetVelX, deltaTime * 15);
+ this.player.velocity.z = THREE.MathUtils.lerp(this.player.velocity.z, targetVelZ, deltaTime * 15);
+ 
+ // Enhanced jumping/flying
+ if (this.keys['Space']) {
+ if (this.player.flying) {
+ this.player.velocity.y = moveSpeed * 0.8;
+ } else if (this.player.onGround) {
+ this.player.velocity.y = FRONTIER_CONFIG.JUMP_FORCE;
+ this.player.onGround = false;
+ }
+ }
+ 
+ // Flying descent
+ if (this.keys['ShiftLeft'] && this.player.flying) {
+ this.player.velocity.y = -moveSpeed * 0.8;
+ }
+ 
+ // Apply gravity
+ if (!this.player.flying) {
+ this.player.velocity.y += FRONTIER_CONFIG.GRAVITY * deltaTime;
+ }
+ 
+ // Update position
+ this.player.position.x += this.player.velocity.x * deltaTime;
+ this.player.position.y += this.player.velocity.y * deltaTime;
+ this.player.position.z += this.player.velocity.z * deltaTime;
+ 
+ // Enhanced ground collision
+ const groundHeight = this.getGroundHeight(this.player.position.x, this.player.position.z);
+ if (this.player.position.y <= groundHeight + 1.8) {
+ this.player.position.y = groundHeight + 1.8;
+ this.player.velocity.y = 0;
+ this.player.onGround = true;
+ }
+ 
+ // Update camera
+ this.camera.position.copy(this.player.position);
+ this.camera.rotation.x = this.player.rotation.x;
+ this.camera.rotation.y = this.player.rotation.y;
+ 
+ // Update stats
+ this.stats.position = {
+ x: Math.floor(this.player.position.x),
+ y: Math.floor(this.player.position.y),
+ z: Math.floor(this.player.position.z)
+ };
+ 
+ // Update environmental effects
+ this.updateEnvironmentalEffects();
+ 
+ // Sprint state
+ this.player.sprinting = this.keys['ShiftLeft'] || this.keys['ShiftRight'];
+ }
+ 
+ updateEnvironmentalEffects() {
+ // Update player temperature based on biome and weather
+ const currentBiome = this.getCurrentBiome();
+ const weatherTemp = this.weatherSystem.temperature;
+ 
+ this.player.temperature = THREE.MathUtils.lerp(
+ this.player.temperature, 
+ weatherTemp, 
+ 0.01
+ );
+ 
+ this.stats.temperature = Math.round(this.player.temperature);
+ this.stats.humidity = Math.round(this.weatherSystem.humidity);
+ }
+ 
+ updateTexasChunks() {
+ const playerChunkX = Math.floor(this.player.position.x / FRONTIER_CONFIG.CHUNK_SIZE);
+ const playerChunkZ = Math.floor(this.player.position.z / FRONTIER_CONFIG.CHUNK_SIZE);
+ 
+ // Generate new chunks
+ for (let x = -FRONTIER_CONFIG.RENDER_DISTANCE; x <= FRONTIER_CONFIG.RENDER_DISTANCE; x++) {
+ for (let z = -FRONTIER_CONFIG.RENDER_DISTANCE; z <= FRONTIER_CONFIG.RENDER_DISTANCE; z++) {
+ const chunkX = playerChunkX + x;
+ const chunkZ = playerChunkZ + z;
+ const key = `${chunkX},${chunkZ}`;
+ 
+ if (!this.chunks.has(key)) {
+ this.generateTexasChunk(chunkX, chunkZ);
+ }
+ }
+ }
+ 
+ // Remove distant chunks
+ for (const [key, chunk] of this.chunks) {
+ const dx = Math.abs(chunk.x - playerChunkX);
+ const dz = Math.abs(chunk.z - playerChunkZ);
+ 
+ if (dx > FRONTIER_CONFIG.RENDER_DISTANCE + 2 || dz > FRONTIER_CONFIG.RENDER_DISTANCE + 2) {
+ this.scene.remove(chunk.mesh);
+ chunk.dispose();
+ this.chunks.delete(key);
+ }
+ }
+ 
+ // Update current biome
+ const currentBiome = this.getCurrentBiome();
+ this.stats.biome = currentBiome.name;
+ }
+ 
+ updateFrontierHUD() {
+ // Update location stats
+ document.getElementById('locationStat').textContent = this.stats.biome;
+ document.getElementById('coordsStat').textContent = `${this.stats.position.x}, ${this.stats.position.y}, ${this.stats.position.z}`;
+ document.getElementById('tempStat').textContent = `${this.stats.temperature}°F`;
+ document.getElementById('humidityStat').textContent = `${this.stats.humidity}%`;
+ 
+ // Update header FPS
+ document.getElementById('headerFPS').textContent = this.stats.fps;
+ document.getElementById('biomeCount').textContent = Object.keys(TEXAS_BIOMES).length;
+ }
+ 
+ updateFrontierPerformance(deltaTime) {
+ // Enhanced FPS calculation
+ this.stats.fps = Math.round(1 / deltaTime);
+ this.stats.creatures = this.creatures.length;
+ this.stats.drawCalls = this.renderer.info.render.calls;
+ this.stats.memory = Math.round((this.chunks.size * 0.8 + this.creatures.length * 0.2 + 50));
+ 
+ // Update performance display
+ document.getElementById('perfFPS').textContent = this.stats.fps;
+ document.getElementById('perfChunks').textContent = this.stats.chunks;
+ document.getElementById('perfCreatures').textContent = this.stats.creatures;
+ document.getElementById('perfDrawCalls').textContent = this.stats.drawCalls;
+ document.getElementById('perfMemory').textContent = `${this.stats.memory}MB`;
+ document.getElementById('perfAI').textContent = `${Math.round((this.creatures.length / FRONTIER_CONFIG.MAX_CREATURES) * 100)}%`;
+ 
+ // Update performance graphs
+ const fpsPercentage = Math.min((this.stats.fps / 60) * 100, 100);
+ document.getElementById('fpsGraph').style.width = `${fpsPercentage}%`;
+ 
+ const aiPercentage = (this.creatures.length / FRONTIER_CONFIG.MAX_CREATURES) * 100;
+ document.getElementById('aiGraph').style.width = `${aiPercentage}%`;
+ }
+ 
+ getCurrentBiome() {
+ const biomeValue = this.biomeNoise(
+ this.player.position.x * FRONTIER_CONFIG.BIOME_SCALE,
+ this.player.position.z * FRONTIER_CONFIG.BIOME_SCALE
+ );
+ 
+ return this.getBiomeAt(this.player.position.x, this.player.position.z);
+ }
+ 
+ getBiomeAt(x, z) {
+ const biomeValue = this.biomeNoise(x * FRONTIER_CONFIG.BIOME_SCALE, z * FRONTIER_CONFIG.BIOME_SCALE);
+ const tempValue = this.detailNoise(x * 0.001, z * 0.001);
+ 
+ // Enhanced biome selection based on multiple factors
+ if (biomeValue < -0.6) return TEXAS_BIOMES.DEEP_OCEAN;
+ if (biomeValue < -0.3) return TEXAS_BIOMES.OCEAN;
+ if (biomeValue < -0.1) return TEXAS_BIOMES.BEACH;
+ 
+ // Texas-specific biomes based on temperature and humidity
+ if (biomeValue > 0.5 && tempValue > 0.3) return TEXAS_BIOMES.WEST_TEXAS_BADLANDS;
+ if (biomeValue > 0.3 && tempValue < -0.2) return TEXAS_BIOMES.PINEY_WOODS;
+ if (biomeValue < 0.0 && tempValue > 0.1) return TEXAS_BIOMES.SOUTH_TEXAS_BRUSH;
+ if (biomeValue < -0.05 && tempValue < 0.0) return TEXAS_BIOMES.GULF_MARSHLANDS;
+ 
+ return TEXAS_BIOMES.HILL_COUNTRY; // Default Texas biome
+ }
+ 
+ getGroundHeight(x, z) {
+ const biome = this.getBiomeAt(x, z);
+ 
+ const terrainHeight = this.terrainNoise(
+ x * FRONTIER_CONFIG.TERRAIN_SCALE,
+ 0,
+ z * FRONTIER_CONFIG.TERRAIN_SCALE
+ );
+ 
+ const detailHeight = this.detailNoise(
+ x * FRONTIER_CONFIG.DETAIL_SCALE,
+ z * FRONTIER_CONFIG.DETAIL_SCALE
+ ) * 0.4;
+ 
+ return biome.baseHeight + (terrainHeight + detailHeight) * biome.variance;
+ }
+ 
+ // Enhanced interaction methods
+ selectSlot(slot) {
+ this.selectedSlot = slot;
+ this.updateHotbarSelection();
+ }
+ 
+ updateHotbarSelection() {
+ document.querySelectorAll('.hotbar-slot').forEach((slot, index) => {
+ slot.classList.toggle('selected', index === this.selectedSlot);
+ });
+ }
+ 
+ breakBlock() {
+ // Raycast to find target block
+ const raycaster = new THREE.Raycaster();
+ raycaster.setFromCamera(new THREE.Vector2(0, 0), this.camera);
+ 
+ // Simple block breaking logic (would be more complex in full implementation)
+ console.log('Breaking block at cursor position');
+ 
+ // Add resources to economy
+ this.economy.addResource('limestone', 1);
+ }
+ 
+ placeBlock() {
+ // Raycast to find placement position
+ console.log('Placing block from hotbar slot:', this.selectedSlot);
+ 
+ // Remove resources from economy
+ this.economy.removeResource('limestone', 1);
+ }
+ 
+ toggleFlying() {
+ this.player.flying = !this.player.flying;
+ this.player.velocity.y = 0;
+ }
+ 
+ toggleWeather() {
+ // Cycle through weather types for testing
+ const weatherTypes = Object.keys(this.weatherSystem.weatherTypes);
+ const currentIndex = weatherTypes.indexOf(this.weatherSystem.currentWeather);
+ const nextIndex = (currentIndex + 1) % weatherTypes.length;
+ this.weatherSystem.currentWeather = weatherTypes[nextIndex];
+ this.weatherSystem.updateWeatherStats();
+ this.weatherSystem.updateUI();
+ }
+ 
+ toggleUI() {
+ const hud = document.querySelectorAll('.texas-hud, .frontier-performance, .economy-hud, .weather-system');
+ hud.forEach(element => {
+ element.style.opacity = element.style.opacity === '0' ? '1' : '0';
+ });
+ }
+ 
+ toggleDebugMode() {
+ console.log('Debug Info:', {
+ player: this.player,
+ stats: this.stats,
+ creatures: this.creatures.length,
+ chunks: this.chunks.size,
+ weather: this.weatherSystem.currentWeather,
+ analytics: window.BLAZE_FRONTIER_AI.analytics
+ });
+ }
+ 
+ showError(message) {
+ const status = document.getElementById('frontierStatus');
+ if (status) {
+ status.textContent = `Error: ${message}`;
+ status.style.color = 'var(--cardinal-red)';
+ }
+ }
+ 
+ animate() {
+ requestAnimationFrame(() => this.animate());
+ 
+ const deltaTime = Math.min(this.clock.getDelta(), 0.1);
+ 
+ this.update(deltaTime);
+ this.renderer.render(this.scene, this.camera);
+ }
+ }
+ 
+ // ENHANCED TEXAS CHUNK CLASS
+ class TexasChunk {
+ constructor(x, z, world) {
+ this.x = x;
+ this.z = z;
+ this.world = world;
+ this.blocks = new Uint8Array(FRONTIER_CONFIG.CHUNK_SIZE * FRONTIER_CONFIG.CHUNK_HEIGHT * FRONTIER_CONFIG.CHUNK_SIZE);
+ this.mesh = null;
+ }
+ 
+ async generate() {
+ // Generate enhanced Texas terrain
+ for (let x = 0; x < FRONTIER_CONFIG.CHUNK_SIZE; x++) {
+ for (let z = 0; z < FRONTIER_CONFIG.CHUNK_SIZE; z++) {
+ const worldX = this.x * FRONTIER_CONFIG.CHUNK_SIZE + x;
+ const worldZ = this.z * FRONTIER_CONFIG.CHUNK_SIZE + z;
+ 
+ // Get biome for this position
+ const biome = this.world.getBiomeAt(worldX, worldZ);
+ 
+ // Generate height using multiple noise layers
+ const terrainHeight = this.world.terrainNoise(
+ worldX * FRONTIER_CONFIG.TERRAIN_SCALE,
+ 0,
+ worldZ * FRONTIER_CONFIG.TERRAIN_SCALE
+ );
+ 
+ const detailHeight = this.world.detailNoise(
+ worldX * FRONTIER_CONFIG.DETAIL_SCALE,
+ worldZ * FRONTIER_CONFIG.DETAIL_SCALE
+ ) * 0.4;
+ 
+ const height = Math.floor(biome.baseHeight + (terrainHeight + detailHeight) * biome.variance);
+ 
+ // Fill blocks based on biome and height
+ for (let y = 0; y < height; y++) {
+ const index = this.getIndex(x, y, z);
+ 
+ if (y < height - 6) {
+ // Deep stone layer
+ this.blocks[index] = FRONTIER_BLOCKS.STONE;
+ } else if (y < height - 3) {
+ // Intermediate layer - varies by biome
+ this.blocks[index] = this.getBiomeIntermediateBlock(biome);
+ } else if (y < height - 1) {
+ // Sub-surface layer
+ this.blocks[index] = FRONTIER_BLOCKS.DIRT;
+ } else {
+ // Surface layer - biome-specific
+ this.blocks[index] = this.getBiomeSurfaceBlock(biome, y);
+ }
+ }
+ 
+ // Add water for ocean biomes
+ if (biome === TEXAS_BIOMES.OCEAN || biome === TEXAS_BIOMES.DEEP_OCEAN) {
+ const waterLevel = 25;
+ for (let y = height; y < waterLevel; y++) {
+ if (y < FRONTIER_CONFIG.CHUNK_HEIGHT) {
+ this.blocks[this.getIndex(x, y, z)] = FRONTIER_BLOCKS.WATER;
+ }
+ }
+ }
+ 
+ // Generate caves with enhanced algorithm
+ this.generateTexasCaves(x, z, height);
+ 
+ // Generate biome-specific features
+ this.generateBiomeFeatures(x, z, height, biome);
+ 
+ // Generate resource deposits
+ this.generateResourceDeposits(x, z, height, biome);
+ }
+ }
+ 
+ // Build enhanced mesh
+ this.buildEnhancedMesh();
+ }
+ 
+ getBiomeIntermediateBlock(biome) {
+ switch (biome) {
+ case TEXAS_BIOMES.HILL_COUNTRY:
+ return FRONTIER_BLOCKS.LIMESTONE;
+ case TEXAS_BIOMES.WEST_TEXAS_BADLANDS:
+ return FRONTIER_BLOCKS.SANDSTONE;
+ case TEXAS_BIOMES.GULF_MARSHLANDS:
+ return FRONTIER_BLOCKS.DIRT;
+ default:
+ return FRONTIER_BLOCKS.STONE;
+ }
+ }
+ 
+ getBiomeSurfaceBlock(biome, height) {
+ switch (biome) {
+ case TEXAS_BIOMES.BEACH:
+ case TEXAS_BIOMES.WEST_TEXAS_BADLANDS:
+ return FRONTIER_BLOCKS.SAND;
+ case TEXAS_BIOMES.DEEP_OCEAN:
+ case TEXAS_BIOMES.OCEAN:
+ return FRONTIER_BLOCKS.WATER;
+ case TEXAS_BIOMES.GULF_MARSHLANDS:
+ return Math.random() < 0.3 ? FRONTIER_BLOCKS.WATER : FRONTIER_BLOCKS.GRASS;
+ default:
+ return FRONTIER_BLOCKS.GRASS;
+ }
+ }
+ 
+ generateTexasCaves(x, z, surfaceHeight) {
+ for (let y = 5; y < surfaceHeight - 8; y++) {
+ const worldX = this.x * FRONTIER_CONFIG.CHUNK_SIZE + x;
+ const worldZ = this.z * FRONTIER_CONFIG.CHUNK_SIZE + z;
+ 
+ const caveValue = this.world.caveNoise(
+ worldX * FRONTIER_CONFIG.CAVE_SCALE,
+ y * FRONTIER_CONFIG.CAVE_SCALE,
+ worldZ * FRONTIER_CONFIG.CAVE_SCALE
+ );
+ 
+ // Deeper caves are rarer
+ const caveThreshold = 0.6 + (y / surfaceHeight) * 0.2;
+ 
+ if (caveValue > caveThreshold) {
+ const index = this.getIndex(x, y, z);
+ this.blocks[index] = FRONTIER_BLOCKS.AIR;
+ 
+ // Rare cave formations
+ if (caveValue > 0.9 && Math.random() < 0.05) {
+ this.blocks[index] = FRONTIER_BLOCKS.FRONTIER_CRYSTAL;
+ }
+ }
+ }
+ }
+ 
+ generateBiomeFeatures(x, z, height, biome) {
+ const worldX = this.x * FRONTIER_CONFIG.CHUNK_SIZE + x;
+ const worldZ = this.z * FRONTIER_CONFIG.CHUNK_SIZE + z;
+ 
+ // Trees and vegetation
+ if (biome.treeChance && Math.random() < biome.treeChance && height > 30) {
+ this.generateTexasTree(x, height, z, biome);
+ }
+ 
+ // Special biome features
+ if (biome.specialFeatures) {
+ biome.specialFeatures.forEach(feature => {
+ if (Math.random() < 0.001) { // Very rare
+ this.generateSpecialFeature(x, height, z, feature);
+ }
+ });
+ }
+ 
+ // Flowers and small vegetation
+ if (biome === TEXAS_BIOMES.HILL_COUNTRY && Math.random() < 0.1) {
+ if (height < FRONTIER_CONFIG.CHUNK_HEIGHT - 1) {
+ this.blocks[this.getIndex(x, height, z)] = FRONTIER_BLOCKS.BLUEBONNET;
+ }
+ }
+ }
+ 
+ generateTexasTree(x, groundY, z, biome) {
+ let treeHeight = 4 + Math.floor(Math.random() * 4);
+ let woodType = FRONTIER_BLOCKS.OAK;
+ 
+ // Select wood type based on biome
+ switch (biome) {
+ case TEXAS_BIOMES.PINEY_WOODS:
+ woodType = FRONTIER_BLOCKS.PINE;
+ treeHeight = 6 + Math.floor(Math.random() * 6);
+ break;
+ case TEXAS_BIOMES.HILL_COUNTRY:
+ woodType = FRONTIER_BLOCKS.CEDAR;
+ break;
+ case TEXAS_BIOMES.GULF_MARSHLANDS:
+ woodType = FRONTIER_BLOCKS.CYPRESS;
+ break;
+ case TEXAS_BIOMES.SOUTH_TEXAS_BRUSH:
+ woodType = FRONTIER_BLOCKS.MESQUITE;
+ treeHeight = 2 + Math.floor(Math.random() * 3);
+ break;
+ }
+ 
+ // Generate trunk
+ for (let y = 0; y < treeHeight; y++) {
+ if (groundY + y < FRONTIER_CONFIG.CHUNK_HEIGHT) {
+ this.blocks[this.getIndex(x, groundY + y, z)] = woodType;
+ }
+ }
+ 
+ // Generate leaves/branches
+ const leafRadius = Math.max(1, Math.floor(treeHeight / 2));
+ for (let dx = -leafRadius; dx <= leafRadius; dx++) {
+ for (let dy = -Math.floor(leafRadius/2); dy <= leafRadius; dy++) {
+ for (let dz = -leafRadius; dz <= leafRadius; dz++) {
+ const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+ if (dist <= leafRadius && Math.random() < 0.7) {
+ const lx = x + dx;
+ const ly = groundY + treeHeight - 1 + dy;
+ const lz = z + dz;
+ 
+ if (lx >= 0 && lx < FRONTIER_CONFIG.CHUNK_SIZE &&
+ ly >= 0 && ly < FRONTIER_CONFIG.CHUNK_HEIGHT &&
+ lz >= 0 && lz < FRONTIER_CONFIG.CHUNK_SIZE) {
+ 
+ const index = this.getIndex(lx, ly, lz);
+ if (this.blocks[index] === FRONTIER_BLOCKS.AIR) {
+ // Different leaf types for different trees
+ this.blocks[index] = woodType + 100; // Placeholder for leaves
+ }
+ }
+ }
+ }
+ }
+ }
+ }
+ 
+ generateSpecialFeature(x, height, z, featureType) {
+ switch (featureType) {
+ case 'limestone_caves':
+ // Generate a limestone cave entrance
+ for (let dy = 0; dy < 3; dy++) {
+ for (let dx = -1; dx <= 1; dx++) {
+ for (let dz = -1; dz <= 1; dz++) {
+ const fx = x + dx;
+ const fy = height - dy;
+ const fz = z + dz;
+ 
+ if (fx >= 0 && fx < FRONTIER_CONFIG.CHUNK_SIZE &&
+ fy >= 0 && fy < FRONTIER_CONFIG.CHUNK_HEIGHT &&
+ fz >= 0 && fz < FRONTIER_CONFIG.CHUNK_SIZE) {
+ 
+ this.blocks[this.getIndex(fx, fy, fz)] = FRONTIER_BLOCKS.AIR;
+ }
+ }
+ }
+ }
+ break;
+ 
+ case 'oil_wells':
+ // Generate oil deposit marker
+ if (height < FRONTIER_CONFIG.CHUNK_HEIGHT - 2) {
+ this.blocks[this.getIndex(x, height, z)] = FRONTIER_BLOCKS.OIL;
+ this.blocks[this.getIndex(x, height + 1, z)] = FRONTIER_BLOCKS.OIL;
+ }
+ break;
+ 
+ case 'natural_springs':
+ // Generate spring water
+ for (let dy = 0; dy < 2; dy++) {
+ if (height + dy < FRONTIER_CONFIG.CHUNK_HEIGHT) {
+ this.blocks[this.getIndex(x, height + dy, z)] = FRONTIER_BLOCKS.WATER;
+ }
+ }
+ break;
+ }
+ }
+ 
+ generateResourceDeposits(x, z, height, biome) {
+ // Generate resource deposits based on biome
+ if (biome.resources) {
+ biome.resources.forEach(resource => {
+ if (Math.random() < 0.01) { // 1% chance
+ const depth = Math.floor(Math.random() * 10) + 5;
+ const resourceY = height - depth;
+ 
+ if (resourceY > 0 && resourceY < FRONTIER_CONFIG.CHUNK_HEIGHT) {
+ const resourceBlock = this.getResourceBlock(resource);
+ if (resourceBlock) {
+ this.blocks[this.getIndex(x, resourceY, z)] = resourceBlock;
+ }
+ }
+ }
+ });
+ }
+ }
+ 
+ getResourceBlock(resource) {
+ const resourceMap = {
+ 'oil': FRONTIER_BLOCKS.OIL,
+ 'limestone': FRONTIER_BLOCKS.LIMESTONE,
+ 'copper': FRONTIER_BLOCKS.COPPER,
+ 'silver': FRONTIER_BLOCKS.SILVER,
+ 'gold': FRONTIER_BLOCKS.GOLD,
+ 'salt': FRONTIER_BLOCKS.SALT,
+ 'cedar': FRONTIER_BLOCKS.CEDAR,
+ 'pine': FRONTIER_BLOCKS.PINE,
+ 'cypress': FRONTIER_BLOCKS.CYPRESS
+ };
+ 
+ return resourceMap[resource] || null;
+ }
+ 
+ getIndex(x, y, z) {
+ return x + y * FRONTIER_CONFIG.CHUNK_SIZE + z * FRONTIER_CONFIG.CHUNK_SIZE * FRONTIER_CONFIG.CHUNK_HEIGHT;
+ }
+ 
+ buildEnhancedMesh() {
+ const geometry = new THREE.BufferGeometry();
+ const vertices = [];
+ const normals = [];
+ const colors = [];
+ const uvs = [];
+ 
+ // Enhanced block colors with Texas theme
+ const blockColors = {
+ [FRONTIER_BLOCKS.GRASS]: new THREE.Color(0x7fb069),
+ [FRONTIER_BLOCKS.DIRT]: new THREE.Color(0x8b6635),
+ [FRONTIER_BLOCKS.STONE]: new THREE.Color(0x8b8680),
+ [FRONTIER_BLOCKS.WATER]: new THREE.Color(0x006699),
+ [FRONTIER_BLOCKS.SAND]: new THREE.Color(0xd4a574),
+ [FRONTIER_BLOCKS.SNOW]: new THREE.Color(0xe8e8e8),
+ 
+ // Texas wood types
+ [FRONTIER_BLOCKS.PINE]: new THREE.Color(0x6b4423),
+ [FRONTIER_BLOCKS.OAK]: new THREE.Color(0x8b4513),
+ [FRONTIER_BLOCKS.CEDAR]: new THREE.Color(0xa0522d),
+ [FRONTIER_BLOCKS.CYPRESS]: new THREE.Color(0x5d4037),
+ [FRONTIER_BLOCKS.MESQUITE]: new THREE.Color(0x4e342e),
+ 
+ // Texas materials
+ [FRONTIER_BLOCKS.LIMESTONE]: new THREE.Color(0xf5f5dc),
+ [FRONTIER_BLOCKS.SANDSTONE]: new THREE.Color(0xfad5a5),
+ [FRONTIER_BLOCKS.OIL]: new THREE.Color(0x1c1c1c),
+ [FRONTIER_BLOCKS.SALT]: new THREE.Color(0xffffff),
+ [FRONTIER_BLOCKS.BLUEBONNET]: new THREE.Color(0x4f7cac),
+ [FRONTIER_BLOCKS.PRICKLY_PEAR]: new THREE.Color(0x228b22),
+ 
+ // Precious materials
+ [FRONTIER_BLOCKS.COPPER]: new THREE.Color(0xb87333),
+ [FRONTIER_BLOCKS.SILVER]: new THREE.Color(0xc0c0c0),
+ [FRONTIER_BLOCKS.GOLD]: new THREE.Color(0xffd700),
+ [FRONTIER_BLOCKS.BLACK_GOLD]: new THREE.Color(0x000000),
+ 
+ // Special blocks
+ [FRONTIER_BLOCKS.LONGHORN_HORN]: new THREE.Color(0xf5deb3),
+ [FRONTIER_BLOCKS.TEXAS_STAR]: new THREE.Color(0xffd700),
+ [FRONTIER_BLOCKS.FRONTIER_CRYSTAL]: new THREE.Color(0x00b2a9)
+ };
+ 
+ // Generate enhanced mesh
+ for (let x = 0; x < FRONTIER_CONFIG.CHUNK_SIZE; x++) {
+ for (let y = 0; y < FRONTIER_CONFIG.CHUNK_HEIGHT; y++) {
+ for (let z = 0; z < FRONTIER_CONFIG.CHUNK_SIZE; z++) {
+ const block = this.blocks[this.getIndex(x, y, z)];
+ 
+ if (block === FRONTIER_BLOCKS.AIR) continue;
+ 
+ const worldX = this.x * FRONTIER_CONFIG.CHUNK_SIZE + x;
+ const worldZ = this.z * FRONTIER_CONFIG.CHUNK_SIZE + z;
+ 
+ let color = blockColors[block] || new THREE.Color(0xffffff);
+ 
+ // Add special effects for certain blocks
+ if (block === FRONTIER_BLOCKS.OIL) {
+ // Oil has a slight shimmer
+ const shimmer = 0.8 + Math.sin(Date.now() * 0.005 + worldX + worldZ) * 0.2;
+ color = color.clone().multiplyScalar(shimmer);
+ } else if (block === FRONTIER_BLOCKS.FRONTIER_CRYSTAL) {
+ // Crystals glow
+ const glow = 0.9 + Math.sin(Date.now() * 0.003 + worldX + worldZ) * 0.1;
+ color = color.clone().multiplyScalar(glow);
+ }
+ 
+ // Check face visibility and add faces
+ const faces = [
+ { dir: [0, 1, 0], normal: [0, 1, 0] },
+ { dir: [0, -1, 0], normal: [0, -1, 0] },
+ { dir: [1, 0, 0], normal: [1, 0, 0] },
+ { dir: [-1, 0, 0], normal: [-1, 0, 0] },
+ { dir: [0, 0, 1], normal: [0, 0, 1] },
+ { dir: [0, 0, -1], normal: [0, 0, -1] }
+ ];
+ 
+ for (const face of faces) {
+ const nx = x + face.dir[0];
+ const ny = y + face.dir[1];
+ const nz = z + face.dir[2];
+ 
+ let exposed = false;
+ if (nx < 0 || nx >= FRONTIER_CONFIG.CHUNK_SIZE ||
+ ny < 0 || ny >= FRONTIER_CONFIG.CHUNK_HEIGHT ||
+ nz < 0 || nz >= FRONTIER_CONFIG.CHUNK_SIZE) {
+ exposed = true;
+ } else {
+ const neighborBlock = this.blocks[this.getIndex(nx, ny, nz)];
+ exposed = neighborBlock === FRONTIER_BLOCKS.AIR || 
+ (block !== FRONTIER_BLOCKS.WATER && neighborBlock === FRONTIER_BLOCKS.WATER);
+ }
+ 
+ if (exposed) {
+ this.addEnhancedFace(
+ vertices, normals, colors, uvs,
+ worldX, y, worldZ,
+ face.normal,
+ color
+ );
+ }
+ }
+ }
+ }
+ }
+ 
+ // Set geometry attributes
+ geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+ geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+ geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+ geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+ 
+ // Enhanced material with better lighting
+ const material = new THREE.MeshLambertMaterial({
+ vertexColors: true,
+ side: THREE.FrontSide
+ });
+ 
+ // Create mesh
+ if (vertices.length > 0) {
+ this.mesh = new THREE.Mesh(geometry, material);
+ this.mesh.castShadow = true;
+ this.mesh.receiveShadow = true;
+ }
+ }
+ 
+ addEnhancedFace(vertices, normals, colors, uvs, x, y, z, normal, color) {
+ const size = FRONTIER_CONFIG.BLOCK_SIZE;
+ 
+ // Face vertex definitions
+ const faceVertices = {
+ '0,1,0': [ // Top
+ [x, y + size, z],
+ [x + size, y + size, z],
+ [x + size, y + size, z + size],
+ [x, y + size, z + size]
+ ],
+ '0,-1,0': [ // Bottom
+ [x, y, z + size],
+ [x + size, y, z + size],
+ [x + size, y, z],
+ [x, y, z]
+ ],
+ '1,0,0': [ // Right
+ [x + size, y, z],
+ [x + size, y, z + size],
+ [x + size, y + size, z + size],
+ [x + size, y + size, z]
+ ],
+ '-1,0,0': [ // Left
+ [x, y, z + size],
+ [x, y, z],
+ [x, y + size, z],
+ [x, y + size, z + size]
+ ],
+ '0,0,1': [ // Front
+ [x, y, z + size],
+ [x + size, y, z + size],
+ [x + size, y + size, z + size],
+ [x, y + size, z + size]
+ ],
+ '0,0,-1': [ // Back
+ [x + size, y, z],
+ [x, y, z],
+ [x, y + size, z],
+ [x + size, y + size, z]
+ ]
+ };
+ 
+ const key = `${normal[0]},${normal[1]},${normal[2]}`;
+ const verts = faceVertices[key];
+ 
+ if (!verts) return;
+ 
+ // Add triangles
+ const indices = [0, 1, 2, 0, 2, 3];
+ 
+ for (const i of indices) {
+ vertices.push(...verts[i]);
+ normals.push(...normal);
+ colors.push(color.r, color.g, color.b);
+ uvs.push(
+ (verts[i][0] + verts[i][2]) % 1,
+ (verts[i][1] + verts[i][2]) % 1
+ );
+ }
+ }
+ 
+ dispose() {
+ if (this.mesh) {
+ this.mesh.geometry.dispose();
+ this.mesh.material.dispose();
+ }
+ }
+ }
+ 
+ // Initialize the Legendary Frontier Experience
+ window.addEventListener('DOMContentLoaded', () => {
+ const game = new LegendaryFrontierWorlds();
+ window.frontierWorlds = game;
+ window.LEGENDARY_FRONTIER = game;
+ 
+ // Enhanced console welcome
+ console.log('%c🌟 BLAZE WORLDS: LEGENDARY FRONTIER 🌟', 
+ 'color: #FFD700; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);');
+ console.log('%c🤠 Ultimate Texas Universe Explorer - AI Powered!', 
+ 'color: #BF5700; font-size: 16px; font-weight: 700;');
+ console.log('%c🏆 Championship-level engineering meets Texas frontier spirit', 
+ 'color: #4F7CAC; font-size: 14px; font-weight: 600;');
+ console.log('%cGame instance: window.LEGENDARY_FRONTIER', 
+ 'color: #00B2A9; font-size: 12px; font-weight: 500;');
+ 
+ // Add CSS animation keyframes
+ const style = document.createElement('style');
+ style.textContent = `
+ @keyframes welcomeSlide {
+ from {
+ transform: translate(-50%, -70%);
+ opacity: 0;
+ }
+ to {
+ transform: translate(-50%, -50%);
+ opacity: 1;
+ }
+ }
+ `;
+ document.head.appendChild(style);
+ });
+ </script>
+</body>
+</html>

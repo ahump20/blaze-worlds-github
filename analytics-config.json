@@ -1,0 +1,31 @@
+{
+    "blaze_intelligence": {
+        "enabled": true,
+        "endpoint": "https://api.blaze-intelligence.com/v1/analytics",
+        "features": {
+            "performance_monitoring": true,
+            "player_behavior_tracking": true,
+            "biome_exploration_analysis": true,
+            "resource_economy_metrics": true,
+            "ai_ecosystem_interactions": true
+        },
+        "privacy": {
+            "anonymize_data": true,
+            "respect_dnt": true,
+            "data_retention_days": 30
+        }
+    },
+    "metrics": {
+        "fps_tracking": true,
+        "chunk_loading_performance": true,
+        "memory_usage_monitoring": true,
+        "user_session_analytics": true,
+        "error_reporting": true
+    },
+    "dashboard": {
+        "real_time_updates": true,
+        "historical_trends": true,
+        "comparative_analysis": true,
+        "export_capabilities": true
+    }
+}
