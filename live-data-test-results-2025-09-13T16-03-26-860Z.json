@@ -1,0 +1,313 @@
+{
+  "timestamp": "2025-09-13T16:03:23.897Z",
+  "apiEndpoints": {
+    "cloudflare": {
+      "/api/health": {
+        "status": 200,
+        "responseTime": 494,
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization, X-API-Key",
+          "access-control-allow-methods": "GET, POST, OPTIONS",
+          "access-control-allow-origin": "*",
+          "alt-svc": "h3=\":443\"; ma=86400",
+          "cache-control": "public, max-age=30",
+          "cdn-cache-control": "public, max-age=300",
+          "cf-ray": "97e8dfdd9b992cd5-DFW",
+          "connection": "keep-alive",
+          "content-encoding": "br",
+          "content-type": "application/json",
+          "date": "Sat, 13 Sep 2025 16:03:24 GMT",
+          "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+          "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v4?s=8DHneQOnjHG3g9NoIEoh4X%2FnIAaHuqvnpHIdpeAN3Jbx61KHxsSz2y17nAvXsprBPLXH0xuTOit8FAkB1aka3I5BE55TSrsdUTqo6WA1WrHg1Beygrn%2BNYZ6M980wzENpVUnSRj%2BcLs0vg3W8IhJym%2B6KO2PGhO4%2BK09XThQ6Q%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+          "server": "cloudflare",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=45967&min_rtt=45306&rtt_var=18312&sent=5&recv=5&lost=0&retrans=0&sent_bytes=2888&recv_bytes=690&delivery_rate=79927&cwnd=92&unsent_bytes=0&cid=db0eb07c646717f3&ts=106&x=0\"",
+          "transfer-encoding": "chunked",
+          "vary": "Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY",
+          "x-response-time": "0ms"
+        },
+        "contentType": "application/json"
+      },
+      "/api/analytics": {
+        "status": 404,
+        "responseTime": 228,
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization, X-API-Key",
+          "access-control-allow-methods": "GET, POST, OPTIONS",
+          "access-control-allow-origin": "*",
+          "alt-svc": "h3=\":443\"; ma=86400",
+          "cache-control": "public, max-age=60, s-maxage=300",
+          "cdn-cache-control": "public, max-age=300",
+          "cf-ray": "97e8dfdf3e2f2cbf-DFW",
+          "connection": "keep-alive",
+          "content-length": "217",
+          "content-type": "application/problem+json",
+          "date": "Sat, 13 Sep 2025 16:03:24 GMT",
+          "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+          "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v4?s=SauUk95eN7Lva3jZnrdhvvYttVDgcSQEvfLCKNfamQqyQaHxB%2FNo36oewGzqwDCKzJIjrF612lo8u0v7aNxISHffF4umNsJ%2FtP6GISRputdMnwtTTbR5sNxPEaLRQU0Gxt6DvkuodRfD2PzVyT6BoeW59AvdjETvb32P%2FExrTA%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+          "server": "cloudflare",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=36172&min_rtt=35497&rtt_var=14662&sent=3&recv=5&lost=0&retrans=0&sent_bytes=219&recv_bytes=948&delivery_rate=32959&cwnd=117&unsent_bytes=0&cid=5fcbebd00c605d3a&ts=105&x=0\"",
+          "vary": "Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY",
+          "x-response-time": "0ms"
+        },
+        "contentType": "application/problem+json"
+      },
+      "/api/cardinals/readiness": {
+        "status": 200,
+        "responseTime": 143,
+        "headers": {
+          "access-control-allow-headers": "Content-Type",
+          "access-control-allow-methods": "GET, OPTIONS",
+          "access-control-allow-origin": "*",
+          "alt-svc": "h3=\":443\"; ma=86400",
+          "cf-ray": "97e8dfdfff1b2cbf-DFW",
+          "connection": "keep-alive",
+          "content-encoding": "br",
+          "content-type": "application/json",
+          "date": "Sat, 13 Sep 2025 16:03:24 GMT",
+          "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+          "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v4?s=AlAUE8P7Tmv3a8syoK7V3Q96gzrLHAbG6chTx33Fmd5Yo%2FjyuR9am0GydVoRRx2DKyXV42rDE1w0kjWykR8%2FcBcL2ozcR1mhGRru5Xx30MFH3k%2F2RnibEInT4v%2FYbmlCG0e5ugpoFDqTq6J7Evs2qIKzA6LyOaCX60d7RF5R%2Bw%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+          "server": "cloudflare",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=38677&min_rtt=35497&rtt_var=16007&sent=6&recv=7&lost=0&retrans=0&sent_bytes=2059&recv_bytes=1181&delivery_rate=47959&cwnd=119&unsent_bytes=0&cid=5fcbebd00c605d3a&ts=284&x=0\"",
+          "transfer-encoding": "chunked",
+          "vary": "Accept-Encoding"
+        },
+        "contentType": "application/json"
+      },
+      "/api/live-data-engine": {
+        "status": 404,
+        "responseTime": 63,
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization, X-API-Key",
+          "access-control-allow-methods": "GET, POST, OPTIONS",
+          "access-control-allow-origin": "*",
+          "alt-svc": "h3=\":443\"; ma=86400",
+          "cache-control": "public, max-age=60, s-maxage=300",
+          "cdn-cache-control": "public, max-age=300",
+          "cf-ray": "97e8dfe0efa52cd5-DFW",
+          "connection": "keep-alive",
+          "content-length": "231",
+          "content-type": "application/problem+json",
+          "date": "Sat, 13 Sep 2025 16:03:24 GMT",
+          "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+          "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v4?s=bcC1n6ZmTpLj5cq75wxyhQc1f%2BvRXyIvxV6vUhLfXofcr3Z7EXBkEukBBCMxOMnQ9IZSTmEiWgeOIBAW0Y6Hl7%2B2KMRJxc%2BU072%2FwpD29N17QBx3VbxrgIHszN9H%2BqCcHbNx4ZlYiOyuBnw2pmxtlgVpAuCL99MMAO%2F6OJcfyA%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+          "server": "cloudflare",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=53971&min_rtt=45306&rtt_var=29742&sent=11&recv=8&lost=0&retrans=1&sent_bytes=4722&recv_bytes=920&delivery_rate=79927&cwnd=96&unsent_bytes=0&cid=db0eb07c646717f3&ts=616&x=0\"",
+          "vary": "Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY",
+          "x-response-time": "0ms"
+        },
+        "contentType": "application/problem+json"
+      },
+      "/api/video-analysis": {
+        "status": 404,
+        "responseTime": 102,
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization, X-API-Key",
+          "access-control-allow-methods": "GET, POST, OPTIONS",
+          "access-control-allow-origin": "*",
+          "alt-svc": "h3=\":443\"; ma=86400",
+          "cache-control": "public, max-age=60, s-maxage=300",
+          "cdn-cache-control": "public, max-age=300",
+          "cf-ray": "97e8dfe158852cbf-DFW",
+          "connection": "keep-alive",
+          "content-length": "227",
+          "content-type": "application/problem+json",
+          "date": "Sat, 13 Sep 2025 16:03:25 GMT",
+          "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+          "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v4?s=7HFaBj64VMryqpK%2F4FePFDj13hSnedPCJQor%2FpZNqft12z5vvbtX6jewW21JXw%2Bm6Q0KpS1S96xF7Lcu8hHNwTSMrTzj%2B%2B5FCkQAERtCquzYk22Iic%2Bupk1tqaslYd%2FnqODrAn44ZBfxbVvs4XrbGMPP9L%2F87g7BAuP2MSQWxA%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+          "server": "cloudflare",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=35139&min_rtt=23470&rtt_var=15135&sent=11&recv=10&lost=0&retrans=0&sent_bytes=3625&recv_bytes=1409&delivery_rate=228590&cwnd=123&unsent_bytes=0&cid=5fcbebd00c605d3a&ts=410&x=0\"",
+          "vary": "Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY",
+          "x-response-time": "0ms"
+        },
+        "contentType": "application/problem+json"
+      },
+      "/api/ar-coaching-engine": {
+        "status": 404,
+        "responseTime": 80,
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization, X-API-Key",
+          "access-control-allow-methods": "GET, POST, OPTIONS",
+          "access-control-allow-origin": "*",
+          "alt-svc": "h3=\":443\"; ma=86400",
+          "cache-control": "public, max-age=60, s-maxage=300",
+          "cdn-cache-control": "public, max-age=300",
+          "cf-ray": "97e8dfe1e8ee2cd5-DFW",
+          "connection": "keep-alive",
+          "content-length": "235",
+          "content-type": "application/problem+json",
+          "date": "Sat, 13 Sep 2025 16:03:25 GMT",
+          "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+          "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v4?s=bB6YgtQIfviFCvtU7CzKzdDkscWh0zyS94pmje6EJtDac0kZHP1n%2B0xcmjAoTuWZk9%2BS9IjRv8qeXM0uT%2BUp6JAJ9E1AjOB96ccQyqthbZMMWS2zE3AgxVClQ8YWO7FtAjBMt9jI8J3R9XV2bHbI2LO3vsp1GOks1Racy7NZXw%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+          "server": "cloudflare",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=53243&min_rtt=45306&rtt_var=23763&sent=14&recv=10&lost=0&retrans=1&sent_bytes=6155&recv_bytes=1152&delivery_rate=83992&cwnd=96&unsent_bytes=0&cid=db0eb07c646717f3&ts=779&x=0\"",
+          "vary": "Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY",
+          "x-response-time": "0ms"
+        },
+        "contentType": "application/problem+json"
+      }
+    },
+    "netlify": {
+      "/api/health": {
+        "status": 404,
+        "responseTime": 368,
+        "headers": {
+          "age": "0",
+          "cache-control": "public,max-age=0,must-revalidate",
+          "cache-status": "\"Netlify Edge\"; fwd=miss",
+          "content-encoding": "br",
+          "content-type": "text/html; charset=utf-8",
+          "date": "Sat, 13 Sep 2025 16:03:25 GMT",
+          "etag": "1757726923-ssl-df",
+          "server": "Netlify",
+          "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+          "transfer-encoding": "chunked",
+          "vary": "Accept-Encoding",
+          "x-nf-request-id": "01K51X2AN51S4P8HAB66SW72FP"
+        },
+        "contentType": "text/html; charset=utf-8"
+      },
+      "/api/analytics": {
+        "status": 404,
+        "responseTime": 224,
+        "headers": {
+          "age": "0",
+          "cache-control": "public,max-age=0,must-revalidate",
+          "cache-status": "\"Netlify Edge\"; fwd=miss",
+          "content-encoding": "br",
+          "content-type": "text/html; charset=utf-8",
+          "date": "Sat, 13 Sep 2025 16:03:25 GMT",
+          "etag": "1757726923-ssl-df",
+          "server": "Netlify",
+          "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+          "transfer-encoding": "chunked",
+          "vary": "Accept-Encoding",
+          "x-nf-request-id": "01K51X2AVWJ4MWPSM050MS2EER"
+        },
+        "contentType": "text/html; charset=utf-8"
+      },
+      "/api/cardinals/readiness": {
+        "status": 404,
+        "responseTime": 89,
+        "headers": {
+          "age": "0",
+          "cache-control": "public,max-age=0,must-revalidate",
+          "cache-status": "\"Netlify Edge\"; fwd=miss",
+          "content-encoding": "br",
+          "content-type": "text/html; charset=utf-8",
+          "date": "Sat, 13 Sep 2025 16:03:25 GMT",
+          "etag": "1757726923-ssl-df",
+          "server": "Netlify",
+          "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+          "transfer-encoding": "chunked",
+          "vary": "Accept-Encoding",
+          "x-nf-request-id": "01K51X2AZ2TX39VEEJ5RRZHQ4P"
+        },
+        "contentType": "text/html; charset=utf-8"
+      },
+      "/api/live-data-engine": {
+        "status": 404,
+        "responseTime": 84,
+        "headers": {
+          "age": "0",
+          "cache-control": "public,max-age=0,must-revalidate",
+          "cache-status": "\"Netlify Edge\"; fwd=miss",
+          "content-encoding": "br",
+          "content-type": "text/html; charset=utf-8",
+          "date": "Sat, 13 Sep 2025 16:03:25 GMT",
+          "etag": "1757726923-ssl-df",
+          "server": "Netlify",
+          "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+          "transfer-encoding": "chunked",
+          "vary": "Accept-Encoding",
+          "x-nf-request-id": "01K51X2B1Q8FCPANJ78BC5SD5R"
+        },
+        "contentType": "text/html; charset=utf-8"
+      },
+      "/api/video-analysis": {
+        "status": 404,
+        "responseTime": 92,
+        "headers": {
+          "age": "0",
+          "cache-control": "public,max-age=0,must-revalidate",
+          "cache-status": "\"Netlify Edge\"; fwd=miss",
+          "content-encoding": "br",
+          "content-type": "text/html; charset=utf-8",
+          "date": "Sat, 13 Sep 2025 16:03:25 GMT",
+          "etag": "1757726923-ssl-df",
+          "server": "Netlify",
+          "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+          "transfer-encoding": "chunked",
+          "vary": "Accept-Encoding",
+          "x-nf-request-id": "01K51X2B49FX69PSZHKN9YM317"
+        },
+        "contentType": "text/html; charset=utf-8"
+      },
+      "/api/ar-coaching-engine": {
+        "status": 404,
+        "responseTime": 86,
+        "headers": {
+          "age": "0",
+          "cache-control": "public,max-age=0,must-revalidate",
+          "cache-status": "\"Netlify Edge\"; fwd=miss",
+          "content-encoding": "br",
+          "content-type": "text/html; charset=utf-8",
+          "date": "Sat, 13 Sep 2025 16:03:26 GMT",
+          "etag": "1757726923-ssl-df",
+          "server": "Netlify",
+          "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+          "transfer-encoding": "chunked",
+          "vary": "Accept-Encoding",
+          "x-nf-request-id": "01K51X2B774MDQJF38DWD7TX65"
+        },
+        "contentType": "text/html; charset=utf-8"
+      }
+    }
+  },
+  "websocketTests": {
+    "wss://blaze-intelligence-lsl.pages.dev/ws/live-data": {
+      "status": "ERROR",
+      "error": "Unexpected server response: 200",
+      "timestamp": "2025-09-13T16:03:26.170Z"
+    },
+    "wss://blaze-intelligence-main.netlify.app/ws/live-data": {
+      "status": "ERROR",
+      "error": "Unexpected server response: 200",
+      "timestamp": "2025-09-13T16:03:26.436Z"
+    }
+  },
+  "realTimeFeatures": {
+    "Cardinals Analytics Data": {
+      "status": "FETCH_ERROR",
+      "error": "Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON"
+    },
+    "Live Performance Metrics": {
+      "status": "HTTP_ERROR",
+      "metrics": {
+        "Response Time": "123ms",
+        "HTTP Status": 404,
+        "Latency Target": "⚠️ >100ms"
+      }
+    },
+    "Neural Network Visualization": {
+      "status": "SUCCESS",
+      "metrics": {
+        "Features Detected": "4/5",
+        "Three.js": "✅",
+        "Neural Visualization": "✅",
+        "Particle System": "✅",
+        "Animation Frame": "✅",
+        "WebGL Context": "❌"
+      }
+    }
+  }
+}

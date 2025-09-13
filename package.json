@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "blaze-intelligence-api",
   "version": "1.0.0",
   "description": "Blaze Intelligence API Services",
@@ -8,10 +9,17 @@
     "deploy:auth": "wrangler deploy auth.js --config ../wrangler-auth-api.toml --env production"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3"
+    "bcryptjs": "^2.4.3",
+    "node-fetch": "^3.3.2",
+    "ws": "^8.18.3"
   },
-  "devDependencies": {},
-  "keywords": ["cloudflare", "workers", "api", "authentication", "contact"],
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "api",
+    "authentication",
+    "contact"
+  ],
   "author": "Austin Humphrey <ahump20@outlook.com>",
   "license": "MIT"
 }

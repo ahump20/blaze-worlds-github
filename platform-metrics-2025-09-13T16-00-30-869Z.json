@@ -1,0 +1,209 @@
+{
+  "timestamp": "2025-09-13T16:00:28.723Z",
+  "performance": {
+    "cloudflare": {
+      "/": {
+        "url": "https://blaze-intelligence-lsl.pages.dev/",
+        "status": 200,
+        "statusText": "OK",
+        "responseTime": 208,
+        "headers": {
+          "access-control-allow-origin": "*",
+          "alt-svc": "h3=\":443\"; ma=86400",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "cf-ray": "97e8db952c716bad-DFW",
+          "connection": "keep-alive",
+          "content-encoding": "br",
+          "content-type": "text/html; charset=utf-8",
+          "date": "Sat, 13 Sep 2025 16:00:29 GMT",
+          "link": "<https://fonts.googleapis.com>; rel=\"preconnect\"",
+          "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v4?s=mxnBZORPXkyMCDS3%2BX6sjaCAxVFdyugY8DqdoDUV1VnX82ngp8XACVvjcjyppOdYpP93ozsmabl6nBhUJ6pGr532fNw4PhuFwfGyGCM1PRDhtHA%2FN%2FC2YOrbEBLxOdLkyzfXQO%2BjXknAcr3iUL9BDSjHTbIgE0MzSqN4E%2BLSSg%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+          "server": "cloudflare",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=21632&min_rtt=21072&rtt_var=6427&sent=5&recv=6&lost=0&retrans=0&sent_bytes=2887&recv_bytes=648&delivery_rate=191849&cwnd=253&unsent_bytes=0&cid=73019ef1e15cd634&ts=120&x=0\"",
+          "vary": "Accept-Encoding",
+          "x-content-type-options": "nosniff"
+        }
+      },
+      "/championship-hub.html": {
+        "url": "https://blaze-intelligence-lsl.pages.dev/championship-hub.html",
+        "status": 200,
+        "statusText": "OK",
+        "responseTime": 203,
+        "headers": {
+          "access-control-allow-origin": "*",
+          "alt-svc": "h3=\":443\"; ma=86400",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "cf-ray": "97e8db965a336900-DFW",
+          "connection": "keep-alive",
+          "content-encoding": "br",
+          "content-type": "text/html; charset=utf-8",
+          "date": "Sat, 13 Sep 2025 16:00:29 GMT",
+          "link": "<https://fonts.googleapis.com>; rel=\"preconnect\"",
+          "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v4?s=KpG72ithjF6plE74cTLWbtUvPqC%2FAOb%2BG1O6elHhHDMHba0GNE5A76s2wwJyzioxUwoyuj5m7s%2FRXktXKVoOfY6V6aUMovoXDGJo2Xb2mrz5Dbk3wi77cME%2BwtZCQ9dQAW7pe4K1VuoAJRYnDB6RVNGnP%2BB3879sTmVT%2FYjbpA%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+          "server": "cloudflare",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=24629&min_rtt=23411&rtt_var=9649&sent=3&recv=5&lost=0&retrans=0&sent_bytes=219&recv_bytes=924&delivery_rate=57579&cwnd=112&unsent_bytes=0&cid=ad1cebcf7e0157c4&ts=126&x=0\"",
+          "vary": "Accept-Encoding",
+          "x-content-type-options": "nosniff"
+        }
+      },
+      "/video-intelligence.html": {
+        "url": "https://blaze-intelligence-lsl.pages.dev/video-intelligence.html",
+        "status": 200,
+        "statusText": "OK",
+        "responseTime": 178,
+        "headers": {
+          "access-control-allow-origin": "*",
+          "alt-svc": "h3=\":443\"; ma=86400",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "cf-ray": "97e8db978f6d479c-DFW",
+          "connection": "keep-alive",
+          "content-encoding": "br",
+          "content-type": "text/html; charset=utf-8",
+          "date": "Sat, 13 Sep 2025 16:00:29 GMT",
+          "link": "<https://fonts.googleapis.com>; rel=\"preconnect\"",
+          "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v4?s=oTQyejaIbpFl0fIIpLXUCmC85HBEVeel41OGWU0wDZ86uyMbRvcUUa%2FjB2wfuV5kty%2FHfuN%2FpmxvyvcNUMe6qbQQZZYyIfrFfLrYdIAGRJKzJ1ZH%2Bl3da9a%2FTkwZaJsoiP7Yihz9LqYifDEMus%2FjcY9zIln%2F%2BJ7qTgZs%2BIcCyQ%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+          "server": "cloudflare",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=20829&min_rtt=20344&rtt_var=8600&sent=3&recv=5&lost=0&retrans=0&sent_bytes=219&recv_bytes=926&delivery_rate=55635&cwnd=152&unsent_bytes=0&cid=e41240a092f62e2b&ts=113&x=0\"",
+          "vary": "Accept-Encoding",
+          "x-content-type-options": "nosniff"
+        }
+      },
+      "/ar-coach.html": {
+        "url": "https://blaze-intelligence-lsl.pages.dev/ar-coach.html",
+        "status": 200,
+        "statusText": "OK",
+        "responseTime": 241,
+        "headers": {
+          "access-control-allow-origin": "*",
+          "alt-svc": "h3=\":443\"; ma=86400",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "cf-ray": "97e8db989c0669d9-DFW",
+          "connection": "keep-alive",
+          "content-encoding": "br",
+          "content-type": "text/html; charset=utf-8",
+          "date": "Sat, 13 Sep 2025 16:00:29 GMT",
+          "link": "<https://fonts.googleapis.com>; rel=\"preconnect\"",
+          "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v4?s=puqgHoeqFjq4q8ck1FSmoO51kt%2Fgel7uxa2FVlDW7eqMrVQfjBaQTx6HVn5FNt%2BwhgzGrab8v%2BI38hgp1D2Xw3zrezv171496ssGbhOtfMCCWH8JXc3ffEydTeAvNV4gE0fQhfj6Ani5RG0X1w3YC3zgLP6jBz8zUr8WKXAInA%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+          "server": "cloudflare",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=24716&min_rtt=21231&rtt_var=10451&sent=4&recv=5&lost=0&retrans=0&sent_bytes=219&recv_bytes=916&delivery_rate=63492&cwnd=251&unsent_bytes=0&cid=bfe4b287d493d3bc&ts=174&x=0\"",
+          "vary": "Accept-Encoding",
+          "x-content-type-options": "nosniff"
+        }
+      }
+    },
+    "netlify": {
+      "/": {
+        "url": "https://blaze-intelligence-main.netlify.app/",
+        "status": 200,
+        "statusText": "OK",
+        "responseTime": 190,
+        "headers": {
+          "accept-ranges": "bytes",
+          "age": "203",
+          "cache-control": "public,max-age=0,must-revalidate",
+          "cache-status": "\"Netlify Edge\"; hit",
+          "content-encoding": "br",
+          "content-length": "12486",
+          "content-type": "text/html; charset=UTF-8",
+          "date": "Sat, 13 Sep 2025 16:00:30 GMT",
+          "etag": "\"759a8a0523617edc7d042a220c7417a9-ssl-df\"",
+          "server": "Netlify",
+          "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+          "vary": "Accept-Encoding",
+          "x-nf-request-id": "01K51WWZB1VY2SENTCDVVVQ7B9"
+        }
+      },
+      "/championship-hub.html": {
+        "url": "https://blaze-intelligence-main.netlify.app/championship-hub.html",
+        "status": 200,
+        "statusText": "OK",
+        "responseTime": 112,
+        "headers": {
+          "accept-ranges": "bytes",
+          "age": "0",
+          "cache-control": "public,max-age=0,must-revalidate",
+          "cache-status": "\"Netlify Edge\"; fwd=miss",
+          "content-encoding": "br",
+          "content-type": "text/html; charset=UTF-8",
+          "date": "Sat, 13 Sep 2025 16:00:30 GMT",
+          "etag": "\"759a8a0523617edc7d042a220c7417a9-ssl-df\"",
+          "server": "Netlify",
+          "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+          "vary": "Accept-Encoding",
+          "x-nf-request-id": "01K51WWZD3S6F7BK9M43GAA2PV"
+        }
+      },
+      "/video-intelligence.html": {
+        "url": "https://blaze-intelligence-main.netlify.app/video-intelligence.html",
+        "status": 200,
+        "statusText": "OK",
+        "responseTime": 258,
+        "headers": {
+          "accept-ranges": "bytes",
+          "age": "0",
+          "cache-control": "public,max-age=0,must-revalidate",
+          "cache-status": "\"Netlify Edge\"; fwd=miss",
+          "content-encoding": "br",
+          "content-type": "text/html; charset=UTF-8",
+          "date": "Sat, 13 Sep 2025 16:00:30 GMT",
+          "etag": "\"759a8a0523617edc7d042a220c7417a9-ssl-df\"",
+          "server": "Netlify",
+          "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+          "vary": "Accept-Encoding",
+          "x-nf-request-id": "01K51WWZNA27RMYJ7JBBD5WBA6"
+        }
+      },
+      "/ar-coach.html": {
+        "url": "https://blaze-intelligence-main.netlify.app/ar-coach.html",
+        "status": 200,
+        "statusText": "OK",
+        "responseTime": 257,
+        "headers": {
+          "accept-ranges": "bytes",
+          "age": "0",
+          "cache-control": "public,max-age=0,must-revalidate",
+          "cache-status": "\"Netlify Edge\"; fwd=miss",
+          "content-encoding": "br",
+          "content-type": "text/html; charset=UTF-8",
+          "date": "Sat, 13 Sep 2025 16:00:30 GMT",
+          "etag": "\"759a8a0523617edc7d042a220c7417a9-ssl-df\"",
+          "server": "Netlify",
+          "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+          "vary": "Accept-Encoding",
+          "x-nf-request-id": "01K51WWZXA3JW2162EBQ3W0NNN"
+        }
+      }
+    }
+  },
+  "availability": {
+    "cloudflare": {
+      "responseTime": 191,
+      "contentSize": 48972,
+      "hasThreeJS": true,
+      "hasChampionshipHub": false,
+      "hasVideoIntelligence": false,
+      "hasARCoaching": false,
+      "hasSupercharge": false,
+      "hasNeuralNetwork": false
+    },
+    "netlify": {
+      "responseTime": 303,
+      "contentSize": 76536,
+      "hasThreeJS": true,
+      "hasChampionshipHub": false,
+      "hasVideoIntelligence": true,
+      "hasARCoaching": false,
+      "hasSupercharge": false,
+      "hasNeuralNetwork": true
+    }
+  },
+  "features": {}
+}
