@@ -48,6 +48,16 @@
   status = 200
 
 [[redirects]]
+  from = "/data-stories"
+  to = "/data-stories/championship-case-studies.html"
+  status = 200
+
+[[redirects]]
+  from = "/stories"
+  to = "/data-stories/championship-case-studies.html"
+  status = 200
+
+[[redirects]]
   from = "/texas"
   to = "/blaze-worlds-texas-championship.html"
   status = 301

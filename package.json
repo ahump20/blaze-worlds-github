@@ -15,6 +15,8 @@
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
     "node-fetch": "^3.3.2",
     "ws": "^8.18.3"
   },
@@ -53,7 +55,6 @@
     "last 2 versions",
     "not dead"
   ],
-  "devDependencies": {},
   "gameVariants": [
     {
       "name": "Texas Championship Edition",
@@ -94,8 +95,18 @@
   "blazeIntelligence": {
     "analytics": {
       "enabled": true,
-      "sports": ["MLB", "NFL", "NCAA", "NBA"],
-      "teams": ["Cardinals", "Titans", "Longhorns", "Grizzlies"],
+      "sports": [
+        "MLB",
+        "NFL",
+        "NCAA",
+        "NBA"
+      ],
+      "teams": [
+        "Cardinals",
+        "Titans",
+        "Longhorns",
+        "Grizzlies"
+      ],
       "perfectGame": true
     },
     "performance": {
