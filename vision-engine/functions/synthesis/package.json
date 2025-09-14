@@ -1,0 +1,23 @@
+{
+  "name": "vision-engine-synthesis",
+  "version": "1.0.0",
+  "description": "Blaze Intelligence Vision Engine - Championship Data Synthesis Function",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "gcloud functions deploy synthesisEngine --runtime nodejs18 --trigger-topic vision-engine-synthesis --memory 2GB --timeout 540s",
+    "test": "jest --coverage",
+    "logs": "gcloud functions logs read synthesisEngine --limit 50"
+  },
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.3.0",
+    "@google-cloud/firestore": "^7.1.0",
+    "@google-cloud/pubsub": "^4.0.7"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "@types/node": "^20.10.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
