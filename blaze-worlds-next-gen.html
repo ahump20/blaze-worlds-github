@@ -510,7 +510,12 @@
                 // Time and weather system
                 this.timeOfDay = 12.0; // 24-hour format
                 this.weatherIntensity = 0;
+                this.weatherIntensityTarget = 0;
+                this.weatherTransitionSpeed = 1.5;
                 this.isRaining = false;
+                this.maxRainHeight = 400;
+                this.rainArea = 600;
+                this.rainSystem = null;
                 
                 // Blaze Intelligence championship color palette
                 this.colors = {
@@ -535,6 +540,7 @@
                 this.setupScene();
                 this.setupCamera();
                 this.setupAdvancedLighting();
+                this.setupWeatherSystem();
                 this.setupPostProcessing();
                 this.setupEventListeners();
                 this.setupAdvancedMaterials();
@@ -738,6 +744,35 @@
                     this.scene.add(light);
                     this.pointLights.push(light);
                 }
+            }
+
+            setupWeatherSystem() {
+                const particleCount = 2500;
+                const positions = new Float32Array(particleCount * 3);
+
+                for (let i = 0; i < particleCount; i++) {
+                    const index = i * 3;
+                    positions[index] = (Math.random() - 0.5) * this.rainArea;
+                    positions[index + 1] = (Math.random() - 0.5) * this.maxRainHeight;
+                    positions[index + 2] = (Math.random() - 0.5) * this.rainArea;
+                }
+
+                const geometry = new THREE.BufferGeometry();
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+
+                const material = new THREE.PointsMaterial({
+                    color: new THREE.Color(0.58, 0.75, 0.95),
+                    size: 1.8,
+                    transparent: true,
+                    opacity: 0,
+                    depthWrite: false,
+                    blending: THREE.AdditiveBlending
+                });
+
+                this.rainSystem = new THREE.Points(geometry, material);
+                this.rainSystem.matrixAutoUpdate = true;
+                this.rainSystem.frustumCulled = false;
+                this.scene.add(this.rainSystem);
             }
 
             setupPostProcessing() {
@@ -1371,6 +1406,12 @@
 
             toggleWeather() {
                 this.settings.dynamicWeather = !this.settings.dynamicWeather;
+                if (!this.settings.dynamicWeather) {
+                    this.weatherIntensityTarget = 0;
+                    this.isRaining = false;
+                }
+                this.showWorldInfo(this.settings.dynamicWeather ? 'Dynamic Weather Enabled' : 'Dynamic Weather Disabled');
+                setTimeout(() => this.hideWorldInfo(), 1500);
                 this.updateGraphicsUI();
             }
 
@@ -1441,9 +1482,14 @@
             }
 
             toggleRain() {
+                if (!this.settings.dynamicWeather) {
+                    this.settings.dynamicWeather = true;
+                    this.updateGraphicsUI();
+                }
+
                 this.isRaining = !this.isRaining;
-                this.weatherIntensity = this.isRaining ? 1.0 : 0.0;
-                this.showWorldInfo(this.isRaining ? 'Rain Starting...' : 'Rain Stopping...');
+                this.weatherIntensityTarget = this.isRaining ? 1.0 : 0.0;
+                this.showWorldInfo(this.isRaining ? 'Rain System Engaged' : 'Skies Clearing...');
                 setTimeout(() => this.hideWorldInfo(), 1500);
             }
 
@@ -1538,9 +1584,9 @@
                 }
             }
 
-            updateAdvancedLighting() {
+            updateAdvancedLighting(delta) {
                 const time = this.clock.getElapsedTime();
-                
+
                 // Dynamic time of day
                 const dayProgress = (this.timeOfDay % 24) / 24;
                 const sunAngle = dayProgress * Math.PI * 2 - Math.PI;
@@ -1569,28 +1615,97 @@
                     this.skyMaterial.uniforms.time.value = time * 100;
                     this.skyMaterial.uniforms.sunPosition.value.copy(this.sunLight.position).normalize();
                 }
-                
+
                 // Update material uniforms
                 if (this.materials.terrain.uniforms) {
                     this.materials.terrain.uniforms.time.value = time;
                     this.materials.terrain.uniforms.sunPosition.value.copy(this.sunLight.position).normalize();
                     this.materials.terrain.uniforms.playerPosition.value.copy(this.playerPosition);
                 }
-                
+
                 if (this.materials.water.uniforms) {
                     this.materials.water.uniforms.time.value = time;
                     this.materials.water.uniforms.cameraPosition.value.copy(this.camera.position);
                 }
-                
+
                 // Animate atmospheric lights
                 this.pointLights.forEach((light, index) => {
                     light.intensity = 0.8 + Math.sin(time * 0.5 + index) * 0.4;
                     light.position.y = 100 + Math.sin(time * 0.3 + index * 2) * 50;
                 });
-                
+
+                this.updateWeather(delta);
+
                 // Automatic time progression
                 this.timeOfDay += delta * 0.2; // Speed up time
                 if (this.timeOfDay >= 24) this.timeOfDay = 0;
+            }
+
+            updateWeather(delta) {
+                if (!this.rainSystem) {
+                    return;
+                }
+
+                const targetIntensity = this.settings.dynamicWeather ? this.weatherIntensityTarget : 0;
+                const lerpFactor = Math.min(delta * this.weatherTransitionSpeed, 1);
+                this.weatherIntensity = THREE.MathUtils.lerp(this.weatherIntensity, targetIntensity, lerpFactor);
+
+                const active = this.weatherIntensity > 0.02 || targetIntensity > 0.02;
+                this.rainSystem.visible = active;
+
+                const rainMaterial = this.rainSystem.material;
+                rainMaterial.opacity = this.weatherIntensity * 0.75;
+                rainMaterial.needsUpdate = true;
+
+                const positions = this.rainSystem.geometry.attributes.position.array;
+                const fallSpeed = 140 + this.weatherIntensity * 240;
+                const area = this.rainArea;
+                const halfArea = area / 2;
+                const height = this.maxRainHeight;
+                const halfHeight = height / 2;
+
+                for (let i = 0; i < positions.length; i += 3) {
+                    positions[i + 1] -= fallSpeed * delta;
+                    positions[i] += (Math.random() - 0.5) * delta * 40;
+                    positions[i + 2] += (Math.random() - 0.5) * delta * 40;
+
+                    if (positions[i + 1] < -halfHeight) {
+                        positions[i] = (Math.random() - 0.5) * area;
+                        positions[i + 1] = halfHeight;
+                        positions[i + 2] = (Math.random() - 0.5) * area;
+                    }
+
+                    if (positions[i] < -halfArea || positions[i] > halfArea) {
+                        positions[i] = (Math.random() - 0.5) * area;
+                    }
+
+                    if (positions[i + 2] < -halfArea || positions[i + 2] > halfArea) {
+                        positions[i + 2] = (Math.random() - 0.5) * area;
+                    }
+                }
+
+                this.rainSystem.geometry.attributes.position.needsUpdate = true;
+                this.rainSystem.position.set(
+                    this.playerPosition.x,
+                    this.playerPosition.y,
+                    this.playerPosition.z
+                );
+
+                if (this.scene.fog && this.settings.volumetricFog) {
+                    this.scene.fog.density = 0.0008 + this.weatherIntensity * 0.0015;
+                }
+
+                const exposureTarget = THREE.MathUtils.lerp(1.2, 0.95, this.weatherIntensity);
+                this.renderer.toneMappingExposure = exposureTarget;
+
+                if (this.skyMaterial.uniforms) {
+                    this.skyMaterial.uniforms.turbidity.value = THREE.MathUtils.lerp(10, 18, this.weatherIntensity);
+                    this.skyMaterial.uniforms.mieCoefficient.value = THREE.MathUtils.lerp(0.005, 0.02, this.weatherIntensity);
+                }
+
+                if (this.rimLight) {
+                    this.rimLight.intensity = 0.5 * (1 - this.weatherIntensity * 0.5);
+                }
             }
 
             updateUI() {
@@ -1612,8 +1727,18 @@
                     `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
                 
                 // Weather display
-                document.getElementById('weather').textContent = 
-                    this.isRaining ? 'Rainy' : 'Clear Skies';
+                let weatherDescription = 'Clear Skies';
+                if (this.weatherIntensity > 0.65) {
+                    weatherDescription = 'Heavy Rain';
+                } else if (this.weatherIntensity > 0.35) {
+                    weatherDescription = 'Steady Rain';
+                } else if (this.weatherIntensity > 0.1) {
+                    weatherDescription = 'Light Rain';
+                } else if (this.settings.dynamicWeather && this.weatherIntensityTarget > 0.1) {
+                    weatherDescription = 'Cloud Cover';
+                }
+
+                document.getElementById('weather').textContent = weatherDescription;
                 
                 // Advanced biome detection
                 const height = this.playerPosition.y;
@@ -1685,7 +1810,7 @@
                 
                 this.updateMovement(delta);
                 this.updateChunks();
-                this.updateAdvancedLighting();
+                this.updateAdvancedLighting(delta);
                 this.updateUI();
                 this.updatePerformance();
                 
