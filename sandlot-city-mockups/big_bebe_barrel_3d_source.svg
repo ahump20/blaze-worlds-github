@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1280" width="1024" height="1280">
+  <defs><filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="14"/></filter><pattern id="grain" width="34" height="34" patternUnits="userSpaceOnUse"><circle cx="7" cy="9" r="1" fill="#33201B" opacity=".03"/><circle cx="26" cy="24" r="1" fill="#FFF7E7" opacity=".11"/></pattern></defs>
+  <rect width="1024" height="1280" fill="#F2E6CB"/>
+  <ellipse cx="515" cy="1157" rx="260" ry="44" fill="#46405E" opacity=".24" filter="url(#soft)"/>
+  <g stroke="#33201B" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
+    <!-- broad bat, clearly detached behind body -->
+    <path d="M268 861 L249 273 L296 268 L316 858 Z" fill="#8C542E"/>
+    <path d="M254 466 L304 466 M255 497 L305 497 M256 528 L306 528" stroke="#F2E6CB" stroke-width="7"/>
+
+    <!-- wide legs -->
+    <rect x="363" y="782" width="145" height="300" rx="48" fill="#4E6E9B"/>
+    <rect x="516" y="782" width="145" height="300" rx="48" fill="#4E6E9B"/>
+    <!-- huge shoes -->
+    <path d="M318 1046 Q404 1026 490 1053 Q511 1077 510 1153 L316 1153 Q294 1103 318 1046 Z" fill="#F2B33A"/>
+    <path d="M518 1052 Q604 1025 691 1051 Q714 1081 713 1153 L517 1153 Q497 1104 518 1052 Z" fill="#D8402C"/>
+    <path d="M319 1122 L510 1122 L507 1160 L314 1160 Z" fill="#D8C09A" stroke-width="6"/>
+    <path d="M519 1122 L712 1122 L710 1160 L516 1160 Z" fill="#D8C09A" stroke-width="6"/>
+
+    <!-- barrel torso -->
+    <path d="M346 386 Q404 348 512 352 Q621 348 681 392 Q723 471 710 631 L674 841 Q596 873 511 866 Q424 873 347 838 L313 633 Q301 471 346 386 Z" fill="#C05A33"/>
+    <!-- marigold jersey top -->
+    <path d="M365 374 Q430 340 512 345 Q594 340 659 379 L640 530 L383 530 Z" fill="#F2B33A"/>
+    <!-- arms -->
+    <path d="M351 431 L287 473 L270 741 L348 765 L399 502 Z" fill="#6A3E2E"/>
+    <path d="M673 431 L737 475 L755 741 L676 767 L625 500 Z" fill="#6A3E2E"/>
+    <ellipse cx="285" cy="750" rx="49" ry="51" fill="#6A3E2E"/>
+    <ellipse cx="741" cy="751" rx="49" ry="51" fill="#6A3E2E"/>
+
+    <!-- denim bib and one fastened strap -->
+    <rect x="405" y="493" width="218" height="294" rx="38" fill="#4E6E9B"/>
+    <path d="M427 381 L492 373 L515 548 L451 552 Z" fill="#4E6E9B"/>
+    <!-- loose strap -->
+    <path d="M585 402 L628 425 L601 617 L563 597 Z" fill="#4E6E9B"/>
+    <circle cx="478" cy="525" r="14" fill="#F2B33A"/>
+    <rect x="457" y="625" width="112" height="93" rx="18" fill="#4E6E9B" stroke-width="6"/>
+    <path d="M477 662 L550 662" stroke="#F2E6CB" stroke-width="5"/>
+
+    <!-- short neck -->
+    <rect x="460" y="317" width="106" height="98" rx="28" fill="#6A3E2E"/>
+    <!-- giant head -->
+    <ellipse cx="393" cy="246" rx="23" ry="32" fill="#6A3E2E"/>
+    <ellipse cx="631" cy="246" rx="23" ry="32" fill="#6A3E2E"/>
+    <ellipse cx="512" cy="236" rx="126" ry="126" fill="#6A3E2E"/>
+    <path d="M404 209 Q440 105 513 108 Q588 104 620 210" fill="none" stroke="#2A1713" stroke-width="30"/>
+    <!-- eyes -->
+    <ellipse cx="472" cy="239" rx="21" ry="23" fill="#FFF7E7" stroke-width="4"/><ellipse cx="554" cy="239" rx="21" ry="23" fill="#FFF7E7" stroke-width="4"/>
+    <circle cx="479" cy="245" r="8" fill="#33201B" stroke="none"/><circle cx="561" cy="245" r="8" fill="#33201B" stroke="none"/>
+    <path d="M501 258 Q513 276 526 258" fill="none" stroke-width="4"/>
+    <!-- joyful grin -->
+    <path d="M458 292 Q512 348 570 292" fill="#FFF7E7"/>
+    <path d="M458 292 Q512 348 570 292" fill="none"/>
+
+    <!-- flame-painted helmet -->
+    <path d="M383 224 Q391 135 462 100 Q546 75 616 134 Q638 159 643 224 Z" fill="#D8402C"/>
+    <path d="M404 158 L438 93 L469 157 L510 69 L544 155 L585 96 L616 168" fill="#F2B33A" stroke-width="7"/>
+    <path d="M617 190 L701 215 L623 250 Z" fill="#D8402C"/>
+
+    <!-- freckles -->
+    <circle cx="445" cy="272" r="6" fill="#F2B33A" stroke="none"/><circle cx="463" cy="281" r="5" fill="#F2B33A" stroke="none"/><circle cx="578" cy="275" r="6" fill="#F2B33A" stroke="none"/>
+  </g>
+  <rect width="1024" height="1280" fill="url(#grain)"/>
+</svg>
