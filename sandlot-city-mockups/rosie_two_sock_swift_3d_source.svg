@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1280" width="1024" height="1280">
+  <defs><filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="14"/></filter><pattern id="grain" width="35" height="35" patternUnits="userSpaceOnUse"><circle cx="8" cy="11" r="1" fill="#33201B" opacity=".03"/><circle cx="27" cy="25" r="1" fill="#FFF7E7" opacity=".11"/></pattern></defs>
+  <rect width="1024" height="1280" fill="#F2E6CB"/>
+  <ellipse cx="515" cy="1157" rx="220" ry="40" fill="#46405E" opacity=".22" filter="url(#soft)"/>
+  <g stroke="#33201B" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
+    <!-- long, springy legs -->
+    <path d="M414 735 L501 735 L480 1043 L390 1043 Z" fill="#C98258"/>
+    <path d="M524 735 L609 735 L642 1043 L550 1043 Z" fill="#C98258"/>
+    <!-- mismatched two socks -->
+    <path d="M396 872 L486 872 L480 1080 L385 1080 Z" fill="#D8402C"/>
+    <path d="M548 837 L632 837 L647 1080 L545 1080 Z" fill="#6C4F9E"/>
+    <path d="M397 930 L484 930 M551 900 L637 900 M554 957 L640 957" fill="none" stroke="#F2E6CB" stroke-width="7"/>
+    <path d="M554 957 L640 957" stroke="#2FA39B"/>
+
+    <!-- mismatched chunky shoes -->
+    <path d="M349 1034 Q415 1017 481 1041 Q506 1062 505 1149 L350 1149 Q326 1095 349 1034 Z" fill="#2FA39B"/>
+    <path d="M538 1037 Q607 1016 677 1043 Q701 1068 704 1149 L536 1149 Q518 1093 538 1037 Z" fill="#F2B33A"/>
+    <path d="M351 1118 L505 1118 L501 1155 L347 1155 Z" fill="#D8C09A" stroke-width="6"/>
+    <path d="M537 1118 L704 1118 L700 1155 L534 1155 Z" fill="#D8C09A" stroke-width="6"/>
+
+    <!-- shorts -->
+    <path d="M401 646 L617 646 L602 794 L524 794 L510 733 L497 794 L416 794 Z" fill="#4E6E9B"/>
+    <!-- slim torso -->
+    <path d="M411 364 Q463 340 512 344 Q565 340 617 369 L595 678 L425 678 Z" fill="#2FA39B"/>
+    <path d="M424 380 L603 380 L580 572 L441 572 Z" fill="#F2E6CB" stroke-width="7"/>
+    <path d="M487 432 L539 432 L539 533 L484 533 L484 480 L462 480 L462 438 Z" fill="#D8402C" stroke-width="5"/>
+
+    <!-- long A-pose arms -->
+    <path d="M414 389 L357 422 L288 704 L346 733 L465 429 Z" fill="#C98258"/>
+    <path d="M610 389 L666 427 L739 704 L680 733 L558 429 Z" fill="#C98258"/>
+    <ellipse cx="302" cy="717" rx="42" ry="44" fill="#C98258"/>
+    <ellipse cx="724" cy="717" rx="42" ry="44" fill="#C98258"/>
+    <!-- chalky palms -->
+    <path d="M273 701 L326 739 M696 739 L752 701" stroke="#F2E6CB" stroke-width="10"/>
+
+    <!-- short neck -->
+    <rect x="475" y="312" width="76" height="78" rx="22" fill="#C98258"/>
+    <!-- head -->
+    <ellipse cx="407" cy="239" rx="20" ry="29" fill="#C98258"/>
+    <ellipse cx="617" cy="239" rx="20" ry="29" fill="#C98258"/>
+    <ellipse cx="512" cy="232" rx="105" ry="109" fill="#C98258"/>
+    <path d="M426 205 Q453 125 513 126 Q575 123 600 207" fill="none" stroke="#2A1713" stroke-width="25"/>
+    <!-- one side ponytail -->
+    <path d="M418 196 Q359 217 355 284 Q399 267 432 229 Z" fill="#2A1713"/>
+    <path d="M375 259 L337 304 L399 300 Z" fill="#D8402C"/>
+
+    <!-- eyes and grin -->
+    <ellipse cx="480" cy="235" rx="18" ry="21" fill="#FFF7E7" stroke-width="4"/><ellipse cx="550" cy="235" rx="18" ry="21" fill="#FFF7E7" stroke-width="4"/>
+    <circle cx="486" cy="240" r="7" fill="#33201B" stroke="none"/><circle cx="556" cy="240" r="7" fill="#33201B" stroke="none"/>
+    <path d="M505 251 Q514 268 524 251" fill="none" stroke-width="4"/>
+    <path d="M470 282 Q514 327 558 282" fill="#FFF7E7"/>
+    <path d="M470 282 Q514 327 558 282" fill="none"/>
+
+    <!-- grape cap and cracked goggles -->
+    <path d="M414 187 Q431 119 505 107 Q579 109 613 180 L604 215 L420 216 Z" fill="#6C4F9E"/>
+    <path d="M423 180 L350 202 L414 228 L449 214 Z" fill="#6C4F9E"/>
+    <ellipse cx="477" cy="164" rx="29" ry="20" fill="#8A7A66" stroke-width="5"/>
+    <ellipse cx="545" cy="164" rx="29" ry="20" fill="#8A7A66" stroke-width="5"/>
+    <path d="M506 164 L516 164 M457 153 L488 174" fill="none" stroke-width="5"/>
+
+    <!-- chalk streak on knee -->
+    <path d="M557 856 L628 885" stroke="#F2E6CB" stroke-width="9"/>
+  </g>
+  <rect width="1024" height="1280" fill="url(#grain)"/>
+</svg>
