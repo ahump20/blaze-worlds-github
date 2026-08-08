@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1280" width="1024" height="1280">
+  <defs>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="14"/></filter>
+    <pattern id="grain" width="34" height="34" patternUnits="userSpaceOnUse">
+      <circle cx="5" cy="8" r="1.1" fill="#33201B" opacity=".035"/><circle cx="25" cy="17" r=".9" fill="#FFF7E7" opacity=".12"/><circle cx="14" cy="29" r=".8" fill="#33201B" opacity=".025"/>
+    </pattern>
+  </defs>
+  <rect width="1024" height="1280" fill="#F2E6CB"/>
+  <ellipse cx="515" cy="1158" rx="230" ry="42" fill="#46405E" opacity=".23" filter="url(#soft)"/>
+  <g stroke="#33201B" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
+    <!-- taped bat behind the silhouette -->
+    <path d="M620 778 L718 248 L754 258 L664 790 Z" fill="#A9764A"/>
+    <path d="M682 430 L724 438 M678 458 L719 466 M673 487 L714 495" stroke="#F2E6CB" stroke-width="7"/>
+
+    <!-- legs -->
+    <path d="M405 755 L505 755 L486 1062 L386 1062 Z" fill="#4E6E9B"/>
+    <path d="M520 755 L614 755 L646 1062 L542 1062 Z" fill="#4E6E9B"/>
+    <path d="M388 1015 Q444 1034 496 1014 L500 1077 Q442 1091 382 1074 Z" fill="#F2E6CB"/>
+    <path d="M536 1014 Q590 1035 638 1013 L650 1077 Q591 1092 532 1074 Z" fill="#F2E6CB"/>
+
+    <!-- oversized high-tops -->
+    <path d="M354 1055 Q407 1029 478 1050 Q503 1060 507 1118 L495 1152 L352 1152 Q330 1122 354 1055 Z" fill="#2FA39B"/>
+    <path d="M536 1050 Q594 1027 660 1053 Q690 1068 699 1121 L686 1152 L530 1152 Q516 1113 536 1050 Z" fill="#2FA39B"/>
+    <path d="M356 1122 L499 1122 L495 1156 L350 1156 Z" fill="#D8C09A" stroke-width="6"/>
+    <path d="M532 1122 L690 1122 L686 1156 L528 1156 Z" fill="#D8C09A" stroke-width="6"/>
+    <path d="M376 1092 L470 1092" stroke="#F2B33A" stroke-width="8"/>
+    <path d="M552 1092 L660 1092" stroke="#D8402C" stroke-width="8"/>
+
+    <!-- compact torso and jersey -->
+    <path d="M405 372 Q454 345 510 349 Q566 345 625 378 L602 790 L420 790 Z" fill="#F2E6CB"/>
+    <path d="M408 378 L340 414 L325 520 L397 526 L438 420 Z" fill="#D8402C"/>
+    <path d="M624 380 L688 416 L704 526 L632 532 L590 420 Z" fill="#D8402C"/>
+    <path d="M431 426 L598 426" stroke="#C05A33" stroke-width="5"/>
+    <path d="M482 476 L535 476 L535 616 L478 616 L478 523 L454 523 L454 482 Z" fill="#D8402C" stroke-width="6"/>
+    <path d="M421 770 L604 770" stroke-width="9"/>
+
+    <!-- A-pose arms -->
+    <path d="M344 480 L393 503 L321 714 L257 695 Z" fill="#B86F48"/>
+    <path d="M686 493 L635 516 L712 722 L774 697 Z" fill="#B86F48"/>
+    <ellipse cx="267" cy="708" rx="42" ry="43" fill="#B86F48"/>
+    <ellipse cx="765" cy="709" rx="42" ry="43" fill="#B86F48"/>
+
+    <!-- scraped knee -->
+    <ellipse cx="438" cy="949" rx="20" ry="14" fill="#C05A33" stroke-width="4"/>
+
+    <!-- short neck -->
+    <rect x="472" y="322" width="82" height="86" rx="26" fill="#B86F48"/>
+
+    <!-- head and ears -->
+    <ellipse cx="397" cy="254" rx="21" ry="30" fill="#B86F48"/>
+    <ellipse cx="627" cy="254" rx="21" ry="30" fill="#B86F48"/>
+    <ellipse cx="512" cy="246" rx="112" ry="116" fill="#B86F48"/>
+    <path d="M417 213 Q451 124 518 128 Q588 126 608 215" fill="none" stroke="#2A1713" stroke-width="27"/>
+
+    <!-- expressive eyes -->
+    <ellipse cx="477" cy="244" rx="19" ry="22" fill="#FFF7E7" stroke-width="4"/>
+    <ellipse cx="551" cy="244" rx="19" ry="22" fill="#FFF7E7" stroke-width="4"/>
+    <ellipse cx="483" cy="249" rx="7" ry="10" fill="#33201B" stroke="none"/>
+    <ellipse cx="557" cy="249" rx="7" ry="10" fill="#33201B" stroke="none"/>
+    <path d="M505 260 Q515 276 527 260" fill="none" stroke-width="4"/>
+
+    <!-- gap-tooth grin -->
+    <path d="M468 293 Q514 337 562 293" fill="#FFF7E7"/>
+    <path d="M468 293 Q514 337 562 293" fill="none"/>
+    <path d="M506 315 L506 334 M520 315 L520 334" stroke-width="3"/>
+
+    <!-- backwards cap -->
+    <path d="M411 191 Q430 118 507 105 Q582 108 615 183 L603 218 L419 219 Z" fill="#D8402C"/>
+    <path d="M422 183 L344 203 L411 230 L446 215 Z" fill="#D8402C"/>
+    <path d="M492 111 L489 213" fill="none" stroke-width="5"/>
+  </g>
+  <rect width="1024" height="1280" fill="url(#grain)"/>
+</svg>
